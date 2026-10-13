@@ -1,0 +1,13 @@
+PySide6-Essentials==6.8.3
+hidapi==0.15.0
+winrt-runtime==3.2.1
+winrt-Windows.Foundation==3.2.1
+winrt-Windows.Foundation.Collections==3.2.1
+winrt-Windows.Media.Control==3.2.1
+winrt-Windows.Media==3.2.1
+winrt-Windows.Storage.Streams==3.2.1
+requests==2.34.2
+pycaw==20260927
+psutil==7.2.2
+comtypes==1.4.17
+nvidia-ml-py==13.580.82

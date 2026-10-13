@@ -1,0 +1,2 @@
+724cc39f426fdc6074cb1a64ce21ff38018e0fca08abe93ba02b9f3cca6e7a7d  HaloStudio-v1.0.0-win64.zip
+5c12d945c8d30112e498f5b505a5f8f026177a6780dcd366547e0f001b8b2188  HaloFirmware-v1.0.0-win64.zip

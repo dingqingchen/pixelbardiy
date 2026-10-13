@@ -1,0 +1,226 @@
+{
+  "legacy": {
+    "checks": [
+      "pinned emulator executes real monitored memset/memcmp IT blocks with correct bounds and return",
+      "actual init hook clears shared lease state before original startup continuation",
+      "real UART parser -> patched dispatcher -> bounded receiver -> stock copy/flush; two atomic frames and final retry",
+      "idle heartbeats hold lease without frames; unsigned monotonic counter wrap",
+      "real timer ISR crosses stock 1000-tick reset; separate lease counter continues",
+      "stock text/mode/upload/draw schedulers excluded; communication-ready still passes",
+      "actual main-loop body defers a pending settings save while owned; no persistent writer reached",
+      "actual loop-entry branch skips pending stock overlay while owned; timeout restores original continuation",
+      "explicit release calls real built-in clock initializer; old SID/data/heartbeat cannot reclaim it",
+      "host silence scenarios release at 2000 ticks through actual service hook; incomplete frame discarded",
+      "another SID cannot change lease, release it, or renew timeout",
+      "integrated CRC/order/changed-retry rejection retains old frame; a fresh frame transaction recovers",
+      "OTA start/power/reset release before original handler; dangerous handler I/O mocked",
+      "cannot acquire during OTA or an existing stock upload",
+      "reserved data and obsolete START never enter Flash handlers after workspace reuse; fresh normal START still routes",
+      "real parser accepts byte-by-byte split header, payload and terminator",
+      "48 malformed extension frames and overlong declared length stay in guarded buffers; parser resynchronizes",
+      "offline PC planner uses 500ms idle heartbeat, 28 fragments, and idempotent explicit stop",
+      "PC lifecycle driver -> actual ARM parser: static-frame dedup, 10s heartbeat, explicit close, retired-ID refusal"
+    ],
+    "checks_passed": 19,
+    "machines": 74,
+    "instructions": 4024625,
+    "frames": 19,
+    "forbidden_flash_calls": 0
+  },
+  "checks": [
+    "raw/RLE/XOR-RLE including incompressible pixels, sparse differences and split tokens; CRC atomic commit",
+    "RLE streaming decoder handles every permitted fragment split without crossing the output boundary",
+    "bad CRC/order/base/repeated fragment/truncation/overflow/extra data never publish; full frame recovers",
+    "24 local up/wipe steps preserve decorations and match independent bit model; no USB frames needed",
+    "new content interrupts animation safely; delta applies to accepted target",
+    "release/heartbeat timeout cancel native animation; legacy fallback and wrong-SID exclusion preserved",
+    "real PC latest-target sender -> new MCU code: partial frame cancelled, committed-base delta, native animation",
+    "64 randomized malformed extended headers/data remain bounded with no resource handler forwarding"
+  ],
+  "checks_passed": 8,
+  "machines": 122,
+  "instructions": 15185789,
+  "frames": 134,
+  "forbidden_flash_calls": 0,
+  "candidate_sha256": "f7b8ee274ba2439b3211c5eea80206599acff6e80d73dc0c898ba143e2e32f62",
+  "layout": {
+    "core_address": "0x800c528",
+    "core_bytes": 588,
+    "session_address": "0x800c774",
+    "session_bytes": 1232,
+    "decoder_bytes": 200,
+    "remaining_bytes": 1684,
+    "hooks": [
+      {
+        "address": "0x800519a",
+        "original": "f8b50400",
+        "replacement": "05f0c3be",
+        "target": "0x800af24"
+      },
+      {
+        "address": "0x8006be6",
+        "original": "fff7b1fe",
+        "replacement": "05f0c5fd",
+        "target": "0x800c774"
+      },
+      {
+        "address": "0x8008c7e",
+        "original": "fdf7adff",
+        "replacement": "03f07bfd",
+        "target": "0x800c778"
+      },
+      {
+        "address": "0x800f292",
+        "original": "fbf7a7f9",
+        "replacement": "fdf773fa",
+        "target": "0x800c77c"
+      },
+      {
+        "address": "0x8008bce",
+        "original": "2de9fc47",
+        "replacement": "03f0d7bd",
+        "target": "0x800c780"
+      },
+      {
+        "address": "0x800886e",
+        "original": "2c540888",
+        "replacement": "03f093bf",
+        "target": "0x800c798"
+      },
+      {
+        "address": "0x8008bf4",
+        "original": "3a4d2868",
+        "replacement": "03f0d2bd",
+        "target": "0x800c79c"
+      },
+      {
+        "address": "0x8008cc2",
+        "original": "00f06bfa",
+        "replacement": "03f06dfd",
+        "target": "0x800c7a0"
+      },
+      {
+        "address": "0x8008c82",
+        "original": "01f02afb",
+        "replacement": "03f07ffd",
+        "target": "0x800c784"
+      },
+      {
+        "address": "0x8008c86",
+        "original": "01f04afb",
+        "replacement": "03f07ffd",
+        "target": "0x800c788"
+      },
+      {
+        "address": "0x8008c8a",
+        "original": "01f066fb",
+        "replacement": "03f07ffd",
+        "target": "0x800c78c"
+      },
+      {
+        "address": "0x8008c92",
+        "original": "01f08bfb",
+        "replacement": "03f07dfd",
+        "target": "0x800c790"
+      },
+      {
+        "address": "0x8008c9a",
+        "original": "01f09afb",
+        "replacement": "03f07bfd",
+        "target": "0x800c794"
+      }
+    ],
+    "extension_address": "0x800cc44",
+    "extension_bytes": 1008,
+    "extension_state": [
+      "0x20001358",
+      "0x200013b8"
+    ],
+    "ota_compat_address": "0x800d034",
+    "ota_compat_bytes": 92,
+    "change_ranges_vs_installed": [
+      [
+        "0x800c774",
+        "0x800d724"
+      ],
+      [
+        "0x800afec",
+        "0x800b024"
+      ],
+      [
+        "0x800519a",
+        "0x800519e"
+      ],
+      [
+        "0x80052e2",
+        "0x80052e6"
+      ],
+      [
+        "0x800ebec",
+        "0x800ecec"
+      ],
+      [
+        "0x800f632",
+        "0x800f674"
+      ],
+      [
+        "0x800fed4",
+        "0x800fed8"
+      ]
+    ],
+    "animation_old_frame": [
+      "0x200013b8",
+      "0x200017b8"
+    ]
+  },
+  "device_accessed": false,
+  "firmware_written": false,
+  "image_bytes": 57252,
+  "ota_compatibility": {
+    "candidate_sha256": "f7b8ee274ba2439b3211c5eea80206599acff6e80d73dc0c898ba143e2e32f62",
+    "installed_sha256": "fe18bc92afd790cd2f2248b98091033f8d8d76cac674b60540cbf5c644f389ae",
+    "checks_passed": 5,
+    "old_first_byte_cases": 256,
+    "new_first_byte_cases": 256,
+    "packets": 1057,
+    "bytes": 57252,
+    "first_byte_filter_reproduced": true,
+    "staging_byte_exact": true,
+    "marker_after_complete_only": [
+      [
+        2,
+        57252
+      ]
+    ],
+    "spi_writes": 56,
+    "erases": [
+      [
+        536875840,
+        0
+      ]
+    ],
+    "graphics": {
+      "background_bytes": 1024,
+      "glyph_cases": 16,
+      "theme_cases": 30,
+      "weak_loop_same_pc": [
+        134282964,
+        134282964
+      ]
+    },
+    "instructions": 5787420,
+    "physical_flash_access": false,
+    "device_accessed": false,
+    "bridge_model": "USB actual payload length minus two gives UART OTA DATA byte count; static audit at 0603BCFA and 060217AC..060217F2",
+    "limitations": [
+      "Jieli bridge forwarding verified statically, not instruction-emulated",
+      "Absent bootloader install/copy not emulated; physical boot not proven"
+    ]
+  },
+  "bootloader_included": false,
+  "usb_audio_firmware_included": false,
+  "independent_dead_mcu_recovery": false,
+  "device_flash_readback": false,
+  "original_sha256": "8fb58ded25d23b5148dc9a37ec57b380e03d65681c13c7f445eff62102010e3b",
+  "note": "Historical offline review of the exact image; later physical tests are summarized in docs/VALIDATION.md."
+}

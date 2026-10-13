@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+runtime/
+backups/
+build/
+dist/
+firmware-analysis/
+firmware-lab/vendor-*/
+*.log
+.build-env-path
+.ssh-known-hosts
+release-staging/

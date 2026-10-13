@@ -1,0 +1,12 @@
+* text=auto
+*.py text eol=lf
+*.s text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.ps1 text eol=crlf
+*.bin binary
+*.exe binary
+*.zip binary
+*.png binary
+# Preserve the unmodified upstream PawnIO source, including original whitespace.
+thermal-native/references/AMDFamily17.p -whitespace
