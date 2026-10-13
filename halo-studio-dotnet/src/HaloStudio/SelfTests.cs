@@ -152,6 +152,24 @@ public static class SelfTests
         File.WriteAllText(badPalette, "{\"version\":1,\"colors\":[{\"input\":\"#FF6000\",\"preview\":\"#C7A34A\",\"name\":\"ok\",\"observation\":\"ok\",\"quick\":true}],\"official_colors\":[{\"input\":\"broken\",\"name\":\"bad\"}]}");
         Assert(ScreenPalette.Reload(badPalette) != null && ReferenceEquals(officialBefore, ScreenPalette.Official), "Malformed official palette cannot replace either loaded group");
         Assert(ScreenPalette.Reload(palettePath) == null, "Restore full palette after rejected official metadata");
+        var freshTemperature = new Settings().Validated();
+        Assert(!freshTemperature.CpuTemperatureEnabled && !freshTemperature.CpuTemperatureElevation && freshTemperature.CpuTemperatureOptIn == false, "First launch has no temperature collection or elevation opt-in");
+        var legacyDefaultTemperature = JsonSerializer.Deserialize<Settings>("{\"cpu_temperature_enabled\":true,\"cpu_temperature_elevation\":false}", Files.Json)!.Validated();
+        Assert(!legacyDefaultTemperature.CpuTemperatureEnabled, "Legacy enabled-by-default setting is not treated as explicit consent");
+        var legacyAuthorizedTemperature = JsonSerializer.Deserialize<Settings>("{\"cpu_temperature_enabled\":true,\"cpu_temperature_elevation\":true}", Files.Json)!.Validated();
+        Assert(legacyAuthorizedTemperature.CpuTemperatureEnabled && legacyAuthorizedTemperature.CpuTemperatureOptIn == true, "Legacy explicit authorization remains opted in");
+        var enabledTemperature = freshTemperature.WithTemperatureChoice(true).Validated();
+        Assert(enabledTemperature.CpuTemperatureEnabled && enabledTemperature.CpuTemperatureElevation && enabledTemperature.CpuTemperatureOptIn == true, "Explicit on action enables and records temperature consent");
+        var restartedTemperature = JsonSerializer.Deserialize<Settings>(JsonSerializer.Serialize(enabledTemperature, Files.Json), Files.Json)!.Validated();
+        Assert(restartedTemperature.CpuTemperatureEnabled && restartedTemperature.CpuTemperatureElevation, "Explicit temperature choice restores after restart");
+        var disabledTemperature = restartedTemperature.WithTemperatureChoice(false).Validated();
+        Assert(!disabledTemperature.CpuTemperatureEnabled && !disabledTemperature.CpuTemperatureElevation && disabledTemperature.CpuTemperatureOptIn == true, "Explicit off persists without retaining automatic elevation");
+        Assert(!(enabledTemperature with { CpuTemperatureOptIn = false }).Validated().CpuTemperatureElevation, "False consent blocks stale elevation flag");
+        using (var dormantTemperature = new CpuTemperature())
+        {
+            Assert(dormantTemperature.ReadAsync().GetAwaiter().GetResult() == null && dormantTemperature.Detail == "CPU 温度采集已关闭", "Default temperature read exits without probing a driver or spawning a helper");
+            Assert(dormantTemperature.ReadAsync(false, true).GetAwaiter().GetResult() == null && dormantTemperature.Detail == "CPU 温度采集已关闭", "Disabled temperature blocks elevation request");
+        }
         byte[] thermalSample = new byte[80]; "HALOTC02"u8.CopyTo(thermalSample);
         void Write32(int at, uint value) => System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(thermalSample.AsSpan(at), value);
         Write32(8, 2); Write32(12, 123); System.Buffers.Binary.BinaryPrimitives.WriteUInt64LittleEndian(thermalSample.AsSpan(24), 9000);

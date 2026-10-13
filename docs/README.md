@@ -1,6 +1,6 @@
 # 实现文档
 
-本文档对应 HaloStudio 2.6.0 和 HPL2 换色固件。先阅读显示链路，再看 MCU 动画；协议字段以链接到的源码为准。
+本文档对应 HaloStudio 2.6.2 和 HPL2 换色固件。先阅读显示链路，再看 MCU 动画；协议字段以链接到的源码为准。
 
 | 文档 | 内容 |
 | --- | --- |
@@ -14,6 +14,7 @@
 | [外部主题格式](../halo-studio-dotnet/docs/THEMES.md) | 运行时 JSON 布局、绘图指令与主题入口动画 |
 | [客户端调度](../halo-studio-dotnet/docs/ARCHITECTURE.md) | 采集线程、传输任务、歌词优先级和后台开销 |
 | [实测与离线验证](../halo-studio-dotnet/docs/VALIDATION.md) | 测试内容及证据的适用范围 |
+| [README 效果图](SCREENSHOTS.md) | 真实控件导出、模拟数据、Win11 风格外框及拼图复现命令 |
 | [Python 旧版](../legacy-python/README.md) | 保留版应用、原更新工具和历史实现 |
 
 主链路：**主题/时钟/硬件/歌词 → PC 绘制目标点阵 → 压缩分包 → USB 主控转发 → 显示 MCU 校验暂存 → 本地显示或过场**。PC 提交目标画面，MCU 负责生成支持的过场中间帧。屏幕是单色掩码加整屏 RGB，并非每个像素独立 RGB。

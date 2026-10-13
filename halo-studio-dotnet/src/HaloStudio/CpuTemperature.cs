@@ -24,7 +24,7 @@ public sealed class CpuTemperature : IDisposable
     static readonly string[] messages = ["温度正常", "等待首个样本", "此 CPU 暂不支持独立直读", "驱动未就绪，请启用独立采集", "需要管理员授权，请点击「授权并重试」", "PCI 访问繁忙", "寄存器读取失败", "辅助进程已结束", "未启用", "已取消权限授权", "辅助文件缺失", "驱动需要重启", "准备驱动", "组件哈希不匹配"];
     public void RequestRetry() => Interlocked.Exchange(ref retry, 1);
 
-    public async Task<double?> ReadAsync(bool enabled = true, bool elevate = false)
+    public async Task<double?> ReadAsync(bool enabled = false, bool elevate = false)
     {
         if (disposed || !await gate.WaitAsync(0)) return null;
         try

@@ -23,8 +23,13 @@ public sealed record Settings
     public Dictionary<string, string> ThemeColors { get; init; } = [];
     public Dictionary<string, bool> ThemeOfficialColors { get; init; } = [];
     public int ScreenWhiteBlue { get; init; } = 255;
-    public bool CpuTemperatureEnabled { get; init; } = true;
+    public bool CpuTemperatureEnabled { get; init; }
     public bool CpuTemperatureElevation { get; init; }
+    // Missing in older settings: only the old explicit authorization flag is
+    // evidence of opting in; the old Enabled=true default was not consent.
+    public bool? CpuTemperatureOptIn { get; init; }
+    public Settings WithTemperatureChoice(bool enabled) => this with
+    { CpuTemperatureEnabled = enabled, CpuTemperatureElevation = enabled, CpuTemperatureOptIn = true };
     public bool Animations { get; init; }
     public string MonitorView { get; init; } = "bar";
     public string PairAdvance { get; init; } = "pair";
@@ -48,6 +53,9 @@ public sealed record Settings
         PairAdvance = PairAdvance == "single" ? "single" : "pair",
         PixelTransition = PixelTransition is "up" or "wipe" or "center" or "dissolve" ? PixelTransition : "up",
         ScreenWhiteBlue = Math.Clamp(ScreenWhiteBlue, 0, 255),
+        CpuTemperatureOptIn = CpuTemperatureOptIn ?? (CpuTemperatureEnabled && CpuTemperatureElevation),
+        CpuTemperatureEnabled = CpuTemperatureEnabled && (CpuTemperatureOptIn ?? CpuTemperatureElevation),
+        CpuTemperatureElevation = CpuTemperatureEnabled && CpuTemperatureElevation && (CpuTemperatureOptIn ?? CpuTemperatureElevation),
         RotationSeconds = Math.Clamp(RotationSeconds, 2, 120),
         Offset = Math.Clamp(Offset, -30, 30),
         LyricLeadSeconds = Math.Clamp(LyricLeadSeconds, 0, 3),

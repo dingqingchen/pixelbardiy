@@ -10,7 +10,7 @@ public sealed class Hardware : IDisposable
     ulong priorIdle, priorKernel, priorUser; long priorNetTx, priorNetRx, priorTime;
     readonly Dictionary<string, Queue<double>> history = [];
     IntPtr nv; IntPtr gpu; bool nvTried; object? wmi; long nextWmi; readonly CounterSet counters = new();
-    public async Task<Snapshot> SampleAsync(Dictionary<string, double> limits, bool temperatureEnabled = true, bool temperatureElevation = false)
+    public async Task<Snapshot> SampleAsync(Dictionary<string, double> limits, bool temperatureEnabled = false, bool temperatureElevation = false)
     {
         var rows = new List<Metric>(); void Add(string key, string name, string shortName, double? value, string unit, string source, double? scale = null) => rows.Add(new(key, name, shortName, value, unit, source, scale));
         Native.GetSystemTimes(out ulong idle, out ulong kernel, out ulong user); ulong total = kernel - priorKernel + user - priorUser; double? cpu = priorKernel == 0 || total == 0 ? null : 100.0 * (total - (idle - priorIdle)) / total; priorIdle = idle; priorKernel = kernel; priorUser = user;

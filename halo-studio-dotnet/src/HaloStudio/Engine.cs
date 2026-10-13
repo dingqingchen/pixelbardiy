@@ -21,7 +21,7 @@ public sealed class Engine : IAsyncDisposable
     public void Configure(Settings value) { Volatile.Write(ref settings, value.Validated()); Interlocked.Increment(ref revision); Files.Save(Path.Combine(runtime, "settings.json"), Config); }
     public void RefreshThemes() => Interlocked.Increment(ref revision);
     public void Start(bool preview = false) => runner = Task.Run(() => RunAsync(preview));
-    public void EnableTemperature() { Configure(Config with { CpuTemperatureEnabled = true, CpuTemperatureElevation = true }); hardware.Temperature.RequestRetry(); }
+    public void EnableTemperature() { Configure(Config.WithTemperatureChoice(true)); hardware.Temperature.RequestRetry(); }
     public void ImportLrc(string path) { lyrics.Save(track, File.ReadAllText(path), "本地 LRC"); Interlocked.Increment(ref lyricImportRevision); Interlocked.Increment(ref revision); }
     void Log(string message) { lock (logGate) { string path = Path.Combine(runtime, "studio-net.log"); if (File.Exists(path) && new FileInfo(path).Length > 2_000_000) File.Move(path, path + ".previous", true); File.AppendAllText(path, $"{DateTimeOffset.Now:O} {message}\n"); } }
     static bool TempoHubRunning() { var processes = Process.GetProcessesByName("Edifier TempoHub"); bool running = processes.Length > 0; foreach (var process in processes) process.Dispose(); return running; }
