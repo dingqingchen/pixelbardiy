@@ -4,7 +4,7 @@
 > **非官方实验项目 · 设备损坏与变砖风险**
 > 本项目主要代码由 **GPT-6 Astra** 完成，结合作者在本机设备上的实验与反馈迭代。项目**尚未经过完整、全面的测试，不保证不会损坏设备**，也不保证适用于所有硬件批次、固件或播放器版本。固件/硬件版本不匹配、刷写中断及其他未知问题，可能导致音响无法启动、显示异常、变砖或其他设备损坏。已提供的备份与回退流程不是通用救砖保证，显示 MCU 完全失效后的独立 USB 恢复尚未验证。请先阅读适配条件、备份和恢复边界，自行评估并承担使用风险。遇到问题欢迎通过 [GitHub Issues](https://github.com/woozyc/pixelbardiy/issues) 反馈，附版本和复现步骤，并隐藏设备序列号、路径和个人信息。
 
-将 Edifier Halo PixelBar 的 **256 × 32 点阵屏**变成桌面的延伸：看网易云歌词、电脑性能状态，也能选择自己喜欢的时钟、图案与配色。当前桌面版是 **C# / .NET 10 的 HaloStudio 2.6.2**，Python 旧版源码保留在独立目录。
+将 Edifier Halo PixelBar 的 **256 × 32 点阵屏**变成桌面的延伸：看网易云歌词、电脑性能状态，也能选择自己喜欢的时钟、图案与配色。当前桌面版是 **C# / .NET 10 的 HaloStudio 2.6.3**，Python 旧版源码保留在独立目录。
 
 ## 当前功能
 
@@ -37,7 +37,7 @@
 
 | 内容 | 下载 / 说明 |
 | --- | --- |
-| 最新 Windows x64 应用与固件资料 | [HaloStudio C# 2.6.2](packages/HaloStudio-CSharp-2.6.2-win64.zip) |
+| 最新 Windows x64 应用与固件资料 | [HaloStudio C# 2.6.3](packages/HaloStudio-CSharp-2.6.3-win64.zip) |
 | MCU 固件与工程工具包 | [HPL2 固件工具包 2.6.0](packages/HaloPixelBar-MCU-2.6.0.zip) |
 | 下载校验 | [全部包的 SHA256](packages/SHA256SUMS.txt) |
 | C# 使用、配置与构建 | [新版说明](halo-studio-dotnet/README.md) |
@@ -91,12 +91,12 @@
 | C# 源码编译 | Windows x64 + **.NET 10 SDK**（本机构建 10.0.401）；首次还原需网络。目标 API 版本为 Windows 10.0.19041，不能据此宣称旧系统已完整测试 |
 | 固件工程工具 | **Python 3.12 x64**、`legacy-python/requirements-dev.txt` 固定依赖（含 Unicorn 2.1.3、Keystone 0.9.2、Capstone 5.0.9、hidapi、PySide6、psutil）；另需自己的原厂包、镜像和备份记录，详见[完整命令流程](docs/FIRMWARE_USAGE.md) |
 
-应用包为 **2.6.2**，固件工具包仍为 **2.6.0** 发布资料；显示 MCU BIN 与 2.5.1 相同，已安装并验证相同 SHA 的设备**无需重新刷写**。本次权限默认值和文档改进只需更新电脑端。
+应用包为 **2.6.3**，固件工具包仍为 **2.6.0** 发布资料；显示 MCU BIN 与 2.5.1 相同，已安装并验证相同 SHA 的设备**无需重新刷写**。本次歌词兼容性修复只需更新电脑端。
 
 ## 源码与验证
 
 ```text
-halo-studio-dotnet/   C# 2.6.2 客户端、外部主题/色表、MCU 扩展源码与报告
+halo-studio-dotnet/   C# 2.6.3 客户端、外部主题/色表、MCU 扩展源码与报告
 legacy-python/       Python 旧版、依赖、测试与固件实验基线
 docs/                MCU 动画、USB 协议与显示链路的实现原理
 firmware/            当前与历史显示 MCU 镜像、校验值

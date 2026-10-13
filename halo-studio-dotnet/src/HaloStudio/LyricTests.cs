@@ -38,6 +38,23 @@ static class LyricTests
 
     public static void Run(Action<bool, string> assert)
     {
+        var nativeTrack = new Track("Synthetic duet", "Lead/Guest/Remixer", "Exact album", 192, 65.5, true, "cloudmusic.exe", "网易云本地进度 · 3.1.41", SongId: "123", NativeTimeline: true);
+        var smtcTrack = new Track("Synthetic duet", "Lead", Playing: true, App: "cloudmusic.exe");
+        var merged = MediaMonitor.MergeSession(smtcTrack, nativeTrack);
+        assert(merged == nativeTrack, "SMTC lead-artist metadata with zero timeline retains exact native track and progress");
+        assert(MediaMonitor.MergeSession(smtcTrack with { Artist = "LEAD / Guest / Remixer" }, nativeTrack) == nativeTrack, "Full SMTC credits still merge after normalization");
+        assert(!MediaMonitor.MergeSession(smtcTrack with { Playing = false }, nativeTrack).Playing, "Matching SMTC pause state overrides audio peak fallback");
+        assert(MediaMonitor.MergeSession(smtcTrack, nativeTrack with { Playing = false }).Playing, "Matching SMTC resume state restores playing");
+        assert(MediaMonitor.MergeSession(smtcTrack with { Title = "Another song" }, nativeTrack).SongId.Length == 0, "Stale or different song title cannot inherit native progress");
+        assert(MediaMonitor.MergeSession(smtcTrack with { Artist = "Other" }, nativeTrack).SongId.Length == 0, "Different lead artist cannot inherit native song ID");
+        assert(MediaMonitor.MergeSession(smtcTrack with { Artist = "Lea" }, nativeTrack).SongId.Length == 0, "Artist substring does not count as a lead-artist match");
+        assert(MediaMonitor.MergeSession(smtcTrack with { Artist = "Guest" }, nativeTrack).SongId.Length == 0, "Guest artist is not silently accepted as a lead credit");
+        assert(MediaMonitor.MergeSession(smtcTrack with { Duration = 250 }, nativeTrack).SongId.Length == 0, "Conflicting known durations prevent cross-version merge");
+        assert(MediaMonitor.MergeSession(smtcTrack, null) == smtcTrack, "Missing native track leaves public session unchanged");
+        var publicTimed = smtcTrack with { Duration = 192, Position = 65.5 };
+        var sentence = MediaMonitor.MergeSession(publicTimed, nativeTrack with { NativeTimeline = false, Position = 0, RealtimeLyric = "Synthetic current line" });
+        assert(sentence.Position == 65.5 && sentence.RealtimeLyric == "Synthetic current line" && sentence.SongId == "123", "Public timeline can retain matching native sentence and exact ID");
+        assert(new LyricPlayback().Select(merged, [new(0, "Opening"), new(60, "Current duet"), new(70, "Next line")], new Settings(), 0, LyricsStore.CanUseTimeline(merged, "网易云当前版本"))?.Text == "Current duet", "Lead-only SMTC with zero timeline no longer removes the current lyric");
         List<LyricLine> lines = [new(0, "第一句"), new(5, "第二句"), new(10, "这是一整句很长很长不能切成两页的中文歌词直到最后一个字"), new(20, ""), new(25, "第二句")];
         var player = new LyricPlayback(); var s = new Settings();
         var track = new Track("测试", Duration: 40, Position: 4.3, Playing: true, RealtimeLyric: "第一句");

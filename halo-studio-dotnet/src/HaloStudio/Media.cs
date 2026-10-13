@@ -30,16 +30,29 @@ public sealed class MediaMonitor : IDisposable
             var playback = session.GetPlaybackInfo(); var timeline = session.GetTimelineProperties();
             bool playing = playback.PlaybackStatus == GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing;
             double duration = Math.Max(0, (timeline.EndTime - timeline.StartTime).TotalSeconds), position = Math.Max(0, (timeline.Position - timeline.StartTime).TotalSeconds);
-            // Some NetEase builds publish SMTC metadata/play state but no timeline.
-            // Prefer the verified native playback clock, independent of lyric UI.
-            if (local?.NativeTimeline == true && LyricsStore.Normalize(title) == LyricsStore.Normalize(local.Title) && LyricsStore.Normalize(artist) == LyricsStore.Normalize(local.Artist))
-                return local with { Playing = playing };
             if (playing) { double elapsed = (DateTimeOffset.UtcNow - timeline.LastUpdatedTime).TotalSeconds; if (elapsed is >= 0 and < 86400) position += elapsed * (playback.PlaybackRate ?? 1); }
             var track = new Track(title, artist, album, duration, duration > 0 ? Math.Min(position, duration) : position, playing, app);
-            if (local != null && LyricsStore.Normalize(track.Title) == LyricsStore.Normalize(local.Title) && LyricsStore.Normalize(track.Artist) == LyricsStore.Normalize(local.Artist)) track = track with { RealtimeLyric = local.RealtimeLyric, LineElapsed = local.LineElapsed, SongId = local.SongId };
-            return track;
+            return MergeSession(track, local);
         }
         catch { return local ?? new(); }
+    }
+    internal static Track MergeSession(Track session, Track? local)
+    {
+        if (local == null || !SameSong(session, local)) return session;
+        // NetEase SMTC may expose only the lead artist and a zero timeline.
+        // Retain the verified local clock, complete credits and exact song ID;
+        // take only playback state from the matching public media session.
+        if (local.NativeTimeline) return local with { Playing = session.Playing };
+        return session with { RealtimeLyric = local.RealtimeLyric, LineElapsed = local.LineElapsed, SongId = local.SongId };
+    }
+    static bool SameSong(Track session, Track local)
+    {
+        string title = LyricsStore.Normalize(session.Title), artist = LyricsStore.Normalize(session.Artist);
+        if (title.Length == 0 || title != LyricsStore.Normalize(local.Title) || artist.Length == 0) return false;
+        if (session.Duration > 0 && local.Duration > 0 && Math.Abs(session.Duration - local.Duration) > 2) return false;
+        // Exact credit or exact first slash-separated credit only: never use
+        // substring matching (e.g. "Ann" must not match "Anna").
+        return artist == LyricsStore.Normalize(local.Artist) || artist == LyricsStore.Normalize(local.Artist.Split('/')[0]);
     }
     public void Dispose() { native.Dispose(); manager = null; }
 }
