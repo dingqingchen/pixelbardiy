@@ -12,6 +12,9 @@ public sealed class RamController : IAsyncDisposable
     public long Dropped { get; private set; }
     public string Codec { get; private set; } = "raw"; public int EncodedBytes { get; private set; } = 1024;
     public double FrameSeconds { get; private set; }
+    public sealed record Receipt(string Identity, int LyricPart, long At);
+    Receipt? receipt;
+    public Receipt? LastCommit => Volatile.Read(ref receipt);
     public RamController(IHaloTransport transport, bool useCodec, string screenColor, bool useFullAnimation = false, bool useLocalRain = false, bool useLiveColor = false) { link = transport; codec = useCodec; fullAnimation = useCodec && useFullAnimation; localRain = fullAnimation && useLocalRain; liveColor = localRain && useLiveColor; color = screenColor; }
     public static (bool Codec, bool FullAnimation, bool LocalRain, bool LiveColor) Capabilities(string? sha) => sha switch
     {
@@ -112,7 +115,7 @@ public sealed class RamController : IAsyncDisposable
             {
                 var p = packets.Dequeue(); Check(await link.QueryAsync(0x17, p), packets.Count == 0); heartbeat = Environment.TickCount64 + 500;
                 // The device only commits after the final CRC check. Base never follows an abandoned frame.
-                if (packets.Count == 0) { committed = current; committedId = frame; activeColor = currentColor; current = null; Frames++; Codec = plan!.Name; EncodedBytes = plan.Data.Length; FrameSeconds = (Environment.TickCount64 - started) / 1000.0; if (currentAnimation != 0) nativeUntil = Environment.TickCount64 + (currentAnimation == 5 ? 160 : currentAnimation >= 3 ? 32 : 24) * currentInterval + 20; }
+                if (packets.Count == 0) { committed = current!; committedId = frame; activeColor = currentColor; Volatile.Write(ref receipt, new(committed.Identity, committed.LyricPart, Environment.TickCount64)); current = null; Frames++; Codec = plan!.Name; EncodedBytes = plan.Data.Length; FrameSeconds = (Environment.TickCount64 - started) / 1000.0; if (currentAnimation != 0) nativeUntil = Environment.TickCount64 + (currentAnimation == 5 ? 160 : currentAnimation >= 3 ? 32 : 24) * currentInterval + 20; }
                 continue;
             }
             await Task.Delay(lighting ? 25 : 50, stop);

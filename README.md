@@ -1,17 +1,36 @@
 # HaloStudio · PixelBar DIY
 
-将 Edifier Halo PixelBar 的 **256 × 32 点阵屏**用作图形时钟、系统监控、网易云逐句歌词和音乐氛围灯。当前桌面版为 **C# / .NET 10 的 HaloStudio 2.5.1**，Python 旧版源码继续保留。
+> [!WARNING]
+> **非官方实验项目 · 设备损坏与变砖风险**
+> 本项目主要代码由 **GPT-6 Astra** 完成，结合作者在本机设备上的实验与反馈迭代。项目**尚未经过完整、全面的测试，不保证不会损坏设备**，也不保证适用于所有硬件批次、固件或播放器版本。固件/硬件版本不匹配、刷写中断及其他未知问题，可能导致音响无法启动、显示异常、变砖或其他设备损坏。已提供的备份与回退流程不是通用救砖保证，显示 MCU 完全失效后的独立 USB 恢复尚未验证。请先阅读适配条件、备份和恢复边界，自行评估并承担使用风险。遇到问题欢迎通过 [GitHub Issues](https://github.com/woozyc/pixelbardiy/issues) 反馈，附版本和复现步骤，并隐藏设备序列号、路径和个人信息。
+
+将 Edifier Halo PixelBar 的 **256 × 32 点阵屏**用作图形时钟、系统监控、网易云逐句歌词和音乐氛围灯。当前桌面版为 **C# / .NET 10 的 HaloStudio 2.6.0**，Python 旧版源码继续保留。
 
 画面通过 USB HID 写入显示 MCU 的 RAM，支持压缩、差分更新和 MCU 本地动画。日常换图、换主题和歌词更新不擦写 Flash，也不会出现原厂图片上传提示。
 
 > 非官方实验性项目。已测试的是 USB `VID 2D99 / PID A106`、控制接口 `MI04`、主控报告版本 `1.3.7` 的设备，产品名或版本号相同不代表内部硬件相同。显示 MCU 完全失效后的独立 USB 恢复仍未验证。备份的镜像是已知文件，不是整机 Flash 读回。
 
+## 已测试环境与必要依赖
+
+| 项目 | 实际测试版本 / 前提 |
+| --- | --- |
+| Windows | **Windows 11 专业版，64 位，26H2，OS Build 26300.9457**；这是本机测试环境，不代表所有 Windows 版本已验证 |
+| 网易云音乐 | **Windows 桌面版 3.1.41.205564**；独立播放进度只对已核对模块指纹启用，更新播放器后可能需要重新适配 |
+| 音响 | Edifier Halo PixelBar，USB `VID 2D99 / PID A106`、`MI04`、主控报告 `1.3.7`；还需核对硬件及显示 MCU 镜像，不能只凭产品名判断兼容 |
+| 日常运行 | Windows x64 应用包已含 **.NET 10** 运行时；无需 Python、.NET SDK 或 TrafficMonitor。USB HID 使用系统驱动；需自己的、实屏验证过的 MCU 安装记录 |
+| 在线歌词 | 需能访问歌词接口；网易云歌曲 ID 与歌词版本应匹配。不要求开启桌面歌词。离线仅使用缓存或导入的 LRC，部分歌曲没有逐字数据 |
+| CPU 温度（可选） | 随包 HaloThermal / AMD 采集模块；复用已有 WinRing0/PawnIO，否则通过已校验的 PawnIO 组件加载。可能需要用户确认 UAC。独立通道面向 AMD Family 17h / 19h / 1Ah，其他硬件可能没有温度 |
+| GPU / 主板监控（可选） | NVIDIA 指标需厂商驱动提供 NVML；主板其他传感器需可用的 LHM/OHM WMI 提供程序。缺少传感器不影响时钟/歌词，显示 `--` |
+| C# 源码编译 | Windows x64 + **.NET 10 SDK**（本机构建 10.0.401）；首次还原需网络。目标 API 版本为 Windows 10.0.19041，不能据此宣称旧系统已完整测试 |
+| 固件工程工具 | **Python 3.12 x64**、`legacy-python/requirements-dev.txt` 固定依赖（含 Unicorn 2.1.3、Keystone 0.9.2、Capstone 5.0.9、hidapi、PySide6、psutil）；另需自己的原厂包、镜像和备份记录，详见[完整命令流程](docs/FIRMWARE_USAGE.md) |
+
+应用包与固件工具包均为 **2.6.0** 发布资料；显示 MCU BIN 与 2.5.1 相同，已安装并验证相同 SHA 的设备**无需重新刷写**。本次歌词改进只需更新电脑端。
 ## 下载与启动
 
 | 内容 | 下载 / 说明 |
 | --- | --- |
-| 最新 Windows x64 应用与固件资料 | [HaloStudio C# 2.5.1](packages/HaloStudio-CSharp-2.5.1-win64.zip) |
-| MCU 固件与工程工具包 | [HPL2 2.5.1 固件包](packages/HaloPixelBar-MCU-2.5.1.zip) |
+| 最新 Windows x64 应用与固件资料 | [HaloStudio C# 2.6.0](packages/HaloStudio-CSharp-2.6.0-win64.zip) |
+| MCU 固件与工程工具包 | [HPL2 固件工具包 2.6.0](packages/HaloPixelBar-MCU-2.6.0.zip) |
 | 下载校验 | [全部包的 SHA256](packages/SHA256SUMS.txt) |
 | C# 使用、配置与构建 | [新版说明](halo-studio-dotnet/README.md) |
 | Python 旧版 | [旧版说明和下载](legacy-python/README.md) |
@@ -31,7 +50,7 @@
 
 - 六套运行时加载的外部 JSON 主题，统一覆盖时钟、系统监控和歌词，各自有布局、图案、字形及过场设计。
 - 单指标仪表、历史曲线、紧凑两行、双指标卡片；双指标优先同类配对，余项就近匹配，只有总数为奇数时末项单独显示；横向轮换可选每次一个或一对。
-- 网易云实时歌词、本地 LRC，以及按实际播放能量变化的两侧灯光。播放器版本变化可能需要更新适配。
+- 网易云 YRC 逐字／逐词分页、无逐字时间时的首尾两页、本地 LRC；默认提前 0.8 秒，手动偏移可独立叠加。已适配的网易云版本无需打开桌面歌词或歌曲歌词页，最小化仍可同步。[歌词实现与限制](halo-studio-dotnet/docs/LYRICS.md)。
 - 独立 CPU 温度采集，优先复用已有驱动。驱动需要权限时仅采集器请求 UAC；支持范围见[温度说明](legacy-python/docs/THERMAL.md)。
 - MCU 本地整屏上推、横向揭幕、中心展开、像素溶解与字符雨；新版换色与画面在同一显示租约中提交，主题和演示换幕不再插入原厂时钟。
 - 独占显示、心跳超时恢复、正常退出恢复原厂时钟；后台暂停 UI 绘制、按需采样、合并待传帧，避免积压。
@@ -56,7 +75,7 @@
 ## 源码与验证
 
 ```text
-halo-studio-dotnet/   C# 2.5.1 客户端、外部主题/色表、MCU 扩展源码与报告
+halo-studio-dotnet/   C# 2.6.0 客户端、外部主题/色表、MCU 扩展源码与报告
 legacy-python/       Python 旧版、依赖、测试与固件实验基线
 docs/                MCU 动画、USB 协议与显示链路的实现原理
 firmware/            当前与历史显示 MCU 镜像、校验值
@@ -71,7 +90,7 @@ cd halo-studio-dotnet
 ./scripts/verify.ps1
 ```
 
-GitHub Actions 分别验证 Python 与 C#。本机 2.5.1 已完成协议/主题自检、30 组布局状态和连续三次高 DPI 色表重载检查；新 MCU 的实屏、退出、停心跳恢复已单独验证。[验证范围与记录](halo-studio-dotnet/docs/VALIDATION.md)。离线检查不替代刷机后的实物确认。
+GitHub Actions 分别验证 Python 与 C#。本机 2.6.0 已通过 348 项离线检查，并只读核对真实歌曲的逐字时间和后台换句；此前完成 30 组布局状态和连续三次高 DPI 色表重载检查；新 MCU 的实屏、退出、停心跳恢复已单独验证。[验证范围与记录](halo-studio-dotnet/docs/VALIDATION.md)。离线检查不替代刷机后的实物确认。
 
 固件离线重建需要自行取得并核对原厂显示 MCU 镜像。先依照 [旧固件构建说明](legacy-python/docs/FIRMWARE.md)准备 `legacy-python/firmware-analysis/v137/mcu.bin`，安装 `legacy-python/requirements-dev.txt` 中的开发依赖，再运行 `python halo-studio-dotnet/firmware-color/validate_color.py`。`legacy-python/` 中的 Python/实验工具同时为新版验证提供基线；仿真不访问 USB，也不在 CI 中自动刷写设备。
 

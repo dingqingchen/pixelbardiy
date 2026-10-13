@@ -1,6 +1,7 @@
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
+using System.Text;
 
 namespace HaloStudio;
 
@@ -36,6 +37,72 @@ public sealed class PixelCanvas
     public void Tag(string text, int x, int y, int w) { Small(text, x + 3, y + 2); Invert(x, y, w, 11); }
     // Masks are shared by rendering and preview. A bounded cache avoids repeated Chinese glyph rasterization.
     static readonly Dictionary<string, Point[]> maskCache = []; static readonly Queue<string> maskKeys = new(); static readonly object maskGate = new();
+    sealed record LineMask(int Width, byte[] Columns);
+    static readonly Dictionary<string, LineMask> lineCache = []; static readonly Queue<string> lineKeys = new(); static int lineBytes;
+    static LineMask CachedLine(string text, int h, string family, int size, bool bold)
+    {
+        string key = $"{text}\0{h},{family},{size},{bold}"; LineMask mask;
+        lock (maskGate)
+        {
+            if (!lineCache.TryGetValue(key, out mask!))
+            {
+                mask = MakeLine(text, h, family, size, bold); lineCache[key] = mask; lineKeys.Enqueue(key); lineBytes += mask.Columns.Length;
+                while (lineKeys.Count > 32 || lineBytes > 1_048_576) { string oldest = lineKeys.Dequeue(); lineBytes -= lineCache[oldest].Columns.Length; lineCache.Remove(oldest); }
+            }
+        }
+        return mask;
+    }
+    public static int LyricWidth(string text, int h, string family, int size, bool bold) => CachedLine(text, h, family, size, bold).Width;
+    public void LyricPage(string text, int x, int y, int w, int h, string family, int size, bool bold, string align)
+    {
+        var mask = CachedLine(text, h, family, size, bold);
+        int left = align == "left" ? x : align == "right" ? x + w - mask.Width : x + (w - mask.Width) / 2;
+        for (int xx = 0; xx < mask.Width; xx++) for (int yy = 0; yy < Math.Min(32, h); yy++)
+            if (left + xx >= x && left + xx < x + w && (mask.Columns[xx * 4 + yy / 8] & (1 << (yy % 8))) != 0) Dot(left + xx, y + yy);
+    }
+    public int Lyric(string text, int x, int y, int w, int h, LyricScroll scroll, string family, int size, bool bold, string align)
+    {
+        if (w <= 0 || h <= 0 || text.Length == 0) return 0;
+        var whole = CachedLine(text, h, family, size, bold);
+        if (whole.Width <= w) { Typeset(text, x, y, w, h, family, size, bold, align); return 0; }
+        bool tail = scroll.Progress == 1; int room = Math.Max(0, w - 10);
+        // Fit complete Unicode characters, not a pixel crop through a glyph.
+        var runes = text.EnumerateRunes().Select(r => r.ToString()).ToArray(); int lo = 0, hi = runes.Length;
+        LineMask chosen = new(0, []);
+        while (lo < hi)
+        {
+            int n = (lo + hi + 1) / 2;
+            var candidate = CachedLine(string.Concat(tail ? runes.TakeLast(n) : runes.Take(n)), h, family, size, bold);
+            if (candidate.Width <= room) { lo = n; chosen = candidate; } else hi = n - 1;
+        }
+        int left = tail ? x + w - chosen.Width : x;
+        for (int xx = 0; xx < chosen.Width; xx++) for (int yy = 0; yy < Math.Min(32, h); yy++)
+            if ((chosen.Columns[xx * 4 + yy / 8] & (1 << (yy % 8))) != 0) Dot(left + xx, y + yy);
+        int dots = tail ? x : x + w - 7, baseline = y + Math.Clamp(h / 2 + size / 3, 0, h - 1);
+        for (int i = 0; i < 3; i++) if (dots + i * 3 >= x && dots + i * 3 < x + w) Dot(dots + i * 3, baseline);
+        return tail ? 2 : 1;
+    }
+    static LineMask MakeLine(string text, int h, string family, int size, bool bold)
+    {
+        if (text.Length > 4096) throw new InvalidDataException("单句歌词超过 4096 字符");
+        string face = family switch { "round" => "Segoe UI", "serif" => "Georgia", "song" => "SimSun", "body" => "Microsoft YaHei", _ => family };
+        using var measure = new Bitmap(1, 1); using var mg = Graphics.FromImage(measure);
+        using var format = (StringFormat)StringFormat.GenericTypographic.Clone(); format.FormatFlags |= StringFormatFlags.NoWrap | StringFormatFlags.NoClip;
+        int n = Math.Clamp(size, 9, 64); Font font;
+        while (true) { font = new Font(face, n, bold ? FontStyle.Bold : FontStyle.Regular, GraphicsUnit.Pixel); if (font.GetHeight(mg) <= h || n <= 9) break; font.Dispose(); n--; }
+        using (font)
+        {
+            int width = (int)Math.Ceiling(mg.MeasureString(text, font, int.MaxValue, format).Width) + 8;
+            using var bitmap = new Bitmap(width, Math.Clamp(h, 1, 32), PixelFormat.Format32bppArgb); using var g = Graphics.FromImage(bitmap);
+            g.Clear(Color.Black); g.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
+            g.DrawString(text, font, Brushes.White, 4, (h - font.GetHeight(g)) / 2, format);
+            var columns = new byte[width * 4]; int left = width, right = -1;
+            var data = bitmap.LockBits(new(0, 0, width, bitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            try { unsafe { for (int yy = 0; yy < bitmap.Height; yy++) { byte* row = (byte*)data.Scan0 + yy * data.Stride; for (int xx = 0; xx < width; xx++) if (row[xx * 4 + 2] > 110) { columns[xx * 4 + yy / 8] |= (byte)(1 << (yy % 8)); left = Math.Min(left, xx); right = Math.Max(right, xx); } } } }
+            finally { bitmap.UnlockBits(data); }
+            return right < left ? new(0, []) : new(right - left + 1, columns[(left * 4)..((right + 1) * 4)]);
+        }
+    }
     public void Typeset(string text, int x, int y, int w, int h, string family = "body", int size = 17, bool bold = false, string align = "center")
     {
         if (w <= 0 || h <= 0 || string.IsNullOrEmpty(text)) return;

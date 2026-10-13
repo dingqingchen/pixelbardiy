@@ -10,6 +10,7 @@ public sealed record Settings
     public bool Seconds { get; init; }
     public string Color { get; init; } = "#86D8F6";
     public double Offset { get; init; }
+    public double LyricLeadSeconds { get; init; } = .8;
     public bool Online { get; init; } = true;
     public string Effect { get; init; } = "color_tide";
     public string AmbientColor { get; init; } = "#C3B9FF";
@@ -48,6 +49,7 @@ public sealed record Settings
         ScreenWhiteBlue = Math.Clamp(ScreenWhiteBlue, 0, 255),
         RotationSeconds = Math.Clamp(RotationSeconds, 2, 120),
         Offset = Math.Clamp(Offset, -30, 30),
+        LyricLeadSeconds = Math.Clamp(LyricLeadSeconds, 0, 3),
         Speed = Math.Clamp(Speed, 1, 10),
         RhythmGain = Math.Clamp(RhythmGain, .4, 6),
         FanLimits = FanLimits ?? [],
@@ -69,9 +71,9 @@ public sealed record Settings
 }
 public sealed record Track(string Title = "", string Artist = "", string Album = "", double Duration = 0,
     double Position = 0, bool Playing = false, string App = "", string Provider = "Windows 媒体会话",
-    string RealtimeLyric = "", double LineElapsed = 0)
+    string RealtimeLyric = "", double LineElapsed = 0, string SongId = "", bool NativeTimeline = false)
 {
-    public string Key => $"{Title}\0{Artist}\0{Album}";
+    public string Key => $"{Title}\0{Artist}\0{Album}\0{SongId}";
 }
 public sealed record Metric(string Key, string Name, string Short, double? Value, string Unit, string Source, double? Scale = null)
 {
@@ -108,7 +110,7 @@ public sealed record Snapshot(Metric[] Metrics, string Detail)
     public Metric Get(string key, string name = "", string unit = "") =>
         Metrics.FirstOrDefault(m => m.Key == key) ?? new(key, name, name, null, unit, "未发现传感器");
 }
-public sealed record PixelFrame(byte[] Pixels, string Text, string Identity);
+public sealed record PixelFrame(byte[] Pixels, string Text, string Identity, bool Scrolling = false, int LyricPart = 0);
 public sealed record StudioState(string Status, Track Track, Snapshot Snapshot, PixelFrame? Frame,
     long Frames, long Dropped, long Writes, string Codec, int EncodedBytes, double FrameSeconds,
     double CpuPercent, double MemoryMB, double Peak, string TemperatureStatus, bool Connected,

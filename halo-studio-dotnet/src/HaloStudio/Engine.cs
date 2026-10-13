@@ -13,6 +13,7 @@ public sealed class Engine : IAsyncDisposable
     RamController? controller; IHaloTransport? link; Task? runner; Track track = new(); Snapshot snapshot = Snapshot.Empty;
     PixelFrame? frame; double signal; string? rhythmColor; volatile bool rhythmActive; string status = "离线预览"; List<LyricLine> lines = []; string lyricSource = "等待网易云播放";
     readonly object logGate = new(); public event Action<StudioState>? Changed;
+    readonly LyricPlayback lyricPlayback = new(); int lyricImportRevision;
     public Settings Config => Volatile.Read(ref settings);
     public bool Visible { get; set; } = true; public bool MonitorVisible { get; set; }
     public Track CurrentTrack => track; public string LastError { get; private set; } = "";
@@ -21,7 +22,7 @@ public sealed class Engine : IAsyncDisposable
     public void RefreshThemes() => Interlocked.Increment(ref revision);
     public void Start(bool preview = false) => runner = Task.Run(() => RunAsync(preview));
     public void EnableTemperature() { Configure(Config with { CpuTemperatureEnabled = true, CpuTemperatureElevation = true }); hardware.Temperature.RequestRetry(); }
-    public void ImportLrc(string path) { lines = lyrics.Save(track, File.ReadAllText(path), "本地 LRC"); lyricSource = "本地 LRC"; Interlocked.Increment(ref revision); }
+    public void ImportLrc(string path) { lyrics.Save(track, File.ReadAllText(path), "本地 LRC"); Interlocked.Increment(ref lyricImportRevision); Interlocked.Increment(ref revision); }
     void Log(string message) { lock (logGate) { string path = Path.Combine(runtime, "studio-net.log"); if (File.Exists(path) && new FileInfo(path).Length > 2_000_000) File.Move(path, path + ".previous", true); File.AppendAllText(path, $"{DateTimeOffset.Now:O} {message}\n"); } }
     static bool TempoHubRunning() { var processes = Process.GetProcessesByName("Edifier TempoHub"); bool running = processes.Length > 0; foreach (var process in processes) process.Dispose(); return running; }
     async Task SessionAsync()
@@ -46,6 +47,7 @@ public sealed class Engine : IAsyncDisposable
     {
         long started = Environment.TickCount64, nextMedia = 0, nextMonitor = 0, nextEmit = 0, nextConnect = 0, nextPerf = Environment.TickCount64 + 5000, nextPeak = 0, nextOwner = 0; int oldRevision = -1; string renderKey = "", trackKey = "", renderedTheme = "";
         Task<Track>? mediaTask = null; Task<Snapshot>? sensorTask = null; Task<(List<LyricLine> Lines, string Source)>? lyricTask = null; CancellationTokenSource? lyricCancel = null; string fetchKey = ""; bool fetchOnline = Config.Online;
+        int importRevision = -1; string cueKey = "";
         using var process = Process.GetCurrentProcess(); TimeSpan priorCpu = process.TotalProcessorTime; long perfAt = started; double cpu = 0, memory = process.WorkingSet64 / 1048576.0; bool mediaPlaying = false; int metricRevision = 0;
         try
         {
@@ -68,20 +70,21 @@ public sealed class Engine : IAsyncDisposable
                 if (mediaTask == null && now >= nextMedia) { mediaTask = media.PollAsync(mediaPlaying); nextMedia = now + (track.Playing ? (s.PowerProfile == "balanced" ? 100 : 200) : 1500); }
                 if (sensorTask?.IsCompleted == true) { try { snapshot = await sensorTask; metricRevision++; } catch (Exception e) { Log("Sensors: " + e.Message); } sensorTask = null; }
                 if (sensorTask == null && now >= nextMonitor && (MonitorVisible || (s.Enabled && s.IdleContent == "monitor"))) { sensorTask = hardware.SampleAsync(s.FanLimits, s.CpuTemperatureEnabled, s.CpuTemperatureElevation); nextMonitor = now + (s.PowerProfile == "balanced" ? 2000 : 3000); }
-                if (track.Key != trackKey || fetchOnline != s.Online)
+                if (track.Key != trackKey || fetchOnline != s.Online || importRevision != Volatile.Read(ref lyricImportRevision))
                 {
-                    trackKey = track.Key; fetchOnline = s.Online; lines = []; lyricCancel?.Cancel(); lyricCancel?.Dispose(); lyricCancel = CancellationTokenSource.CreateLinkedTokenSource(stop.Token);
+                    trackKey = track.Key; fetchOnline = s.Online; importRevision = Volatile.Read(ref lyricImportRevision); lines = []; lyricCancel?.Cancel(); lyricCancel?.Dispose(); lyricCancel = CancellationTokenSource.CreateLinkedTokenSource(stop.Token);
                     fetchKey = track.Key; lyricTask = track.Title.Length > 0 ? lyrics.FetchAsync(track, s.Online, lyricCancel.Token) : null;
                 }
                 if (lyricTask?.IsCompleted == true) { try { var result = await lyricTask; if (fetchKey == track.Key) { lines = result.Lines; lyricSource = result.Source; } } catch (OperationCanceledException) { } catch (Exception e) { Log("Lyrics: " + e.Message); } lyricTask = null; }
                 string mode = "时钟", text = DateTime.Now.ToString(s.Seconds ? "HH:mm:ss" : "HH:mm");
+                var cue = lyricPlayback.Select(track, lines, s, elapsed, LyricsStore.CanUseTimeline(track, lyricSource), Math.Max(.5, controller?.FrameSeconds ?? .5) + (s.Transitions ? .55 : 0));
                 if (s.Mode == "auto" && track.Playing && track.Title.Length > 0)
                 {
-                    if (track.RealtimeLyric.Length > 0) { var pages = LyricsStore.Pages(track.RealtimeLyric); text = pages[Math.Min(pages.Length - 1, (int)(track.LineElapsed / 2))]; mode = "歌词"; }
-                    else if (!track.Provider.StartsWith("网易云本地") && LyricsStore.At(lines, track.Position + s.Offset, track.Duration) is string line) { text = line; mode = "歌词"; }
+                    if (cue != null) { text = cue.Text; mode = "歌词"; }
                 }
+                cueKey = mode == "歌词" ? cue!.Key + ":" + s.Theme : "";
                 if (mode == "时钟" && s.IdleContent == "monitor") { mode = "系统监控"; text = ""; }
-                var clock = DateTime.Now; string key = $"{mode}|{text}|{rev}|{(mode == "系统监控" ? metricRevision : 0)}|{(mode == "系统监控" && s.MonitorRotate ? (int)(elapsed / s.RotationSeconds) : 0)}|{(s.Animations ? (int)(elapsed / 2) : 0)}|{clock:yyyyMMdd}";
+                var clock = DateTime.Now; string key = $"{mode}|{text}|{cueKey}|{rev}|{(mode == "系统监控" ? metricRevision : 0)}|{(mode == "系统监控" && s.MonitorRotate ? (int)(elapsed / s.RotationSeconds) : 0)}|{(s.Animations ? (int)(elapsed / 2) : 0)}|{clock:yyyyMMdd}";
                 if (demo != null)
                 {
                     var sample = demo.Poll(s);
@@ -92,7 +95,9 @@ public sealed class Engine : IAsyncDisposable
                 {
                     try
                     {
-                        var next = Designs.Render(text, mode, s, elapsed, snapshot, clock); bool urgent = changed || mode == "歌词" && next.Identity != frame?.Identity;
+                        var next = Designs.Render(text, mode, s, elapsed, snapshot, clock, lyricCue: cue);
+                        if (mode == "歌词") next = next with { Identity = next.Identity + ":" + cueKey };
+                        bool urgent = changed || mode == "歌词" && next.Identity != frame?.Identity;
                         byte animation = s.Transitions && frame != null && next.Identity != frame.Identity ? (renderedTheme != s.Theme ? Transitions.ThemeStyle(s.Theme) : Transitions.Style(s.PixelTransition)) : (byte)0;
                         frame = next; frameColor = ScreenColor(s); renderedTheme = s.Theme; controller?.Offer(next, s.DeviceScreenColor(frameColor), animation, urgent);
                     }
@@ -104,7 +109,7 @@ public sealed class Engine : IAsyncDisposable
                     process.Refresh(); TimeSpan current = process.TotalProcessorTime; cpu = 100 * (current - priorCpu).TotalMilliseconds / Math.Max(1, now - perfAt) / Environment.ProcessorCount; priorCpu = current; perfAt = now; memory = process.WorkingSet64 / 1048576.0; nextPerf = now + 5000;
                     Log($"perf cpu={cpu:F3}% rss={memory:F1}MB frames={controller?.Frames ?? 0} writes={link?.Writes ?? 0} codec={controller?.Codec} bytes={controller?.EncodedBytes} theme={s.Theme} playing={track.Playing} peak={signal:F3} demo={demo?.StageName} text={frame?.Text} cpu_temp={snapshot.Get("cpu_temp").Text()} thermal={hardware.Temperature.Detail}");
                 }
-                if (now >= nextEmit) { Changed?.Invoke(new(status + " · " + lyricSource, track, snapshot, frame, controller?.Frames ?? 0, controller?.Dropped ?? 0, link?.Writes ?? 0, controller?.Codec ?? "预览", controller?.EncodedBytes ?? 0, controller?.FrameSeconds ?? 0, cpu, memory, signal, hardware.Temperature.Detail, controller?.Owned ?? false, demo?.StageName ?? "", demo?.Progress ?? 0, frameColor, peak.Detail)); nextEmit = now + (Visible ? (demo != null ? 125 : 500) : 3000); }
+                if (now >= nextEmit) { Changed?.Invoke(new(status + " · " + lyricSource + (mode == "歌词" && cue?.Timed == false ? " · 当前句回退，等待可用时间轴（无法提前）" : ""), track, snapshot, frame, controller?.Frames ?? 0, controller?.Dropped ?? 0, link?.Writes ?? 0, controller?.Codec ?? "预览", controller?.EncodedBytes ?? 0, controller?.FrameSeconds ?? 0, cpu, memory, signal, hardware.Temperature.Detail, controller?.Owned ?? false, demo?.StageName ?? "", demo?.Progress ?? 0, frameColor, peak.Detail)); nextEmit = now + (Visible ? (demo != null ? 125 : 500) : 3000); }
                 await Task.Delay(rhythmActive ? 25 : demo != null || track.Playing ? 50 : 200, stop.Token);
             }
         }

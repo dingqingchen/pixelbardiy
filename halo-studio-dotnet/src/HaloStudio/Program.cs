@@ -16,6 +16,7 @@ internal static class Program
             Designs.Reload(Path.GetFullPath(Arg("--themes", Path.Combine(AppContext.BaseDirectory, "themes"))));
             if (ScreenPalette.Reload(Path.Combine(AppContext.BaseDirectory, "palettes", "pixelbar.json")) is string paletteError) File.WriteAllText(Path.Combine(runtime, "palette-warning.txt"), paletteError);
             if (args.Contains("--self-test")) { SelfTests.Run(Arg("--output", Path.Combine(runtime, "self-test.json")), Arg("--fixtures", "")); return 0; }
+            if (args.Contains("--lyrics-probe")) { Task.Run(() => LyricDiagnostic.Run(runtime, Arg("--output", Path.Combine(runtime, "lyric-probe.json")), int.Parse(Arg("--seconds", "30")))).GetAwaiter().GetResult(); return 0; }
             if (args.Contains("--probe")) { Files.Save(Arg("--output", Path.Combine(runtime, "probe.json")), HidTransport.Enumerate()); return 0; }
             if (args.Contains("--color-commission")) { if(!args.Contains("--after-observed-reboot")) throw new InvalidOperationException("需先确认音响已重启"); ColorCommissioning.Run(runtime,Arg("--live-folder",""),args.Contains("--timeout-release")).GetAwaiter().GetResult(); return 0; }
             if (args.Contains("--color-test")) { ScreenColorDiagnostic.Run(runtime, Arg("--output", Path.Combine(runtime,"screen-colors.json")), hues: args.Contains("--hues")).GetAwaiter().GetResult(); return 0; }
@@ -42,8 +43,9 @@ internal static class Program
             if (int.TryParse(Arg("--quit-after", "0"), out int seconds) && seconds > 0) { closeTimer = new() { Interval = seconds * 1000 }; closeTimer.Tick += async (_, _) => { closeTimer.Stop(); await form.QuitAsync(); }; closeTimer.Start(); }
             string screenshot = Arg("--ui-snapshot", ""); if (screenshot.Length > 0) { screenshotTimer = new() { Interval = 3000 }; screenshotTimer.Tick += (_, _) => { screenshotTimer.Stop(); form.SaveScreenshot(screenshot); }; screenshotTimer.Start(); }
             string audit = Arg("--ui-audit", ""); if (preview && audit.Length > 0) { screenshotTimer = new() { Interval = 3500 }; screenshotTimer.Tick += (_, _) => { screenshotTimer.Stop(); form.AuditLayout(audit); }; screenshotTimer.Start(); }
+            string inputs = Arg("--input-audit", ""); if (preview && inputs.Length > 0) { screenshotTimer = new() { Interval = 1500 }; screenshotTimer.Tick += (_, _) => { screenshotTimer.Stop(); form.AuditInputs(inputs); }; screenshotTimer.Start(); }
             Application.Run(form); closeTimer?.Dispose(); screenshotTimer?.Dispose(); sequenceTimer?.Dispose(); if (savedSettings != null) engine.Configure(savedSettings); ReleaseOwner(); return 0;
         }
-        catch (Exception e) { File.WriteAllText(Path.Combine(runtime, "last-error.txt"), e.ToString()); ReleaseOwner(); if (!args.Any(a => a is "--self-test" or "--probe" or "--diagnostics" or "--transport-probe" or "--color-test" or "--white-test" or "--color-commission" or "--owner-probe")) MessageBox.Show(e.Message, "HaloStudio C#"); return 1; }
+        catch (Exception e) { File.WriteAllText(Path.Combine(runtime, "last-error.txt"), e.ToString()); ReleaseOwner(); if (!args.Any(a => a is "--self-test" or "--lyrics-probe" or "--probe" or "--diagnostics" or "--transport-probe" or "--color-test" or "--white-test" or "--color-commission" or "--owner-probe")) MessageBox.Show(e.Message, "HaloStudio C#"); return 1; }
     }
 }

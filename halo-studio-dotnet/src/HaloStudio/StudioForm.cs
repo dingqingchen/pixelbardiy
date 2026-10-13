@@ -18,6 +18,7 @@ public sealed partial class StudioForm : Form
     readonly SensorTable sensors = new();
     readonly TextBox fanKey = new() { PlaceholderText = "传感器键，例如 gpu0_fan0", AccessibleName = "风扇传感器键" }, fanMax = new() { PlaceholderText = "例如 3000", AccessibleName = "风扇额定最大 RPM" };
     readonly FileSystemWatcher themeWatch; readonly System.Windows.Forms.Timer reloadTimer = new() { Interval = 500 };
+    readonly InputCommit inputCommit;
     readonly Icon appIcon = Branding.Icon(); readonly Image logo = Branding.Logo();
     bool loading, quitting, allowClose, auditing; volatile bool themeDirty; int pageIndex; Settings current; string? legacyLaunch; StudioState? latestState; string sensorSignature = "";
 
@@ -66,6 +67,8 @@ public sealed partial class StudioForm : Form
         main.Controls.Add(body, 0, 2); performance.AutoSize = false; performance.Dock = DockStyle.Fill; performance.TextAlign = ContentAlignment.MiddleRight; performance.ForeColor = Palette.Muted; main.Controls.Add(performance, 0, 3);
         for (int i = 0; i < labels.Length; i++) { var page = new PagePanel { Dock = DockStyle.Fill }; body.Controls.Add(page); pages.Add(page); }
         BuildDisplay(); BuildMonitor(); BuildMusic(); BuildDemo(); BuildDevice(); LoadThemes(); Sync(); SelectPage(0);
+        inputCommit = new(this); Application.AddMessageFilter(inputCommit);
+        Deactivate += (_, _) => { if (!quitting) inputCommit.Commit(false); };
         tray = new NotifyIcon { Icon = appIcon, Text = "HaloStudio", Visible = true }; var menu = new ContextMenuStrip();
         menu.Items.Add("打开 HaloStudio", null, (_, _) => ShowStudio()); menu.Items.Add("播放像素演示", null, (_, _) => { ShowStudio(); StartDemo(); }); menu.Items.Add("退出并恢复原厂显示", null, async (_, _) => await QuitAsync()); tray.ContextMenuStrip = menu; tray.DoubleClick += (_, _) => ShowStudio();
         VisibleChanged += (_, _) => { engine.Visible = Visible; engine.MonitorVisible = Visible && pageIndex == 1; if (Visible && latestState != null) OnState(latestState); };
@@ -95,8 +98,8 @@ public sealed partial class StudioForm : Form
             song.Text = value.DemoStage.Length > 0 ? value.DemoStage : value.Track.Title.Length > 0 ? (value.Track.Playing ? "正在播放  " : "已暂停  ") + value.Track.Title + " · " + value.Track.Artist : "默认显示 · " + (current.IdleContent == "clock" ? "时钟" : "系统监控");
             performance.Text = $"CPU {value.CpuPercent:F2}%   ·   内存 {value.MemoryMB:F0} MB   ·   {value.Frames} 帧已确认   ·   {value.FrameSeconds:F2} s / 帧";
             musicTitle.Text = value.Track.Title.Length > 0 ? value.Track.Title + "  /  " + value.Track.Artist : "等待网易云播放";
-            lyric.Text = value.Track.RealtimeLyric.Length > 0 ? value.Track.RealtimeLyric : value.Frame?.Identity.StartsWith("歌词:") == true ? value.Frame.Text : "暂无当前句";
-            musicDetail.Text = value.Track.Provider + " · " + value.AudioDetail; thermal.Text = value.TemperatureStatus;
+            lyric.Text = value.Frame?.Identity.StartsWith("歌词:") == true ? value.Frame.Text : value.Track.RealtimeLyric.Length > 0 ? value.Track.RealtimeLyric : "暂无当前句";
+            musicDetail.Text = value.Track.Provider + " · " + value.Status; thermal.Text = value.TemperatureStatus;
             demoStatus.Text = value.DemoStage.Length > 0 ? value.DemoStage : "准备播放 · 结束后自动回到日常"; demoProgress.Value = Math.Clamp((int)(value.DemoProgress * 1000), 0, 1000);
             if (engine.MonitorVisible) UpdateSensors(value.Snapshot);
         });
@@ -161,7 +164,7 @@ public sealed partial class StudioForm : Form
     async Task SwitchLegacyAsync() { string? path = FindLegacy(); if (path == null) { using var d = new OpenFileDialog { Filter = "HaloStudio 旧版|HaloStudio.exe" }; if (d.ShowDialog(this) != DialogResult.OK) return; path = d.FileName; } legacyLaunch = path; await QuitAsync(); }
     static string? FindLegacy() { string? p = AppContext.BaseDirectory; for (int i = 0; i < 7 && p != null; i++, p = Path.GetDirectoryName(p.TrimEnd(Path.DirectorySeparatorChar))) { string f = Path.Combine(p, "halo-controller", "dist", "HaloStudio", "HaloStudio.exe"); if (File.Exists(f)) return f; } return null; }
     public async Task QuitAsync() { if (quitting) return; quitting = true; status.Text = "正在恢复原厂显示…"; Enabled = false; await engine.DisposeAsync(); tray.Visible = false; themeWatch.Dispose(); reloadTimer.Stop(); Program.ReleaseOwner(); allowClose = true; if (engine.LastError.Length > 0) { legacyLaunch = null; MessageBox.Show(this, engine.LastError, "退出诊断"); } if (legacyLaunch != null) Process.Start(new ProcessStartInfo(legacyLaunch) { UseShellExecute = true }); Close(); }
-    protected override void Dispose(bool disposing) { if (disposing) { tray?.Dispose(); themeWatch?.Dispose(); reloadTimer?.Dispose(); appIcon?.Dispose(); logo?.Dispose(); } base.Dispose(disposing); }
+    protected override void Dispose(bool disposing) { if (disposing) { inputCommit?.Dispose(); tray?.Dispose(); themeWatch?.Dispose(); reloadTimer?.Dispose(); appIcon?.Dispose(); logo?.Dispose(); } base.Dispose(disposing); }
     public void SaveScreenshot(string path) { using var bitmap = new Bitmap(Width, Height); DrawToBitmap(bitmap, new(0, 0, Width, Height)); bitmap.Save(path, System.Drawing.Imaging.ImageFormat.Png); }
     sealed record Choice(string Key, string Name) { public override string ToString() => Name; }
 }

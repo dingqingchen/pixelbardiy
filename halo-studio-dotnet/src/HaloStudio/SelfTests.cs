@@ -16,7 +16,7 @@ public static class SelfTests
         Assert(Protocol.Choose(target, null, 0).Codec != 2, "Fresh keyframe independent"); var fragments = Protocol.Fragments(123, 42, target, delta, true, 1).ToArray(); Assert(fragments[0][8] == 6 && fragments[0][17] == 2 && fragments[0][18] == 1, "Codec BEGIN animation metadata");
         foreach (var p in fragments) { var packet = Protocol.Packet(0x17, p); Assert(packet.Length == 64 && p.Length <= 54, "HID framing bounded"); }
         if (fixturePath.Length > 0) { using var doc = JsonDocument.Parse(File.ReadAllText(fixturePath)); int i = 0; foreach (var e in doc.RootElement.EnumerateArray()) { byte[] frame = Convert.FromHexString(e.GetProperty("pixels").GetString()!); byte[]? basis = e.TryGetProperty("base", out var b) ? Convert.FromHexString(b.GetString()!) : null; ushort id = (ushort)e.GetProperty("base_id").GetInt32(); var plan = Protocol.Choose(frame, basis, id); Assert(plan.Codec == e.GetProperty("codec").GetByte() && Convert.ToHexString(plan.Data).Equals(e.GetProperty("data").GetString(), StringComparison.OrdinalIgnoreCase) && plan.TargetCrc == e.GetProperty("crc").GetInt32(), "Python validated codec oracle " + i++); } }
-        var lrc = LyricsStore.Parse("[offset:-200]\n[00:01.20]中文歌词\n[00:01.20]translation\n[00:03.000][00:04.0]下一句"); Assert(lrc.Count == 3 && lrc[0].Time == 1 && lrc[0].Text == "中文歌词", "LRC timing / offset / original language"); Assert(LyricsStore.At(lrc, 3, 5) == "下一句", "LRC next sentence"); Assert(LyricsStore.Pages(new string('中', 33)).All(p => System.Text.Encoding.UTF8.GetByteCount(p) <= 48), "Lyric pagination UTF8 limit");
+        var lrc = LyricsStore.Parse("[offset:-200]\n[00:01.20]中文歌词\n[00:01.20]translation\n[00:03.000][00:04.0]下一句"); Assert(lrc.Count == 3 && lrc[0].Time == 1 && lrc[0].Text == "中文歌词", "LRC timing / offset / original language"); Assert(LyricsStore.At(lrc, 3, 5) == "下一句", "LRC next sentence"); LyricTests.Run(Assert);
         Assert(Math.Abs(Expression.Evaluate("clamp(phase*2,0,7)+round(cos(pi)*3)", new Dictionary<string, double> { { "phase", 5 } }) - 4) < .001, "Theme arithmetic parser");
         string originalThemes = Designs.DirectoryPath; string testThemes = Path.Combine(Path.GetDirectoryName(output)!, "test-themes"); Directory.CreateDirectory(testThemes);
         string paper = File.ReadAllText(Path.Combine(originalThemes, "paper.json")); File.WriteAllText(Path.Combine(testThemes, "new.json"), paper.Replace("\"paper\"", "\"custom_new\"").Replace("月白书页", "自定义书页"));
@@ -144,6 +144,8 @@ public static class SelfTests
         Write32(36, 4); Assert(CpuTemperature.Decode(thermalSample, 123, 456, 9500) == null, "Permission error cannot masquerade as cached temperature"); Write32(36, 0);
         Write32(60, 1); Assert(CpuTemperature.Decode(thermalSample, 123, 456, 9500) == null, "Reject stopped temperature helper");
         using var appIcon = Branding.Icon(); using var logo = Branding.Logo(); Assert(appIcon.Width == 32 && logo.Width == 256, "Application and tray use embedded Halo branding");
+        LyricTests.Cache(Assert, Path.Combine(Path.GetDirectoryName(output)!, "lyric-cache-" + Guid.NewGuid().ToString("N"))).GetAwaiter().GetResult();
+        LyricTests.Atlas(Path.Combine(Path.GetDirectoryName(output)!, "lyric-endpoints.png"));
         Lifecycle().GetAwaiter().GetResult(); checks.Add("Exclusive acquire / heartbeat / CRC commit / release / stable stock clock");
         LiveColors().GetAwaiter().GetResult(); checks.Add("Color changes keep one lease, commit same-pixel tint, retain animation and restore on exit");
         Files.Save(output, new { Passed = true, Count = checks.Count, Checks = checks, Atlas = atlas, Time = DateTimeOffset.Now });
@@ -153,6 +155,7 @@ public static class SelfTests
         var mock = new MockDevice(); var controller = new RamController(mock, true, "#86D8F6", true); await controller.ConnectAsync(); if (!controller.Owned) throw new Exception("No acquire");
         using var stop = new CancellationTokenSource(); var pump = controller.PumpAsync(() => new Settings(), () => (null, false), stop.Token); byte[] data = new byte[1024]; data[0] = 3; controller.Offer(new(data, "one", "lyric:one"), "#86D8F6", 1, true);
         long deadline = Environment.TickCount64 + 1500; while (controller.Frames < 1 && Environment.TickCount64 < deadline) await Task.Delay(10); if (controller.Frames != 1 || !mock.Committed.AsSpan().SequenceEqual(data)) throw new Exception("Frame commit");
+        if (controller.LastCommit is not { Identity: "lyric:one", LyricPart: 0 } || controller.LastCommit.At > Environment.TickCount64) throw new Exception("ACK receipt must identify the committed frame");
         byte[] second = new byte[1024]; second[255] = 255; controller.Offer(new(second, "two", "系统监控:matrix:ram"), "#86D8F6", 1, true);
         deadline = Environment.TickCount64 + 1600; while (controller.Frames < 2 && Environment.TickCount64 < deadline) await Task.Delay(10);
         if (controller.Frames != 2 || mock.LastAnimation != 3 || !mock.Committed.AsSpan().SequenceEqual(second)) throw new Exception("Fullscreen target must be one commit using MCU animation 3");

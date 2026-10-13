@@ -1,4 +1,4 @@
-param([string]$Version='2.5.1')
+param([string]$Version='2.6.0')
 $ErrorActionPreference='Stop'
 $projectRoot=Split-Path $PSScriptRoot -Parent
 $source=Join-Path $projectRoot 'dist\HaloStudioNet'

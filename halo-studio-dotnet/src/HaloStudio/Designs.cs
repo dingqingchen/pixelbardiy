@@ -30,9 +30,27 @@ public static class Designs
     }
     static readonly HashSet<string> operations = ["line", "rect", "round", "circle", "star", "sprite", "small", "raster", "digits", "text", "tag", "erase", "invert", "segments", "history", "dial", "repeat", "metrics"];
     static void Validate(JsonElement a) { if (a.ValueKind != JsonValueKind.Array || a.GetArrayLength() > 512) throw new InvalidDataException("命令列表无效"); foreach (var e in a.EnumerateArray()) { string op = e.GetProperty("op").GetString()!; if (!operations.Contains(op)) throw new InvalidDataException("未知操作: " + op); if (op is "repeat" or "metrics") Validate(e.GetProperty("commands")); } }
-    public static PixelFrame Render(string text, string mode, Settings s, double elapsed, Snapshot snap, DateTime now)
+    public static LyricViewport LyricViewport(Settings s)
+    {
+        var d = All.GetValueOrDefault(s.Themes ? s.Theme : "paper") ?? All.Values.First();
+        var ctx = new Context(new(), d, s, Snapshot.Empty); var views = new List<LyricViewport>();
+        void Read(JsonElement commands)
+        {
+            foreach (var e in commands.EnumerateArray())
+            {
+                if (e.GetProperty("op").GetString() == "text" && e.GetProperty("text").GetString() == "${text}")
+                    views.Add(new(Math.Max(1, I(e, "w", ctx)), Math.Max(1, I(e, "h", ctx)), S(e, "font", ctx, "body"), I(e, "size", ctx, 17), B(e, "bold")));
+                if (e.TryGetProperty("commands", out var nested)) Read(nested);
+            }
+        }
+        Read(d.Scenes.GetProperty("lyric"));
+        return views.OrderBy(v => v.Width / (double)Math.Max(1, v.Size)).FirstOrDefault() ?? new(240, 32, "body", 17, false);
+    }
+    public static PixelFrame Render(string text, string mode, Settings s, double elapsed, Snapshot snap, DateTime now, LyricScroll? lyricScroll = null, LyricCue? lyricCue = null)
     {
         var d = All.GetValueOrDefault(s.Themes ? s.Theme : "paper") ?? All.Values.First(); var c = new PixelCanvas(); var ctx = new Context(c, d, s, snap);
+        ctx.LyricScroll = mode == "歌词" ? lyricScroll ?? new(0, 8) : null;
+        ctx.LyricCue = mode == "歌词" ? lyricCue : null;
         foreach (var p in new Dictionary<string, string> { { "text", text }, { "time", now.ToString("HH:mm") }, { "hour", now.ToString("HH") }, { "minute", now.ToString("mm") }, { "second", s.Seconds ? now.ToString("ss") : "" }, { "date", now.ToString("MM/dd") }, { "day", now.ToString("ddd", CultureInfo.InvariantCulture).ToUpperInvariant() }, { "daynum", now.ToString("dd") } }) ctx.Text[p.Key] = p.Value;
         ctx.Numbers["phase"] = s.Animations && s.Themes ? (int)(elapsed / 2) % 8 : 0; ctx.Numbers["seconds"] = s.Seconds ? 1 : 0; ctx.Numbers["graph"] = s.MonitorView == "graph" ? 1 : 0; ctx.Numbers["instrument"] = s.MonitorView == "value" ? 1 : 0;
         string scene = mode == "时钟" ? "clock" : mode == "歌词" ? "lyric" : s.MonitorView == "dense" ? "dense" : s.MonitorView == "compact" ? "pair" : "single", identity = mode + ":" + s.Theme + ":" + scene;
@@ -54,10 +72,11 @@ public static class Designs
         }
         if (mode == "系统监控" && scene != "dense") { if (ctx.Selected.Length == 0) { c.Typeset("等待监控数据", 0, 0, 256, 32, size: 18); return new(c.Data, "等待监控数据", identity); } ctx.Metric = ctx.Selected[0]; ctx.Bind(); text = ctx.Metric.Label + " " + ctx.Metric.Text(); identity += ":" + ctx.Metric.Key; }
         if (scene == "pair") { identity += ":" + string.Join("+", ctx.Selected.Select(m => m.Key)); text = string.Join(" / ", ctx.Selected.Select(m => m.Label + " " + m.Text())); }
-        if (mode == "歌词") identity += ":" + text; if (scene == "dense") identity += ":dense"; Execute(d.Scenes.GetProperty(scene), ctx); return new(c.Data, text, identity);
+        if (mode == "歌词") identity += ":" + text; if (scene == "dense") identity += ":dense"; Execute(d.Scenes.GetProperty(scene), ctx); return new(c.Data, text, identity, ctx.LyricPart == 1, ctx.LyricPart);
     }
     sealed class Context(PixelCanvas canvas, Design design, Settings settings, Snapshot snapshot)
     {
+        public LyricScroll? LyricScroll; public int LyricPart; public LyricCue? LyricCue;
         public PixelCanvas Canvas = canvas; public Design Design = design; public Settings Settings = settings; public Snapshot Snapshot = snapshot; public Metric? Metric; public Metric[] Selected = []; public Dictionary<string, double> Numbers = []; public Dictionary<string, string> Text = []; public int Budget = 4096;
         public void Bind() { if (Metric == null) return; Text["label"] = Metric.Label; Text["value"] = Metric.Text(); Text["compact"] = Metric.Text(true); Text["short"] = Metric.Short; Text["maxlabel"] = Metric.Scale == 100 ? "100" : "AUTO"; Numbers["ratio"] = Metric.Ratio; Numbers["valid"] = Metric.Value != null ? 1 : 0; }
     }
@@ -84,7 +103,13 @@ public static class Designs
                 case "small": c.Small(S(e, "text", ctx), x, y, e.TryGetProperty("right", out _) ? I(e, "right", ctx) : null); break;
                 case "raster": c.Raster(S(e, "text", ctx), x, y, I(e, "scale", ctx, 1), B(e, "dotted")); break;
                 case "digits": c.Digits(S(e, "text", ctx), x, y, w, h, S(e, "style", ctx, "pixel")); break;
-                case "text": c.Typeset(S(e, "text", ctx), x, y, w, h, S(e, "font", ctx, "body"), I(e, "size", ctx, 17), B(e, "bold"), S(e, "align", ctx, "center")); break;
+                case "text":
+                    if (ctx.LyricCue is { } cue && e.GetProperty("text").GetString() == "${text}")
+                        c.LyricPage(cue.Text, x, y, w, h, S(e, "font", ctx, "body"), I(e, "size", ctx, 17), B(e, "bold"), cue.Part == 1 ? "left" : cue.Part == 2 ? "right" : S(e, "align", ctx, "center"));
+                    else if (ctx.LyricScroll is { } scroll && e.GetProperty("text").GetString()!.Contains("${text}"))
+                        ctx.LyricPart = Math.Max(ctx.LyricPart, c.Lyric(S(e, "text", ctx), x, y, w, h, scroll, S(e, "font", ctx, "body"), I(e, "size", ctx, 17), B(e, "bold"), S(e, "align", ctx, "center")));
+                    else c.Typeset(S(e, "text", ctx), x, y, w, h, S(e, "font", ctx, "body"), I(e, "size", ctx, 17), B(e, "bold"), S(e, "align", ctx, "center"));
+                    break;
                 case "tag": c.Tag(S(e, "text", ctx), x, y, w); break;
                 case "erase": c.Erase(x, y, w, h); break;
                 case "invert": c.Invert(x, y, w, h); break;

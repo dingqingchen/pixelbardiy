@@ -1,11 +1,13 @@
 # 固件文件、更新工具与验证
 
+完整操作手册：[功能、前提与逐步命令](FIRMWARE_USAGE.md)。2.6.0 更新的是工程资料和说明，显示 BIN 与 2.5.1 完全相同；本次不要求已验证设备重刷。
+
 ## 文件入口
 
 - [当前换色与过场镜像](../firmware/hpl2-color/mcu-hpl2-color.bin) / [SHA256](../firmware/hpl2-color/mcu-hpl2-color.bin.sha256)。
 - [字符雨历史镜像](../firmware/hpl2-matrix/mcu-hpl2-matrix.bin)。
 - [全屏动画历史镜像](../firmware/hpl2-fullscreen/mcu-hpl2-fullscreen.bin)。
-- [固件与工程工具 ZIP](../packages/HaloPixelBar-MCU-2.5.1.zip) / [校验清单](../packages/SHA256SUMS.txt)。
+- [固件与工程工具 ZIP](../packages/HaloPixelBar-MCU-2.6.0.zip) / [校验清单](../packages/SHA256SUMS.txt)。
 - [当前补丁源码、报告与脚本](../halo-studio-dotnet/firmware-color/README.md)。
 
 三个镜像均为 57,252 字节的显示 MCU 应用镜像。最新 SHA256 为 `9a1b6d1425e980ca1bf9753e0dc1c7ef5ffefde95c741c9a6cf797ace5da237e`。ZIP 保留源码和依赖目录结构，包含原始 codec 基线和工程脚本；不包含个人身份记录、刷机日志、备份、温度驱动安装器或原厂完整更新包。

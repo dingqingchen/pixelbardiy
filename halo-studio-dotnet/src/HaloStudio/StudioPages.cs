@@ -40,6 +40,8 @@ public sealed partial class StudioForm
         var fans = Card(p, "风扇额定转速", "输入额定最大 RPM，用于计算相对转速百分比。"); fanKey.PlaceholderText = "传感器键，例如 gpu0_fan0"; fanMax.PlaceholderText = "最大 RPM";
         Setting(fans, "风扇传感器", "使用显示指标中的传感器键", new InputSurface(fanKey, 256));
         Setting(fans, "额定最大转速", "单位：RPM", new InputSurface(fanMax, 160));
+        void SaveFanIfValid() { string key = fanKey.Text.Trim(); if (key.Length > 0 && double.TryParse(fanMax.Text, out double max) && double.IsFinite(max) && max > 0 && current.FanLimits.GetValueOrDefault(key) != max) Set(current with { FanLimits = new(current.FanLimits) { [key] = max } }); }
+        fanKey.Validated += (_, _) => SaveFanIfValid(); fanMax.Validated += (_, _) => SaveFanIfValid();
         fans.Controls.Add(Button("保存额定转速", () => { if (double.TryParse(fanMax.Text, out double max) && double.IsFinite(max) && max > 0 && fanKey.Text.Trim().Length > 0) Set(current with { FanLimits = new(current.FanLimits) { [fanKey.Text.Trim()] = max } }); else MessageBox.Show(this, "请输入传感器键和大于 0 的额定转速。", "风扇设置"); }));
         var live = Card(p, "实时硬件状态", "当前数值与采集来源", fullWidth: true); live.Controls.Add(sensors);
     }
@@ -47,8 +49,10 @@ public sealed partial class StudioForm
     {
         var p = pages[2]; var now = Card(p, "正在聆听", fullWidth: true); now.Controls.Add(musicTitle); now.Controls.Add(lyric); now.Controls.Add(musicDetail);
         var lrc = Card(p, "歌词同步");
-        Setting(lrc, "联网匹配歌词", "优先使用网易云当前句，也可导入 LRC", Toggle("联网匹配歌词", () => current.Online, v => Set(current with { Online = v })));
-        Setting(lrc, "时间轴偏移", "仅用于有播放时间轴的同步歌词，单位：秒", Number("时间轴偏移", -30, 30, () => (decimal)current.Offset, v => Set(current with { Offset = (double)v }), 1)); lrc.Controls.Add(Button("导入 LRC 文件", ImportLrc));
+        Setting(lrc, "联网匹配歌词", "优先完整时间轴；没有进度时按网易云换句对齐", Toggle("联网匹配歌词", () => current.Online, v => Set(current with { Online = v })));
+        Setting(lrc, "刷新延迟补偿", "默认提前 0.8 秒，可与手动偏移叠加", Number("刷新延迟补偿", 0, 3, () => (decimal)current.LyricLeadSeconds, v => Set(current with { LyricLeadSeconds = (double)v }), 1));
+        Setting(lrc, "时间轴偏移", "秒；正值再提前，负值延后。Enter 或点击空白处应用", Number("时间轴偏移", -30, 30, () => (decimal)current.Offset, v => Set(current with { Offset = (double)v }), 1)); lrc.Controls.Add(Button("导入 LRC 文件", ImportLrc));
+        lrc.Controls.Add(Hint("有逐字／逐词时间戳时，按主题宽度分成短句并准时换页；否则仅显示开头… → …结尾，预留传输耗时让结尾至少占半程。未知时间轴时尽早显示结尾。"));
         var light = Card(p, "音乐氛围灯");
         Setting(light, "氛围灯", "控制音响两侧灯光", Toggle("氛围灯", () => current.AmbientEnabled, v => Set(current with { AmbientEnabled = v })));
         Setting(light, "跟随音乐强弱", "读取实际声音峰值，音量固定也能律动", Toggle("跟随音乐强弱", () => current.Rhythm, v => Set(current with { Rhythm = v })));
@@ -120,6 +124,6 @@ public sealed partial class StudioForm
     ToggleSwitch Toggle(string title, Func<bool> get, Action<bool> set) { var c = new ToggleSwitch { AccessibleName = title }; bindings.Add(() => c.Checked = get()); c.CheckedChanged += (_, _) => { if (!loading) set(c.Checked); }; return c; }
     Control Combo(string title, (string Key, string Name)[] options, Func<string> get, Action<string> set) { var c = new StudioCombo { AccessibleName = title }; foreach (var p in options) c.Options.Add(new(p.Key, p.Name)); bindings.Add(() => c.Value = get()); c.ValueChanged += (_, _) => { if (!loading) set(c.Value); }; return c; }
 
-    Control Number(string title, decimal min, decimal max, Func<decimal> get, Action<decimal> set, int places = 0) { var c = new NumericUpDown { Minimum = min, Maximum = max, DecimalPlaces = places, Increment = places > 0 ? .1m : 1, BackColor = Palette.Input, ForeColor = Palette.Text, BorderStyle = BorderStyle.None, Width = 130, AccessibleName = title }; bindings.Add(() => c.Value = Math.Clamp(get(), min, max)); c.ValueChanged += (_, _) => { if (!loading) set(c.Value); }; return new InputSurface(c, 160); }
+    Control Number(string title, decimal min, decimal max, Func<decimal> get, Action<decimal> set, int places = 0) { var c = new CommitNumber { Minimum = min, Maximum = max, DecimalPlaces = places, Increment = places > 0 ? .1m : 1, BackColor = Palette.Input, ForeColor = Palette.Text, BorderStyle = BorderStyle.None, Width = 130, AccessibleName = title }; bindings.Add(() => { if (!c.ContainsFocus) c.Value = Math.Clamp(get(), min, max); }); c.ValueChanged += (_, _) => { if (!loading) set(c.Value); }; return new InputSurface(c, 160); }
     static TextBox Input(int width) => new() { Width = width, BackColor = Palette.Input, ForeColor = Palette.Text, BorderStyle = BorderStyle.FixedSingle, Margin = new(0, 5, 12, 5) };
 }

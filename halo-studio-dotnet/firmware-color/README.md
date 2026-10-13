@@ -1,5 +1,7 @@
 # HPL2 帧内换色与连续过场
 
+**2.6.0 资料包（BIN 未变）**：支持功能、依赖、备份、离线重建、预检、实际刷写、刷后测试和有条件回退的完整 PowerShell 命令见 [固件工具使用流程](../docs/FIRMWARE_USAGE.md)。这是从已验证字符雨版升级的工程工具，不是原厂新机的一键刷机包。
+
 旧客户端通过 RELEASE → 原厂 EF 调色 → 等待 → ACQUIRE 换色，因此主题与演示之间会露出原厂时钟。本扩展保持同一独占租约，在压缩帧 CRC 验证通过时一起提交 RGB。扩展颜色仅在 RAM 生效，未写入原厂配置；退出、失去心跳、原厂电源/复位/OTA 起始指令仍走已验证的恢复路径。
 
 | 项目 | 值 |
@@ -16,9 +18,9 @@ BEGIN 操作 6 保留原 12 字节格式，新增**精确 15 字节**格式：�
 
 `derive_source.py` 从完整保留的字符雨源文件产生独立扩展源；`validate_color.py` 执行真实 ARM 指令，包括颜色缩放与 336 位输出编码，仅模拟物理 DMA 外设。19 组原生命周期、8 组 codec、11 组全屏动画、20 组新增检查通过；新增检查覆盖两种过场每步全部像素、原字符雨全部帧、错误包、颜色提交、同色抑制、帧号循环、退出与超时。显示测试未触发 Flash 操作；30 个原厂主题场景和 16 个字体用例保持一致。新旧固件双向 OTA 暂存逐字节一致，共 1,041 包。
 
-运行离线验证需要工程的 `firmware-lab`（公开仓库位于 `legacy-python/`，本机分目录布局位于相邻的 `halo-controller`），Unicorn 2.1.3、Capstone 5.0.6、Keystone 0.9.2。报告只描述离线结果，不代表物理启动已验证。
+运行离线验证需要工程的 `firmware-lab`（公开仓库位于 `legacy-python/`，本机分目录布局位于相邻的 `halo-controller`），Unicorn 2.1.3、Capstone 5.0.9、Keystone 0.9.2。报告只描述离线结果，不代表物理启动已验证。
 
-`stage_color.py` 默认只读预检。`--flash-authorized` 才发送显示 MCU 更新，`--rollback` 选择备份的字符雨版本。脚本核验精确哈希、352 文件备份清单、设备身份和一次性尝试标记，不自动重试，不改 USB/音频主控。需要本机 `validation/color-backup-path.txt`、已准备的完整工程和备份；分发包不是无条件通用刷写器。
+`stage_color.py` 默认只读预检。`--flash-authorized` 才发送显示 MCU 更新，`--rollback` 选择备份的字符雨版本。脚本核验精确哈希、本机完整备份清单（本次历史实测为 352 个文件，脚本不固定数量）、设备身份和一次性尝试标记，不自动重试，不改 USB/音频主控。需要本机 `validation/color-backup-path.txt`、已准备的完整工程和备份；分发包不是无条件通用刷写器。
 
 C# 诊断 `--color-commission --after-observed-reboot --live-folder <本机 color-live> --runtime <本机运行目录>` 只在已完成的对应传输和设备身份匹配时运行，播放 6 个主题/颜色；加 `--timeout-release` 则仅显示一幕后停心跳、不发退出。它不会写入目视确认记录。普通客户端始终按已确认 SHA 开启新能力。
 
