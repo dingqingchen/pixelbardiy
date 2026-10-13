@@ -1,2 +1,4 @@
-724cc39f426fdc6074cb1a64ce21ff38018e0fca08abe93ba02b9f3cca6e7a7d  HaloStudio-v1.0.0-win64.zip
 5c12d945c8d30112e498f5b505a5f8f026177a6780dcd366547e0f001b8b2188  HaloFirmware-v1.0.0-win64.zip
+94cb8191f716fd94f30b99e69b1eed10a415e8ad0168b04679593a024fffd7b9  HaloPixelBar-MCU-2.5.1.zip
+e6c2fb9d3d1efcfaf7626b05806ac6a0bad1255d28433859ed89295f4b98a87b  HaloStudio-CSharp-2.5.1-win64.zip
+724cc39f426fdc6074cb1a64ce21ff38018e0fca08abe93ba02b9f3cca6e7a7d  HaloStudio-v1.0.0-win64.zip

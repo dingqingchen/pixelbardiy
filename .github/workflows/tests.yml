@@ -7,11 +7,28 @@ permissions:
 jobs:
   tests:
     runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: legacy-python
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: pip
+          cache-dependency-path: legacy-python/requirements*.txt
       - run: python -m pip install -r requirements-dev.txt
-      - run: python -m pytest -q
+      - run: python -m pytest tests -q
+  dotnet:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: halo-studio-dotnet
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: dotnet publish src/HaloStudio/HaloStudio.csproj -c Release -r win-x64 --self-contained true -o dist/HaloStudioNet
+      - shell: pwsh
+        run: ./scripts/verify.ps1

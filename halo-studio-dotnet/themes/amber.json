@@ -1,0 +1,489 @@
+{
+  "version": 1,
+  "id": "amber",
+  "transition": "center",
+  "name": "复古 · 琥珀音响",
+  "color": "#FF6000",
+  "accent": "#FF915D",
+  "description": "点阵数字 / 磁带双盘 / 模拟电平",
+  "sprites": {
+    "cat": [
+      "X.........X",
+      "XX.......XX",
+      "X.XXXXXXX.X",
+      "X.........X",
+      "X..X...X..X",
+      "X.........X",
+      "X....X....X",
+      "X...X.X...X",
+      ".X.......X.",
+      "..XXXXXXX.."
+    ],
+    "bunny": [
+      "..XX...XX..",
+      "..XX...XX..",
+      "..XX...XX..",
+      ".XXXXXXXXX.",
+      "X.........X",
+      "X..X...X..X",
+      "X.........X",
+      ".X...X...X.",
+      "..XXXXXXX.."
+    ],
+    "heart": [
+      ".XX.XX.",
+      "XXXXXXX",
+      "XXXXXXX",
+      ".XXXXX.",
+      "..XXX..",
+      "...X..."
+    ]
+  },
+  "scenes": {
+    "clock": [
+      {
+        "op": "digits",
+        "text": "${time}",
+        "x": 1,
+        "y": 0,
+        "w": 177,
+        "h": 24,
+        "style": "dots"
+      },
+      {
+        "op": "rect",
+        "x": 185,
+        "y": 1,
+        "w": 70,
+        "h": 30,
+        "fill": false
+      },
+      {
+        "op": "small",
+        "text": "FM LOCAL",
+        "x": 191,
+        "y": 4
+      },
+      {
+        "op": "small",
+        "text": "${second} SEC",
+        "x": 195,
+        "y": 20,
+        "when": "=seconds"
+      },
+      {
+        "op": "small",
+        "text": "${date}",
+        "x": 195,
+        "y": 20,
+        "when": "=1-seconds"
+      },
+      {
+        "op": "repeat",
+        "count": 35,
+        "commands": [
+          {
+            "op": "line",
+            "x": "=4+i*5",
+            "y": 28,
+            "x2": "=4+i*5",
+            "y2": "=29+i%3"
+          }
+        ],
+        "var": "i",
+        "start": 0,
+        "step": 1
+      },
+      {
+        "op": "rect",
+        "x": "=5+phase*21",
+        "y": 26,
+        "w": 7,
+        "h": 2,
+        "fill": true
+      }
+    ],
+    "lyric": [
+      {
+        "op": "repeat",
+        "count": 2,
+        "commands": [
+          {
+            "op": "circle",
+            "x": "=9+i*18",
+            "y": 10,
+            "r": 7
+          },
+          {
+            "op": "circle",
+            "x": "=9+i*18",
+            "y": 10,
+            "r": 2
+          },
+          {
+            "op": "line",
+            "x": "=9+i*18",
+            "y": 10,
+            "x2": "=9+i*18+round(cos(phase*pi/4)*6)",
+            "y2": "=10+round(sin(phase*pi/4)*6)"
+          }
+        ],
+        "var": "i",
+        "start": 0,
+        "step": 1
+      },
+      {
+        "op": "line",
+        "x": 6,
+        "y": 22,
+        "x2": 31,
+        "y2": 22
+      },
+      {
+        "op": "line",
+        "x": 6,
+        "y": 22,
+        "x2": 3,
+        "y2": 29
+      },
+      {
+        "op": "line",
+        "x": 31,
+        "y": 22,
+        "x2": 34,
+        "y2": 29
+      },
+      {
+        "op": "line",
+        "x": 3,
+        "y": 29,
+        "x2": 34,
+        "y2": 29
+      },
+      {
+        "op": "repeat",
+        "count": 25,
+        "commands": [
+          {
+            "op": "rect",
+            "x": "=41+i*8",
+            "y": 0,
+            "w": 3,
+            "h": 2,
+            "fill": true
+          },
+          {
+            "op": "rect",
+            "x": "=41+i*8",
+            "y": 30,
+            "w": 3,
+            "h": 2,
+            "fill": true
+          }
+        ],
+        "var": "i",
+        "start": 0,
+        "step": 1
+      },
+      {
+        "op": "text",
+        "text": "${text}",
+        "x": 42,
+        "y": 4,
+        "w": 193,
+        "h": 24,
+        "size": 16,
+        "bold": true
+      },
+      {
+        "op": "repeat",
+        "count": 7,
+        "commands": [
+          {
+            "op": "rect",
+            "x": 243,
+            "y": "=4+i*4",
+            "w": 11,
+            "h": 2,
+            "fill": true
+          }
+        ],
+        "var": "i",
+        "start": 0,
+        "step": 1
+      }
+    ],
+    "single": [
+      {
+        "op": "tag",
+        "text": "${label}",
+        "x": 1,
+        "y": 0,
+        "w": 127
+      },
+      {
+        "op": "digits",
+        "text": "${value}",
+        "x": 0,
+        "y": 11,
+        "w": 130,
+        "h": 21,
+        "style": "dots"
+      },
+      {
+        "op": "small",
+        "text": "NOW",
+        "x": 135,
+        "y": 2,
+        "when": "=valid*(1-graph)*(1-instrument)"
+      },
+      {
+        "op": "segments",
+        "x": 158,
+        "y": 2,
+        "w": 96,
+        "h": 7,
+        "count": 16,
+        "ratio": "=ratio",
+        "when": "=valid*(1-graph)*(1-instrument)"
+      },
+      {
+        "op": "small",
+        "text": "TRACE",
+        "x": 135,
+        "y": 14,
+        "when": "=valid*(1-graph)*(1-instrument)"
+      },
+      {
+        "op": "history",
+        "x": 174,
+        "y": 14,
+        "w": 80,
+        "h": 13,
+        "when": "=valid*(1-graph)*(1-instrument)"
+      },
+      {
+        "op": "repeat",
+        "count": 12,
+        "commands": [
+          {
+            "op": "rect",
+            "x": "=158+i*8",
+            "y": 29,
+            "w": 1,
+            "h": 1,
+            "fill": true
+          }
+        ],
+        "var": "i",
+        "start": 0,
+        "step": 1,
+        "when": "=valid*(1-graph)*(1-instrument)"
+      },
+      {
+        "op": "dial",
+        "x": 187,
+        "y": 25,
+        "r": 20,
+        "ratio": "=ratio",
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "rect",
+        "x": 141,
+        "y": 1,
+        "w": 65,
+        "h": 30,
+        "fill": false,
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "small",
+        "text": "LEVEL",
+        "x": 207,
+        "y": 5,
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "small",
+        "text": "${maxlabel}",
+        "x": 214,
+        "y": 20,
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "history",
+        "x": 142,
+        "y": 5,
+        "w": 109,
+        "h": 21,
+        "when": "=valid*graph",
+        "area": false
+      },
+      {
+        "op": "erase",
+        "x": 140,
+        "y": 1,
+        "w": 116,
+        "h": 31,
+        "when": "=1-valid"
+      },
+      {
+        "op": "small",
+        "text": "NO SENSOR",
+        "x": 147,
+        "y": 12,
+        "when": "=1-valid"
+      }
+    ],
+    "pair": [
+      {
+        "op": "metrics",
+        "count": 2,
+        "commands": [
+          {
+            "op": "tag",
+            "text": "${label}",
+            "x": "=x",
+            "y": 0,
+            "w": 124
+          },
+          {
+            "op": "digits",
+            "text": "${value}",
+            "x": "=x+3",
+            "y": 11,
+            "w": 118,
+            "h": 18,
+            "style": "dots"
+          },
+          {
+            "op": "segments",
+            "x": "=x+4",
+            "y": 30,
+            "w": 117,
+            "h": 2,
+            "count": 23,
+            "ratio": "=ratio"
+          }
+        ]
+      },
+      {
+        "op": "line",
+        "x": 127,
+        "y": 2,
+        "x2": 127,
+        "y2": 29
+      }
+    ],
+    "dense": [
+      {
+        "op": "metrics",
+        "items": [
+          {
+            "key": "upload",
+            "label": "UP",
+            "short": "UP",
+            "unit": "B/s",
+            "x": 0,
+            "w": 68
+          },
+          {
+            "key": "download",
+            "label": "DN",
+            "short": "DN",
+            "unit": "B/s",
+            "x": 0,
+            "w": 68
+          },
+          {
+            "key": "cpu",
+            "label": "CPU",
+            "short": "CPU",
+            "unit": "%",
+            "x": 68,
+            "w": 61
+          },
+          {
+            "key": "gpu0",
+            "label": "GPU",
+            "short": "GPU",
+            "unit": "%",
+            "x": 68,
+            "w": 61
+          },
+          {
+            "key": "cpu_temp",
+            "label": "C",
+            "short": "C",
+            "unit": "C",
+            "x": 129,
+            "w": 56
+          },
+          {
+            "key": "gpu0_temp",
+            "label": "G",
+            "short": "G",
+            "unit": "C",
+            "x": 129,
+            "w": 56
+          },
+          {
+            "key": "ram",
+            "label": "RAM",
+            "short": "RAM",
+            "unit": "%",
+            "x": 185,
+            "w": 71
+          },
+          {
+            "key": "ram_gb",
+            "label": "",
+            "short": "",
+            "unit": "GB",
+            "x": 185,
+            "w": 71
+          }
+        ],
+        "commands": [
+          {
+            "op": "small",
+            "text": "${label} ${compact}",
+            "x": "=x+4",
+            "y": "=y"
+          },
+          {
+            "op": "segments",
+            "x": "=x+4",
+            "y": "=y+9",
+            "w": "=w-8",
+            "h": 2,
+            "count": 10,
+            "ratio": "=ratio"
+          }
+        ]
+      },
+      {
+        "op": "line",
+        "x": 68,
+        "y": 1,
+        "x2": 68,
+        "y2": 30
+      },
+      {
+        "op": "line",
+        "x": 129,
+        "y": 1,
+        "x2": 129,
+        "y2": 30
+      },
+      {
+        "op": "line",
+        "x": 185,
+        "y": 1,
+        "x2": 185,
+        "y2": 30
+      }
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+bin/
+obj/
+dist/
+dist-check/
+packages/
+runtime/
+validation/
+*.user

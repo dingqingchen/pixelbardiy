@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "basis": "2026-10-14：快捷色按近似观感的色相顺序排列，白色置后；包含六套主题原色。G1 浅绿、P2 淡粉及土黄、白色保留校准；新增柔红待实屏核对。preview 是近似观感，input 是设备发送值。",
+  "colors": [
+    { "input": "#FF0000", "preview": "#FF0000", "name": "朱红", "observation": "原纯红，仅保留旧设置的颜色说明", "quick": false },
+    { "input": "#D8321C", "preview": "#EA8C88", "name": "柔红", "observation": "降低红通道并少量混色的柔和红候选；待实屏核对，预览为目标近似", "quick": true },
+    { "input": "#FF6000", "preview": "#C7A34A", "name": "土黄", "observation": "琥珀音响原色；保留已认可的土黄效果，预览近似", "quick": true },
+    { "input": "#00FF00", "preview": "#00FF00", "name": "纯绿", "observation": "原纯绿，仅保留旧设置的颜色说明", "quick": false },
+    { "input": "#60FF30", "preview": "#A4EBAC", "name": "浅绿", "observation": "雷达终端原色；G1 实屏校准，作为柔和绿色，预览近似", "quick": true },
+    { "input": "#8DF5B4", "preview": "#9EC5F1", "name": "浅蓝", "observation": "比离子蓝浅；预览近似", "quick": false },
+    { "input": "#64DFFF", "preview": "#78A9F4", "name": "离子蓝", "observation": "离子仪表原色；作为柔和蓝色，偏蓝观感，预览近似", "quick": true },
+    { "input": "#D6BBFF", "preview": "#89A1F0", "name": "猫咪蓝", "observation": "猫咪乐谱原色；偏蓝观感，预览近似", "quick": true },
+    { "input": "#0000FF", "preview": "#0000FF", "name": "纯蓝", "observation": "原纯蓝，仅保留旧设置的颜色说明", "quick": false },
+    { "input": "#FF4080", "preview": "#BC93EF", "name": "桃紫", "observation": "较浓紫色；预览近似", "quick": false },
+    { "input": "#FF6048", "preview": "#F2B3C8", "name": "淡粉", "observation": "桃兔甜点原色；P2 实屏校准接近淡粉，预览近似", "quick": true },
+    { "input": "#FFFFFF", "preview": "#FFFFFF", "name": "白色", "observation": "月白书页原色；实屏随下方白色校正，预览为目标白", "quick": true }
+  ]
+}

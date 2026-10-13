@@ -12,3 +12,8 @@ firmware-lab/vendor-*/
 .build-env-path
 .ssh-known-hosts
 release-staging/
+**/bin/
+**/obj/
+**/dist-*/
+**/validation/
+**/regression/

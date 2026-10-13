@@ -1,0 +1,42 @@
+AMD temperature sampler: adapted from LibreHardwareMonitor, MPL-2.0.
+Copyright (C) LibreHardwareMonitor and Contributors.
+Full license: licenses/LibreHardwareMonitor/LICENSE in packaged app.
+Ported source: thermal-native/halo_thermal.c in HaloStudio source workspace.
+
+PawnIO AMDFamily17 module (unmodified): LGPL-2.1-or-later.
+Copyright (C) 2025 namazso <admin@namazso.eu>.
+Full license, upstream module source, provenance: licenses/PawnIO in packaged app.
+Source: https://github.com/namazso/PawnIO.Modules
+Official signed installer: https://github.com/namazso/PawnIO.Setup/releases/tag/2.2.0
+
+PySide6/Qt for Python: LGPL-3.0/GPL-3.0/commercial upstream distribution.
+Unmodified Python wheels and their license/metadata files are packaged.
+Source and licensing: https://code.qt.io/cgit/pyside/pyside-setup.git/
+Qt sources: https://download.qt.io/official_releases/qt/
+Other dependencies retain their included upstream license and metadata.
+
+halo/vendor_core.py derives from Seraph310/halo-pixelbar-mcp (MIT).
+Protocol/lyrics references also credit HaloPixelToolBox; see licenses directory.
+The display MCU image includes proprietary Edifier code and is not MIT licensed.
+
+MIT License
+
+Copyright (c) 2026 Seraph310
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

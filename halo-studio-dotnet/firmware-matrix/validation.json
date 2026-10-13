@@ -1,0 +1,429 @@
+{
+  "candidate_sha256": "ccb55a58beb825e730175969d9388bdc94ef55d0ad8534947a3ec8c728473884",
+  "installed_sha256": "ab4698cf8e826a3c64472ea0af1125653f65f796cd7fcf9013667344e4c0fc50",
+  "image_bytes": 57252,
+  "baseline": {
+    "candidate_sha256": "ccb55a58beb825e730175969d9388bdc94ef55d0ad8534947a3ec8c728473884",
+    "installed_sha256": "f7b8ee274ba2439b3211c5eea80206599acff6e80d73dc0c898ba143e2e32f62",
+    "image_bytes": 57252,
+    "layout": {
+      "core_address": "0x800c528",
+      "core_bytes": 588,
+      "session_address": "0x800c774",
+      "session_bytes": 1232,
+      "decoder_bytes": 200,
+      "remaining_bytes": 1300,
+      "hooks": [
+        {
+          "address": "0x800519a",
+          "original": "f8b50400",
+          "replacement": "05f0c3be",
+          "target": "0x800af24"
+        },
+        {
+          "address": "0x8006be6",
+          "original": "fff7b1fe",
+          "replacement": "05f0c5fd",
+          "target": "0x800c774"
+        },
+        {
+          "address": "0x8008c7e",
+          "original": "fdf7adff",
+          "replacement": "03f07bfd",
+          "target": "0x800c778"
+        },
+        {
+          "address": "0x800f292",
+          "original": "fbf7a7f9",
+          "replacement": "fdf773fa",
+          "target": "0x800c77c"
+        },
+        {
+          "address": "0x8008bce",
+          "original": "2de9fc47",
+          "replacement": "03f0d7bd",
+          "target": "0x800c780"
+        },
+        {
+          "address": "0x800886e",
+          "original": "2c540888",
+          "replacement": "03f093bf",
+          "target": "0x800c798"
+        },
+        {
+          "address": "0x8008bf4",
+          "original": "3a4d2868",
+          "replacement": "03f0d2bd",
+          "target": "0x800c79c"
+        },
+        {
+          "address": "0x8008cc2",
+          "original": "00f06bfa",
+          "replacement": "03f06dfd",
+          "target": "0x800c7a0"
+        },
+        {
+          "address": "0x8008c82",
+          "original": "01f02afb",
+          "replacement": "03f07ffd",
+          "target": "0x800c784"
+        },
+        {
+          "address": "0x8008c86",
+          "original": "01f04afb",
+          "replacement": "03f07ffd",
+          "target": "0x800c788"
+        },
+        {
+          "address": "0x8008c8a",
+          "original": "01f066fb",
+          "replacement": "03f07ffd",
+          "target": "0x800c78c"
+        },
+        {
+          "address": "0x8008c92",
+          "original": "01f08bfb",
+          "replacement": "03f07dfd",
+          "target": "0x800c790"
+        },
+        {
+          "address": "0x8008c9a",
+          "original": "01f09afb",
+          "replacement": "03f07bfd",
+          "target": "0x800c794"
+        }
+      ],
+      "extension_address": "0x800cc44",
+      "extension_bytes": 1392,
+      "extension_state": [
+        "0x20001358",
+        "0x200013b8"
+      ],
+      "ota_compat_address": "0x800d1b4",
+      "ota_compat_bytes": 92,
+      "change_ranges_vs_installed": [
+        [
+          "0x800c774",
+          "0x800d724"
+        ],
+        [
+          "0x800afec",
+          "0x800b024"
+        ],
+        [
+          "0x800519a",
+          "0x800519e"
+        ],
+        [
+          "0x80052e2",
+          "0x80052e6"
+        ],
+        [
+          "0x800ebec",
+          "0x800ecec"
+        ],
+        [
+          "0x800f632",
+          "0x800f674"
+        ],
+        [
+          "0x800fed4",
+          "0x800fed8"
+        ]
+      ],
+      "animation_old_frame": [
+        "0x200013b8",
+        "0x200017b8"
+      ]
+    },
+    "baseline": {
+      "legacy": {
+        "checks": [
+          "pinned emulator executes real monitored memset/memcmp IT blocks with correct bounds and return",
+          "actual init hook clears shared lease state before original startup continuation",
+          "real UART parser -> patched dispatcher -> bounded receiver -> stock copy/flush; two atomic frames and final retry",
+          "idle heartbeats hold lease without frames; unsigned monotonic counter wrap",
+          "real timer ISR crosses stock 1000-tick reset; separate lease counter continues",
+          "stock text/mode/upload/draw schedulers excluded; communication-ready still passes",
+          "actual main-loop body defers a pending settings save while owned; no persistent writer reached",
+          "actual loop-entry branch skips pending stock overlay while owned; timeout restores original continuation",
+          "explicit release calls real built-in clock initializer; old SID/data/heartbeat cannot reclaim it",
+          "host silence scenarios release at 2000 ticks through actual service hook; incomplete frame discarded",
+          "another SID cannot change lease, release it, or renew timeout",
+          "integrated CRC/order/changed-retry rejection retains old frame; a fresh frame transaction recovers",
+          "OTA start/power/reset release before original handler; dangerous handler I/O mocked",
+          "cannot acquire during OTA or an existing stock upload",
+          "reserved data and obsolete START never enter Flash handlers after workspace reuse; fresh normal START still routes",
+          "real parser accepts byte-by-byte split header, payload and terminator",
+          "48 malformed extension frames and overlong declared length stay in guarded buffers; parser resynchronizes",
+          "offline PC planner uses 500ms idle heartbeat, 28 fragments, and idempotent explicit stop",
+          "PC lifecycle driver -> actual ARM parser: static-frame dedup, 10s heartbeat, explicit close, retired-ID refusal"
+        ],
+        "checks_passed": 19,
+        "machines": 74,
+        "instructions": 4024625,
+        "frames": 19,
+        "forbidden_flash_calls": 0
+      },
+      "checks": [
+        "raw/RLE/XOR-RLE including incompressible pixels, sparse differences and split tokens; CRC atomic commit",
+        "RLE streaming decoder handles every permitted fragment split without crossing the output boundary",
+        "bad CRC/order/base/repeated fragment/truncation/overflow/extra data never publish; full frame recovers",
+        "24 local up/wipe steps preserve decorations and match independent bit model; no USB frames needed",
+        "new content interrupts animation safely; delta applies to accepted target",
+        "release/heartbeat timeout cancel native animation; legacy fallback and wrong-SID exclusion preserved",
+        "real PC latest-target sender -> new MCU code: partial frame cancelled, committed-base delta, native animation",
+        "64 randomized malformed extended headers/data remain bounded with no resource handler forwarding"
+      ],
+      "checks_passed": 8,
+      "machines": 122,
+      "instructions": 15222869,
+      "frames": 134,
+      "forbidden_flash_calls": 0
+    },
+    "fullscreen_checks": [
+      "animation 3: all 8192 pixels at all 33 steps; intervals 8/16/64; no USB redraw; exact delta base",
+      "animation 3: unsigned tick wrap",
+      "animation 3: release clears/settles animation safely",
+      "animation 3: timeout clears/settles animation safely",
+      "animation 3: interrupt clears/settles animation safely",
+      "animation 4: all 8192 pixels at all 33 steps; intervals 8/16/64; no USB redraw; exact delta base",
+      "animation 4: unsigned tick wrap",
+      "animation 4: release clears/settles animation safely",
+      "animation 4: timeout clears/settles animation safely",
+      "animation 4: interrupt clears/settles animation safely",
+      "unknown animation IDs rejected without forwarding or state mutation"
+    ],
+    "fullscreen_checks_passed": 11,
+    "forbidden_flash_calls": 0,
+    "ota": {
+      "upgrade": {
+        "packets": 1041,
+        "bytes": 57252,
+        "exact": true,
+        "markers": [
+          [
+            2,
+            57252
+          ]
+        ]
+      },
+      "rollback": {
+        "packets": 1041,
+        "bytes": 57252,
+        "exact": true,
+        "markers": [
+          [
+            2,
+            57252
+          ]
+        ]
+      }
+    },
+    "stock_graphics": {
+      "background_bytes": 1024,
+      "glyph_cases": 16,
+      "theme_cases": 30,
+      "weak_loop_same_pc": [
+        134282964,
+        134282964
+      ]
+    },
+    "changed_bytes": 915,
+    "allowed_changes": [
+      [
+        "0x800cc44",
+        "0x800d724"
+      ],
+      [
+        "0x800519a",
+        "0x800519e"
+      ],
+      [
+        "0x80052e2",
+        "0x80052e6"
+      ]
+    ],
+    "additional_ram_bytes": 0,
+    "device_accessed": false,
+    "firmware_written": false,
+    "device_flash_readback": false,
+    "independent_dead_mcu_recovery": false,
+    "limitations": [
+      "Bootloader absent; physical install/boot is not emulated.",
+      "Known-file rollback requires a responsive application."
+    ]
+  },
+  "rain_checks": [
+    "160 local rain steps plus exact target; every pixel equals independent coordinate model, no USB redraw",
+    "bounded per-step instructions; duplicate tick does not redraw",
+    "post-effect XOR delta uses final target, never rain pixels",
+    "rain lifecycle: release",
+    "rain lifecycle: timeout",
+    "rain lifecycle: interrupt",
+    "rain lifecycle: wrong-owner"
+  ],
+  "rain_checks_passed": 7,
+  "max_instructions_per_step": 17930,
+  "forbidden_flash_calls": 0,
+  "additional_ram_bytes": 0,
+  "ota": {
+    "upgrade": {
+      "packets": 1041,
+      "bytes": 57252,
+      "exact": true,
+      "markers": [
+        [
+          2,
+          57252
+        ]
+      ]
+    },
+    "rollback": {
+      "packets": 1041,
+      "bytes": 57252,
+      "exact": true,
+      "markers": [
+        [
+          2,
+          57252
+        ]
+      ]
+    }
+  },
+  "changed_bytes": 879,
+  "layout": {
+    "core_address": "0x800c528",
+    "core_bytes": 588,
+    "session_address": "0x800c774",
+    "session_bytes": 1232,
+    "decoder_bytes": 200,
+    "remaining_bytes": 1300,
+    "hooks": [
+      {
+        "address": "0x800519a",
+        "original": "f8b50400",
+        "replacement": "05f0c3be",
+        "target": "0x800af24"
+      },
+      {
+        "address": "0x8006be6",
+        "original": "fff7b1fe",
+        "replacement": "05f0c5fd",
+        "target": "0x800c774"
+      },
+      {
+        "address": "0x8008c7e",
+        "original": "fdf7adff",
+        "replacement": "03f07bfd",
+        "target": "0x800c778"
+      },
+      {
+        "address": "0x800f292",
+        "original": "fbf7a7f9",
+        "replacement": "fdf773fa",
+        "target": "0x800c77c"
+      },
+      {
+        "address": "0x8008bce",
+        "original": "2de9fc47",
+        "replacement": "03f0d7bd",
+        "target": "0x800c780"
+      },
+      {
+        "address": "0x800886e",
+        "original": "2c540888",
+        "replacement": "03f093bf",
+        "target": "0x800c798"
+      },
+      {
+        "address": "0x8008bf4",
+        "original": "3a4d2868",
+        "replacement": "03f0d2bd",
+        "target": "0x800c79c"
+      },
+      {
+        "address": "0x8008cc2",
+        "original": "00f06bfa",
+        "replacement": "03f06dfd",
+        "target": "0x800c7a0"
+      },
+      {
+        "address": "0x8008c82",
+        "original": "01f02afb",
+        "replacement": "03f07ffd",
+        "target": "0x800c784"
+      },
+      {
+        "address": "0x8008c86",
+        "original": "01f04afb",
+        "replacement": "03f07ffd",
+        "target": "0x800c788"
+      },
+      {
+        "address": "0x8008c8a",
+        "original": "01f066fb",
+        "replacement": "03f07ffd",
+        "target": "0x800c78c"
+      },
+      {
+        "address": "0x8008c92",
+        "original": "01f08bfb",
+        "replacement": "03f07dfd",
+        "target": "0x800c790"
+      },
+      {
+        "address": "0x8008c9a",
+        "original": "01f09afb",
+        "replacement": "03f07bfd",
+        "target": "0x800c794"
+      }
+    ],
+    "extension_address": "0x800cc44",
+    "extension_bytes": 1392,
+    "extension_state": [
+      "0x20001358",
+      "0x200013b8"
+    ],
+    "ota_compat_address": "0x800d1b4",
+    "ota_compat_bytes": 92,
+    "change_ranges_vs_installed": [
+      [
+        "0x800c774",
+        "0x800d724"
+      ],
+      [
+        "0x800afec",
+        "0x800b024"
+      ],
+      [
+        "0x800519a",
+        "0x800519e"
+      ],
+      [
+        "0x80052e2",
+        "0x80052e6"
+      ],
+      [
+        "0x800ebec",
+        "0x800ecec"
+      ],
+      [
+        "0x800f632",
+        "0x800f674"
+      ],
+      [
+        "0x800fed4",
+        "0x800fed8"
+      ]
+    ],
+    "animation_old_frame": [
+      "0x200013b8",
+      "0x200017b8"
+    ]
+  },
+  "independent_dead_mcu_recovery": false,
+  "device_flash_readback": false,
+  "device_accessed": false,
+  "firmware_written": false
+}

@@ -1,0 +1,16 @@
+{
+  "repo": "namazso/PawnIO.Setup",
+  "tag": "2.2.0",
+  "url": "https://github.com/namazso/PawnIO.Setup/releases/download/2.2.0/PawnIO_setup.exe",
+  "sha256": "1f519a22e47187f70a1379a48ca604981c4fcf694f4e65b734aaa74a9fba3032",
+  "digest": "sha256:1f519a22e47187f70a1379a48ca604981c4fcf694f4e65b734aaa74a9fba3032",
+  "installer_signature": "Valid; namazso.eu; F380DCC9F706E2756A5047B832FFE719E1BC35F5",
+  "module_repo": "namazso/PawnIO.Modules",
+  "module_source_commit": "85786f3050c4a81b4d3d725f3899b98c834f106a",
+  "module_source_url": "https://github.com/namazso/PawnIO.Modules/blob/85786f3050c4a81b4d3d725f3899b98c834f106a/AMDFamily17.p",
+  "module_binary_origin": "LibreHardwareMonitor cd60f10f3290ff9b706e0f489b27ba9a50c1f9fa, Resources/PawnIo/AMDFamily17.bin; unmodified signed upstream module",
+  "module_binary_sha256": "dae74615761b78bdf064dfb3e136252ddcc6fc727d88f14738d0e5800d427a91",
+  "module_source_note": "Pinned source is for review; no claim of reproducing the signed binary byte for byte.",
+  "runtime_install_arguments": "-install -silent",
+  "runtime_io": "fixed ioctl_read_smn(0x59800); Global Access_PCI mutex"
+}

@@ -1,0 +1,421 @@
+{
+  "version": 1,
+  "id": "paper",
+  "transition": "dissolve",
+  "name": "简约 · 月白书页",
+  "color": "#FFFFFF",
+  "accent": "#90B2CC",
+  "description": "衬线数字 / 书页排版 / 山形留白",
+  "sprites": {
+    "cat": [
+      "X.........X",
+      "XX.......XX",
+      "X.XXXXXXX.X",
+      "X.........X",
+      "X..X...X..X",
+      "X.........X",
+      "X....X....X",
+      "X...X.X...X",
+      ".X.......X.",
+      "..XXXXXXX.."
+    ],
+    "bunny": [
+      "..XX...XX..",
+      "..XX...XX..",
+      "..XX...XX..",
+      ".XXXXXXXXX.",
+      "X.........X",
+      "X..X...X..X",
+      "X.........X",
+      ".X...X...X.",
+      "..XXXXXXX.."
+    ],
+    "heart": [
+      ".XX.XX.",
+      "XXXXXXX",
+      "XXXXXXX",
+      ".XXXXX.",
+      "..XXX..",
+      "...X..."
+    ]
+  },
+  "scenes": {
+    "clock": [
+      {
+        "op": "text",
+        "text": "${time}",
+        "x": 50,
+        "y": 0,
+        "w": 139,
+        "h": 32,
+        "font": "serif",
+        "size": 29
+      },
+      {
+        "op": "small",
+        "text": "${daynum}",
+        "x": 5,
+        "y": 4
+      },
+      {
+        "op": "small",
+        "text": "${day}",
+        "x": 4,
+        "y": 20
+      },
+      {
+        "op": "line",
+        "x": 40,
+        "y": 3,
+        "x2": 40,
+        "y2": 28
+      },
+      {
+        "op": "line",
+        "x": 198,
+        "y": 3,
+        "x2": 198,
+        "y2": 28
+      },
+      {
+        "op": "small",
+        "text": "${second} S",
+        "x": 213,
+        "y": 6,
+        "when": "=seconds"
+      },
+      {
+        "op": "small",
+        "text": "${date}",
+        "x": 213,
+        "y": 6,
+        "when": "=1-seconds"
+      },
+      {
+        "op": "line",
+        "x": 211,
+        "y": 24,
+        "x2": 251,
+        "y2": 24
+      },
+      {
+        "op": "repeat",
+        "count": 9,
+        "commands": [
+          {
+            "op": "rect",
+            "x": "=211+i*5",
+            "y": "=22-i%4",
+            "w": 1,
+            "h": 1,
+            "fill": true
+          }
+        ],
+        "var": "i",
+        "start": 0,
+        "step": 1
+      }
+    ],
+    "lyric": [
+      {
+        "op": "text",
+        "text": "“",
+        "x": 0,
+        "y": 0,
+        "w": 34,
+        "h": 30,
+        "font": "serif",
+        "size": 32
+      },
+      {
+        "op": "text",
+        "text": "${text}",
+        "x": 44,
+        "y": 4,
+        "w": 188,
+        "h": 24,
+        "font": "song",
+        "size": 18,
+        "align": "left"
+      },
+      {
+        "op": "line",
+        "x": 43,
+        "y": 30,
+        "x2": 116,
+        "y2": 30
+      },
+      {
+        "op": "line",
+        "x": 159,
+        "y": 30,
+        "x2": 234,
+        "y2": 30
+      },
+      {
+        "op": "rect",
+        "x": 132,
+        "y": 29,
+        "w": 6,
+        "h": 2,
+        "fill": true
+      },
+      {
+        "op": "line",
+        "x": 248,
+        "y": 5,
+        "x2": 248,
+        "y2": 27
+      },
+      {
+        "op": "small",
+        "text": "I",
+        "x": 243,
+        "y": 0
+      }
+    ],
+    "single": [
+      {
+        "op": "small",
+        "text": "${label}",
+        "x": 2,
+        "y": 1
+      },
+      {
+        "op": "text",
+        "text": "${value}",
+        "x": 1,
+        "y": 7,
+        "w": 124,
+        "h": 25,
+        "font": "serif",
+        "size": 27,
+        "align": "left"
+      },
+      {
+        "op": "line",
+        "x": 128,
+        "y": 2,
+        "x2": 128,
+        "y2": 30
+      },
+      {
+        "op": "history",
+        "x": 147,
+        "y": 4,
+        "w": 104,
+        "h": 21,
+        "area": true,
+        "when": "=valid*(1-graph)*(1-instrument)"
+      },
+      {
+        "op": "line",
+        "x": 141,
+        "y": 28,
+        "x2": 252,
+        "y2": 28,
+        "when": "=valid*(1-graph)*(1-instrument)"
+      },
+      {
+        "op": "small",
+        "text": "0",
+        "x": 132,
+        "y": 22,
+        "when": "=valid*(1-graph)*(1-instrument)"
+      },
+      {
+        "op": "dial",
+        "x": 171,
+        "y": 25,
+        "r": 14,
+        "ratio": "=ratio",
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "small",
+        "text": "LEVEL",
+        "x": 207,
+        "y": 5,
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "small",
+        "text": "${maxlabel}",
+        "x": 214,
+        "y": 20,
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "line",
+        "x": 140,
+        "y": 30,
+        "x2": 254,
+        "y2": 30,
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "history",
+        "x": 142,
+        "y": 5,
+        "w": 109,
+        "h": 21,
+        "when": "=valid*graph",
+        "area": true
+      },
+      {
+        "op": "erase",
+        "x": 140,
+        "y": 1,
+        "w": 116,
+        "h": 31,
+        "when": "=1-valid"
+      },
+      {
+        "op": "small",
+        "text": "NO SENSOR",
+        "x": 147,
+        "y": 12,
+        "when": "=1-valid"
+      }
+    ],
+    "pair": [
+      {
+        "op": "metrics",
+        "count": 2,
+        "commands": [
+          {
+            "op": "line",
+            "x": "=x+3",
+            "y": 11,
+            "x2": "=x+123",
+            "y2": 11
+          },
+          {
+            "op": "small",
+            "text": "${label}",
+            "x": "=x+4",
+            "y": 1
+          },
+          {
+            "op": "digits",
+            "text": "${value}",
+            "x": "=x+3",
+            "y": 11,
+            "w": 118,
+            "h": 18,
+            "style": "serif"
+          },
+          {
+            "op": "segments",
+            "x": "=x+4",
+            "y": 30,
+            "w": 117,
+            "h": 2,
+            "count": 23,
+            "ratio": "=ratio"
+          }
+        ]
+      },
+      {
+        "op": "line",
+        "x": 127,
+        "y": 2,
+        "x2": 127,
+        "y2": 29
+      }
+    ],
+    "dense": [
+      {
+        "op": "metrics",
+        "items": [
+          {
+            "key": "upload",
+            "label": "UP",
+            "short": "UP",
+            "unit": "B/s",
+            "x": 0,
+            "w": 68
+          },
+          {
+            "key": "download",
+            "label": "DN",
+            "short": "DN",
+            "unit": "B/s",
+            "x": 0,
+            "w": 68
+          },
+          {
+            "key": "cpu",
+            "label": "CPU",
+            "short": "CPU",
+            "unit": "%",
+            "x": 68,
+            "w": 61
+          },
+          {
+            "key": "gpu0",
+            "label": "GPU",
+            "short": "GPU",
+            "unit": "%",
+            "x": 68,
+            "w": 61
+          },
+          {
+            "key": "cpu_temp",
+            "label": "C",
+            "short": "C",
+            "unit": "C",
+            "x": 129,
+            "w": 56
+          },
+          {
+            "key": "gpu0_temp",
+            "label": "G",
+            "short": "G",
+            "unit": "C",
+            "x": 129,
+            "w": 56
+          },
+          {
+            "key": "ram",
+            "label": "RAM",
+            "short": "RAM",
+            "unit": "%",
+            "x": 185,
+            "w": 71
+          },
+          {
+            "key": "ram_gb",
+            "label": "",
+            "short": "",
+            "unit": "GB",
+            "x": 185,
+            "w": 71
+          }
+        ],
+        "commands": [
+          {
+            "op": "small",
+            "text": "${label} ${compact}",
+            "x": "=x+4",
+            "y": "=y"
+          },
+          {
+            "op": "line",
+            "x": "=x+4",
+            "y": 14,
+            "x2": "=x+w-5",
+            "y2": 14
+          },
+          {
+            "op": "line",
+            "x": "=x",
+            "y": 3,
+            "x2": "=x",
+            "y2": 28
+          }
+        ]
+      }
+    ]
+  }
+}

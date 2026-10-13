@@ -1,0 +1,19 @@
+{
+  "title": "星际来信",
+  "description": "从绿色字符雨启程，走过六套主题与原创歌词的像素短片，不影响正在播放的音乐。",
+  "stages": [
+    { "kind": "matrix", "name": "01 · 代码之雨", "seconds": 7, "color": "#60FF30" },
+    { "kind": "title", "name": "02 · 每一束光都有回声", "seconds": 3, "color": "#60FF30" },
+    { "kind": "theme", "name": "离子航行 · 时间坐标", "seconds": 5, "theme": "ion", "mode": "clock" },
+    { "kind": "theme", "name": "终端矩阵 · 紧凑遥测", "seconds": 5, "theme": "matrix", "mode": "monitor", "view": "dense" },
+    { "kind": "theme", "name": "桃兔甜点 · 双格日常", "seconds": 5, "theme": "peach", "mode": "monitor", "view": "compact" },
+    { "kind": "theme", "name": "猫咪乐谱 · 午后时钟", "seconds": 5, "theme": "kitty", "mode": "clock" },
+    { "kind": "theme", "name": "月白书页 · 呼吸仪表", "seconds": 5, "theme": "paper", "mode": "monitor", "view": "value" },
+    { "kind": "theme", "name": "琥珀磁带 · 记忆曲线", "seconds": 5, "theme": "amber", "mode": "monitor", "view": "graph" },
+    { "kind": "lyric", "name": "星际来信 · 原创演示歌词", "seconds": 4, "theme": "paper", "text": "把夜色折成远航的帆", "transition": "up" },
+    { "kind": "lyric", "name": "星际来信 · 原创演示歌词", "seconds": 4, "theme": "paper", "text": "让星光落在你的肩", "transition": "up" },
+    { "kind": "lyric", "name": "星际来信 · 原创演示歌词", "seconds": 4, "theme": "paper", "text": "风经过未命名的海", "transition": "wipe" },
+    { "kind": "lyric", "name": "星际来信 · 原创演示歌词", "seconds": 4, "theme": "paper", "text": "我们在黎明之前相见", "transition": "wipe" },
+    { "kind": "outro", "name": "星际来信 · 已送达", "seconds": 3, "color": "#8DE9FF" }
+  ]
+}

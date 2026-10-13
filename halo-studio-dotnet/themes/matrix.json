@@ -1,0 +1,462 @@
+{
+  "version": 1,
+  "id": "matrix",
+  "transition": "center",
+  "name": "科幻 · 雷达终端",
+  "color": "#60FF30",
+  "accent": "#27BD8F",
+  "description": "等宽数据 / 扫描栅格 / 指令字幕",
+  "sprites": {
+    "cat": [
+      "X.........X",
+      "XX.......XX",
+      "X.XXXXXXX.X",
+      "X.........X",
+      "X..X...X..X",
+      "X.........X",
+      "X....X....X",
+      "X...X.X...X",
+      ".X.......X.",
+      "..XXXXXXX.."
+    ],
+    "bunny": [
+      "..XX...XX..",
+      "..XX...XX..",
+      "..XX...XX..",
+      ".XXXXXXXXX.",
+      "X.........X",
+      "X..X...X..X",
+      "X.........X",
+      ".X...X...X.",
+      "..XXXXXXX.."
+    ],
+    "heart": [
+      ".XX.XX.",
+      "XXXXXXX",
+      "XXXXXXX",
+      ".XXXXX.",
+      "..XXX..",
+      "...X..."
+    ]
+  },
+  "scenes": {
+    "clock": [
+      {
+        "op": "tag",
+        "text": "TIME",
+        "x": 0,
+        "y": 0,
+        "w": 57
+      },
+      {
+        "op": "small",
+        "text": "${date}",
+        "x": 3,
+        "y": 15
+      },
+      {
+        "op": "small",
+        "text": "${day}",
+        "x": 3,
+        "y": 25
+      },
+      {
+        "op": "digits",
+        "text": "${time}",
+        "x": 62,
+        "y": 1,
+        "w": 152,
+        "h": 23,
+        "style": "pixel"
+      },
+      {
+        "op": "small",
+        "text": "SYS / LOCAL",
+        "x": 67,
+        "y": 25
+      },
+      {
+        "op": "small",
+        "text": "${second}",
+        "x": 199,
+        "y": 25
+      },
+      {
+        "op": "repeat",
+        "count": 4,
+        "commands": [
+          {
+            "op": "repeat",
+            "count": 6,
+            "commands": [
+              {
+                "op": "rect",
+                "x": "=220+i*6",
+                "y": "=row*8",
+                "w": 4,
+                "h": 5,
+                "fill": true,
+                "when": "=(i+row+phase)%3"
+              }
+            ],
+            "var": "i",
+            "start": 0,
+            "step": 1
+          }
+        ],
+        "var": "row",
+        "start": 0,
+        "step": 1
+      }
+    ],
+    "lyric": [
+      {
+        "op": "tag",
+        "text": "TXT",
+        "x": 0,
+        "y": 0,
+        "w": 33
+      },
+      {
+        "op": "small",
+        "text": "IN",
+        "x": 3,
+        "y": 15
+      },
+      {
+        "op": "small",
+        "text": "01",
+        "x": 3,
+        "y": 25
+      },
+      {
+        "op": "small",
+        "text": "STREAM / LYRICS",
+        "x": 39,
+        "y": 4
+      },
+      {
+        "op": "text",
+        "text": "${text}",
+        "x": 39,
+        "y": 12,
+        "w": 195,
+        "h": 16,
+        "size": 14,
+        "align": "left"
+      },
+      {
+        "op": "repeat",
+        "count": 50,
+        "commands": [
+          {
+            "op": "rect",
+            "x": "=39+i*4",
+            "y": 1,
+            "w": 1,
+            "h": 1,
+            "fill": true
+          }
+        ],
+        "var": "i",
+        "start": 0,
+        "step": 1
+      },
+      {
+        "op": "rect",
+        "x": 243,
+        "y": 19,
+        "w": 10,
+        "h": 3,
+        "fill": true,
+        "when": "=1-phase%2"
+      },
+      {
+        "op": "line",
+        "x": 38,
+        "y": 30,
+        "x2": 255,
+        "y2": 30
+      }
+    ],
+    "single": [
+      {
+        "op": "small",
+        "text": "${label}",
+        "x": 3,
+        "y": 1
+      },
+      {
+        "op": "line",
+        "x": 2,
+        "y": 17,
+        "x2": 6,
+        "y2": 21
+      },
+      {
+        "op": "line",
+        "x": 6,
+        "y": 21,
+        "x2": 2,
+        "y2": 25
+      },
+      {
+        "op": "digits",
+        "text": "${value}",
+        "x": 13,
+        "y": 10,
+        "w": 115,
+        "h": 21,
+        "style": "pixel"
+      },
+      {
+        "op": "tag",
+        "text": "TRACE / ${maxlabel}",
+        "x": 138,
+        "y": 0,
+        "w": 118,
+        "when": "=valid*(1-graph)*(1-instrument)"
+      },
+      {
+        "op": "history",
+        "x": 140,
+        "y": 14,
+        "w": 112,
+        "h": 14,
+        "when": "=valid*(1-graph)*(1-instrument)"
+      },
+      {
+        "op": "repeat",
+        "count": 10,
+        "commands": [
+          {
+            "op": "rect",
+            "x": "=142+i*12",
+            "y": 31,
+            "w": 1,
+            "h": 1,
+            "fill": true
+          }
+        ],
+        "var": "i",
+        "start": 0,
+        "step": 1,
+        "when": "=valid*(1-graph)*(1-instrument)"
+      },
+      {
+        "op": "circle",
+        "x": 157,
+        "y": 16,
+        "r": 14,
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "circle",
+        "x": 157,
+        "y": 16,
+        "r": 7,
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "line",
+        "x": 142,
+        "y": 16,
+        "x2": 172,
+        "y2": 16,
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "line",
+        "x": 157,
+        "y": 1,
+        "x2": 157,
+        "y2": 31,
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "line",
+        "x": 157,
+        "y": 16,
+        "x2": "=157+round(cos(phase*pi/4)*13)",
+        "y2": "=16+round(sin(phase*pi/4)*13)",
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "rect",
+        "x": "=153+round(ratio*13)",
+        "y": 10,
+        "w": 2,
+        "h": 2,
+        "fill": true,
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "history",
+        "x": 184,
+        "y": 4,
+        "w": 69,
+        "h": 22,
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "line",
+        "x": 184,
+        "y": 29,
+        "x2": 254,
+        "y2": 29,
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "history",
+        "x": 142,
+        "y": 5,
+        "w": 109,
+        "h": 21,
+        "when": "=valid*graph",
+        "area": false
+      },
+      {
+        "op": "erase",
+        "x": 140,
+        "y": 1,
+        "w": 116,
+        "h": 31,
+        "when": "=1-valid"
+      },
+      {
+        "op": "small",
+        "text": "NO SENSOR",
+        "x": 147,
+        "y": 12,
+        "when": "=1-valid"
+      }
+    ],
+    "pair": [
+      {
+        "op": "metrics",
+        "count": 2,
+        "commands": [
+          {
+            "op": "tag",
+            "text": "${label}",
+            "x": "=x",
+            "y": 0,
+            "w": 124
+          },
+          {
+            "op": "digits",
+            "text": "${value}",
+            "x": "=x+3",
+            "y": 11,
+            "w": 118,
+            "h": 18,
+            "style": "pixel"
+          },
+          {
+            "op": "segments",
+            "x": "=x+4",
+            "y": 30,
+            "w": 117,
+            "h": 2,
+            "count": 23,
+            "ratio": "=ratio"
+          }
+        ]
+      },
+      {
+        "op": "line",
+        "x": 127,
+        "y": 2,
+        "x2": 127,
+        "y2": 29
+      }
+    ],
+    "dense": [
+      {
+        "op": "metrics",
+        "items": [
+          {
+            "key": "upload",
+            "label": "UP",
+            "short": "UP",
+            "unit": "B/s",
+            "x": 0,
+            "w": 68
+          },
+          {
+            "key": "download",
+            "label": "DN",
+            "short": "DN",
+            "unit": "B/s",
+            "x": 0,
+            "w": 68
+          },
+          {
+            "key": "cpu",
+            "label": "CPU",
+            "short": "CPU",
+            "unit": "%",
+            "x": 68,
+            "w": 61
+          },
+          {
+            "key": "gpu0",
+            "label": "GPU",
+            "short": "GPU",
+            "unit": "%",
+            "x": 68,
+            "w": 61
+          },
+          {
+            "key": "cpu_temp",
+            "label": "C",
+            "short": "C",
+            "unit": "C",
+            "x": 129,
+            "w": 56
+          },
+          {
+            "key": "gpu0_temp",
+            "label": "G",
+            "short": "G",
+            "unit": "C",
+            "x": 129,
+            "w": 56
+          },
+          {
+            "key": "ram",
+            "label": "RAM",
+            "short": "RAM",
+            "unit": "%",
+            "x": 185,
+            "w": 71
+          },
+          {
+            "key": "ram_gb",
+            "label": "",
+            "short": "",
+            "unit": "GB",
+            "x": 185,
+            "w": 71
+          }
+        ],
+        "commands": [
+          {
+            "op": "small",
+            "text": "${label} ${compact}",
+            "x": "=x+4",
+            "y": "=y"
+          },
+          {
+            "op": "invert",
+            "x": "=x",
+            "y": "=row*16",
+            "w": "=w",
+            "h": 16,
+            "when": "=1-column%2"
+          }
+        ]
+      }
+    ]
+  }
+}

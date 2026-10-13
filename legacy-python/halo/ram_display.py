@@ -48,7 +48,7 @@ def validate_installation(path: Path, devices):
     if len(devices) != 1:
         raise core.HaloError('请仅连接一台已验证的 Halo PixelBar')
     device = devices[0]
-    if (record.get('candidate_sha256') not in (CANDIDATE_SHA, ram_codec.FIRMWARE_SHA) or
+    if (record.get('candidate_sha256') not in (CANDIDATE_SHA, ram_codec.FIRMWARE_SHA, ram_codec.FULLSCREEN_SHA, ram_codec.MATRIX_SHA, ram_codec.COLOR_SHA) or
             record.get('graphics_visually_confirmed') is not True or
             record.get('serial') != device.serial_number or
             record.get('hid_path', '').casefold() != device.path.decode().casefold()):
@@ -148,7 +148,7 @@ class RamDisplay(HaloLink):
 
     def connect(self, color=None):
         record = validate_installation(self.installation, core.enumerate_halo_devices())
-        self.codec_enabled = record['candidate_sha256'] == ram_codec.FIRMWARE_SHA
+        self.codec_enabled = record['candidate_sha256'] in (ram_codec.FIRMWARE_SHA, ram_codec.FULLSCREEN_SHA, ram_codec.MATRIX_SHA, ram_codec.COLOR_SHA)
         info = super().connect()
         try:
             if self.query(0xC6) != b'\x01\x03\x07':

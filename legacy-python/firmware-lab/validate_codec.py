@@ -23,7 +23,7 @@ EX = 0x20001358
 OLD = 0x200013B8
 
 
-def build():
+def build(codec_source=None):
     original, baseline, entries, layout, receiver, _ = session.build()
     source = Path(__file__).with_name('session_thumb.s').read_text()
     def patch(old, new):
@@ -92,7 +92,7 @@ service_stock:
     ext = (address+len(module)+3)&~3
     module2 = compile_session(ext)
     assert len(module2) == len(module)
-    text = Path(__file__).with_name('codec_thumb.s').read_text()
+    text = (Path(codec_source) if codec_source else Path(__file__).with_name('codec_thumb.s')).read_text()
     for key,value in dict(EX=EX, OLD=OLD, LEASE=session.LEASE).items(): text = text.replace(key, hex(value))
     codec = assemble(text, ext)
     compat_address = (ext+len(codec)+3)&~3
