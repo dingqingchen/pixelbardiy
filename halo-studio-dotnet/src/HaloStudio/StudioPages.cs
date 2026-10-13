@@ -8,9 +8,9 @@ public sealed partial class StudioForm
         var colors = Card(p, "主题配色", "色卡与预览依据实屏观感近似显示。整屏共色，每个主题独立保存。");
         colors.Controls.Add(colorStatus); colors.Controls.Add(colorChips); LoadColorChips();
         colors.Controls.Add(Row(Button("设备 RGB…", PickThemeColor), Button("恢复主题原色", () => SetThemeColor(null))));
-        colors.Controls.Add(Hint("按色相排列，白色置后，含各主题原色。预览为近似观感，校准状态见颜色说明。"));
+        colors.Controls.Add(Hint("以上为主题／校准快捷色，按色相排列、白色置后。下方官方配色单独保留原始 RGB。"));
         colors.Controls.Add(Row(Button("打开配色文件夹", () => OpenFolder(Path.GetDirectoryName(ScreenPalette.FilePath)!)), Button("重新加载色表", ReloadColors)));
-        Setting(colors, "白色偏蓝校正", "蓝色分量越低越暖；255 为原始白色，仅影响屏幕纯白", Number("白色蓝色分量", 0, 255, () => current.ScreenWhiteBlue, v => Set(current with { ScreenWhiteBlue = (int)v })));
+        Setting(colors, "白色偏蓝校正", "仅用于主题／校准白色；官方配色不受影响，255 为关闭", Number("白色蓝色分量", 0, 255, () => current.ScreenWhiteBlue, v => Set(current with { ScreenWhiteBlue = (int)v })));
         var daily = Card(p, "日常显示");
         Setting(daily, "屏幕显示", "关闭后恢复原厂时钟", Toggle("屏幕显示", () => current.Enabled, v => Set(current with { Enabled = v })));
         Setting(daily, "默认画面", "没有歌词时显示的内容", Combo("默认画面", [("clock", "图形时钟"), ("monitor", "系统监控")], () => current.IdleContent, v => Set(current with { IdleContent = v })));
@@ -22,6 +22,10 @@ public sealed partial class StudioForm
         Setting(motion, "切换动画", "画面轮换时使用 MCU 本地过渡", Toggle("切换动画", () => current.Transitions, v => Set(current with { Transitions = v })));
         Setting(motion, "切换形式", "主题切换自动展开或溶解；同主题内容使用下方形式", Combo("切换形式", [("up", "向上推入"), ("wipe", "横向揭幕"), ("center", "中心展开"), ("dissolve", "像素溶解")], () => current.PixelTransition, v => Set(current with { PixelTransition = v })));
         motion.Controls.Add(Row(Button("打开主题文件夹", () => OpenFolder(Designs.DirectoryPath)), Button("重新加载主题", ReloadThemes)));
+        var official = Card(p, "官方配色 · TempoHub", "30 个原厂预设，按色相排列、白色置后。名称由 HaloStudio 添加；色号与官方一致，实屏可能有色差。", fullWidth: true);
+        official.Controls.Add(officialChips);
+        official.Controls.Add(Button("官方 RGB…", () => PickThemeColor(true)));
+        official.Controls.Add(Hint("官方预设与自由取色均直接发送 RGB，不额外调色。选择结果按主题保存；原有主题颜色不会自动替换。"));
     }
     void BuildMonitor()
     {

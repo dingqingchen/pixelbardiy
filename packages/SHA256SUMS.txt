@@ -4,3 +4,4 @@ e496335a1851871f2843f76b5022568586ec3eb45304cdfb9ed2f225e09fcefd  HaloPixelBar-M
 e6c2fb9d3d1efcfaf7626b05806ac6a0bad1255d28433859ed89295f4b98a87b  HaloStudio-CSharp-2.5.1-win64.zip
 9830b4e8343e93cc547fe9764d14cdff07201be7aad75d4d2ada83b15bb2577b  HaloStudio-CSharp-2.6.0-win64.zip
 724cc39f426fdc6074cb1a64ce21ff38018e0fca08abe93ba02b9f3cca6e7a7d  HaloStudio-v1.0.0-win64.zip
+5bcab3ccd52a53539353a4cc39baa7dcc234e52745e7b4ddc181e5fde7add9ed  HaloStudio-CSharp-2.6.1-win64.zip

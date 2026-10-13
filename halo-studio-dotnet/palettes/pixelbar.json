@@ -2,17 +2,242 @@
   "version": 1,
   "basis": "2026-10-14：快捷色按近似观感的色相顺序排列，白色置后；包含六套主题原色。G1 浅绿、P2 淡粉及土黄、白色保留校准；新增柔红待实屏核对。preview 是近似观感，input 是设备发送值。",
   "colors": [
-    { "input": "#FF0000", "preview": "#FF0000", "name": "朱红", "observation": "原纯红，仅保留旧设置的颜色说明", "quick": false },
-    { "input": "#D8321C", "preview": "#EA8C88", "name": "柔红", "observation": "降低红通道并少量混色的柔和红候选；待实屏核对，预览为目标近似", "quick": true },
-    { "input": "#FF6000", "preview": "#C7A34A", "name": "土黄", "observation": "琥珀音响原色；保留已认可的土黄效果，预览近似", "quick": true },
-    { "input": "#00FF00", "preview": "#00FF00", "name": "纯绿", "observation": "原纯绿，仅保留旧设置的颜色说明", "quick": false },
-    { "input": "#60FF30", "preview": "#A4EBAC", "name": "浅绿", "observation": "雷达终端原色；G1 实屏校准，作为柔和绿色，预览近似", "quick": true },
-    { "input": "#8DF5B4", "preview": "#9EC5F1", "name": "浅蓝", "observation": "比离子蓝浅；预览近似", "quick": false },
-    { "input": "#64DFFF", "preview": "#78A9F4", "name": "离子蓝", "observation": "离子仪表原色；作为柔和蓝色，偏蓝观感，预览近似", "quick": true },
-    { "input": "#D6BBFF", "preview": "#89A1F0", "name": "猫咪蓝", "observation": "猫咪乐谱原色；偏蓝观感，预览近似", "quick": true },
-    { "input": "#0000FF", "preview": "#0000FF", "name": "纯蓝", "observation": "原纯蓝，仅保留旧设置的颜色说明", "quick": false },
-    { "input": "#FF4080", "preview": "#BC93EF", "name": "桃紫", "observation": "较浓紫色；预览近似", "quick": false },
-    { "input": "#FF6048", "preview": "#F2B3C8", "name": "淡粉", "observation": "桃兔甜点原色；P2 实屏校准接近淡粉，预览近似", "quick": true },
-    { "input": "#FFFFFF", "preview": "#FFFFFF", "name": "白色", "observation": "月白书页原色；实屏随下方白色校正，预览为目标白", "quick": true }
+    {
+      "input": "#FF0000",
+      "preview": "#FF0000",
+      "name": "朱红",
+      "observation": "原纯红，仅保留旧设置的颜色说明",
+      "quick": false
+    },
+    {
+      "input": "#D8321C",
+      "preview": "#EA8C88",
+      "name": "柔红",
+      "observation": "降低红通道并少量混色的柔和红候选；待实屏核对，预览为目标近似",
+      "quick": true
+    },
+    {
+      "input": "#FF6000",
+      "preview": "#C7A34A",
+      "name": "土黄",
+      "observation": "琥珀音响原色；保留已认可的土黄效果，预览近似",
+      "quick": true
+    },
+    {
+      "input": "#00FF00",
+      "preview": "#00FF00",
+      "name": "纯绿",
+      "observation": "原纯绿，仅保留旧设置的颜色说明",
+      "quick": false
+    },
+    {
+      "input": "#60FF30",
+      "preview": "#A4EBAC",
+      "name": "浅绿",
+      "observation": "雷达终端原色；G1 实屏校准，作为柔和绿色，预览近似",
+      "quick": true
+    },
+    {
+      "input": "#8DF5B4",
+      "preview": "#9EC5F1",
+      "name": "浅蓝",
+      "observation": "比离子蓝浅；预览近似",
+      "quick": false
+    },
+    {
+      "input": "#64DFFF",
+      "preview": "#78A9F4",
+      "name": "离子蓝",
+      "observation": "离子仪表原色；作为柔和蓝色，偏蓝观感，预览近似",
+      "quick": true
+    },
+    {
+      "input": "#D6BBFF",
+      "preview": "#89A1F0",
+      "name": "猫咪蓝",
+      "observation": "猫咪乐谱原色；偏蓝观感，预览近似",
+      "quick": true
+    },
+    {
+      "input": "#0000FF",
+      "preview": "#0000FF",
+      "name": "纯蓝",
+      "observation": "原纯蓝，仅保留旧设置的颜色说明",
+      "quick": false
+    },
+    {
+      "input": "#FF4080",
+      "preview": "#BC93EF",
+      "name": "桃紫",
+      "observation": "较浓紫色；预览近似",
+      "quick": false
+    },
+    {
+      "input": "#FF6048",
+      "preview": "#F2B3C8",
+      "name": "淡粉",
+      "observation": "桃兔甜点原色；P2 实屏校准接近淡粉，预览近似",
+      "quick": true
+    },
+    {
+      "input": "#FFFFFF",
+      "preview": "#FFFFFF",
+      "name": "白色",
+      "observation": "月白书页原色；实屏随下方白色校正，预览为目标白",
+      "quick": true
+    }
+  ],
+  "official_source": "TempoHub 1.3.0 / Halo PixelBar 41222，2026-10-14 本机像素屏官方缓存与 UI 核对；30 色，原始 RGB 直传，无额外变换；名称为 HaloStudio 自拟。",
+  "official_colors": [
+    {
+      "input": "#FF2F15",
+      "name": "官方赤红",
+      "official_index": 24
+    },
+    {
+      "input": "#FF4C34",
+      "name": "官方朱橙",
+      "official_index": 23
+    },
+    {
+      "input": "#FF733F",
+      "name": "官方珊瑚橙",
+      "official_index": 22
+    },
+    {
+      "input": "#FF9455",
+      "name": "官方杏橙",
+      "official_index": 21
+    },
+    {
+      "input": "#FFBF20",
+      "name": "官方金黄",
+      "official_index": 26
+    },
+    {
+      "input": "#FFCE48",
+      "name": "官方奶黄",
+      "official_index": 25
+    },
+    {
+      "input": "#A0FF6C",
+      "name": "官方嫩绿",
+      "official_index": 27
+    },
+    {
+      "input": "#71FF56",
+      "name": "官方青柠",
+      "official_index": 28
+    },
+    {
+      "input": "#32FF82",
+      "name": "官方春绿",
+      "official_index": 29
+    },
+    {
+      "input": "#00FF74",
+      "name": "官方翠绿",
+      "official_index": 30
+    },
+    {
+      "input": "#C0FFF2",
+      "name": "官方冰青",
+      "official_index": 2
+    },
+    {
+      "input": "#7EFFF4",
+      "name": "官方薄荷青",
+      "official_index": 3
+    },
+    {
+      "input": "#43FFF0",
+      "name": "官方浅碧",
+      "official_index": 4
+    },
+    {
+      "input": "#1CFFF8",
+      "name": "官方亮青",
+      "official_index": 5
+    },
+    {
+      "input": "#8A95FF",
+      "name": "官方雾蓝",
+      "official_index": 8
+    },
+    {
+      "input": "#3F51FF",
+      "name": "官方靛蓝",
+      "official_index": 10
+    },
+    {
+      "input": "#C3B9FF",
+      "name": "官方薰衣草",
+      "official_index": 7
+    },
+    {
+      "input": "#CFACFF",
+      "name": "官方丁香紫",
+      "official_index": 11
+    },
+    {
+      "input": "#B476FF",
+      "name": "官方浅紫",
+      "official_index": 9
+    },
+    {
+      "input": "#8906FF",
+      "name": "官方电紫",
+      "official_index": 15
+    },
+    {
+      "input": "#C985FF",
+      "name": "官方兰紫",
+      "official_index": 12
+    },
+    {
+      "input": "#BD5FFF",
+      "name": "官方亮紫",
+      "official_index": 13
+    },
+    {
+      "input": "#B139FF",
+      "name": "官方紫罗兰",
+      "official_index": 14
+    },
+    {
+      "input": "#FFE6FE",
+      "name": "官方樱白",
+      "official_index": 6
+    },
+    {
+      "input": "#FF0EDC",
+      "name": "官方品红",
+      "official_index": 20
+    },
+    {
+      "input": "#FF40DB",
+      "name": "官方亮粉",
+      "official_index": 19
+    },
+    {
+      "input": "#FF64DB",
+      "name": "官方玫粉",
+      "official_index": 18
+    },
+    {
+      "input": "#FF81D7",
+      "name": "官方桃粉",
+      "official_index": 17
+    },
+    {
+      "input": "#FFA0CC",
+      "name": "官方浅樱",
+      "official_index": 16
+    },
+    {
+      "input": "#FFFFFF",
+      "name": "官方霜白",
+      "official_index": 1
+    }
   ]
 }

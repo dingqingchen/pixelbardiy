@@ -19,6 +19,16 @@ public sealed partial class StudioForm
                 if (chip.Height - Palette.Px(chip, 43) < TextRenderer.MeasureText(chip.Text, chip.Font).Height) failures.Add("Palette label clipped after reload: " + chip.Text);
         }
         var sample = Showcase.Sample(0);
+        var savedColors = current;
+        try
+        {
+            ApplyTestSettings(current with { Themes = true, ScreenWhiteBlue = 144 });
+            swatches.Single(c => c.Official && c.Hex == "#FFFFFF").PerformClick();
+            if (current.DeviceScreenColor() != "#FFFFFF" || !current.OfficialScreenColor() || swatches.Count(c => c.Selected) != 1) failures.Add("Official white selection or source highlight mismatch");
+            swatches.Single(c => !c.Official && c.Hex == "#FFFFFF").PerformClick();
+            if (current.DeviceScreenColor() != "#FFFF90" || current.OfficialScreenColor() || swatches.Count(c => c.Selected) != 1) failures.Add("Calibrated white selection or source highlight mismatch");
+        }
+        finally { ApplyTestSettings(savedColors); }
         var manySensors = new Snapshot(sample.Metrics.Concat(Enumerable.Range(0, 32).Select(i => new Metric("extra_" + i, "扩展传感器 " + (i + 1), "EXTRA", i, "%", "离线布局测试", 100))).ToArray(), "offline scroll fixture");
         foreach (int logicalWidth in new[] { 1280, 1020, 1520, 1920, 1020, 1280 })
         {
@@ -76,6 +86,14 @@ public sealed partial class StudioForm
                 }
                 if (page == 0)
                 {
+                    var paletteCard = officialChips.Parent!.Parent!;
+                    foreach (var chip in officialChips.Controls.Cast<Control>())
+                        if (chip.Right > officialChips.ClientSize.Width || chip.Bottom > officialChips.ClientSize.Height) failures.Add($"{logicalWidth}: official color clipped {chip.Text}");
+                    using (var bitmap = new Bitmap(paletteCard.Width, paletteCard.Height))
+                    {
+                        paletteCard.DrawToBitmap(bitmap, new(Point.Empty, bitmap.Size));
+                        bitmap.Save(Path.Combine(directory, $"{logicalWidth}-official-palette.png"));
+                    }
                     for (int i = 0; i < tiles.Count; i++)
                     {
                         if (tiles[i].Right > gallery.Width || tiles[i].Bottom > gallery.Height) failures.Add($"{logicalWidth}: tile outside gallery");

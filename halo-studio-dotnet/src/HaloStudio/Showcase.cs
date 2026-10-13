@@ -3,7 +3,7 @@ using System.Text.Json;
 namespace HaloStudio;
 
 public sealed record DemoStage(string Kind, string Name, double Seconds, string Theme = "ion", string Mode = "clock", string View = "bar", string Text = "", string Color = "#8DE9FF", string Transition = "up");
-public sealed record DemoScene(PixelFrame Frame, string Color, byte Animation, bool Urgent, byte Interval = 16);
+public sealed record DemoScene(PixelFrame Frame, string Color, byte Animation, bool Urgent, byte Interval = 16, bool OfficialColor = false);
 public sealed class Showcase
 {
     readonly DemoStage[] stages; int index; long stageAt, nextFrame; string lastIdentity = "";
@@ -47,7 +47,7 @@ public sealed class Showcase
             string mode = stage.Kind == "lyric" ? "歌词" : stage.Mode == "monitor" ? "系统监控" : "时钟";
             var frame = Designs.Render(stage.Text, mode, s, t, Sample(t), new DateTime(2026, 10, 13, 20, 26, Math.Min(59, (int)t)));
             // Preserve lyric identity so the known, bounded MCU text viewport remains available.
-            return new(frame with { Identity = frame.Identity + ":demo:" + index }, settings.ScreenColor(stage.Theme), 0, false);
+            return new(frame with { Identity = frame.Identity + ":demo:" + index }, settings.ScreenColor(stage.Theme), 0, false, OfficialColor: settings.OfficialScreenColor(stage.Theme));
         }
         var c = new PixelCanvas();
         if(stage.Kind == "matrix")

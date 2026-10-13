@@ -82,13 +82,14 @@ public sealed class InputSurface : StudioCard
 public sealed class ColorSwatch : Button
 {
     public string Hex { get; }
+    public bool Official { get; }
     [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)] public bool Selected { get; set; }
-    public ColorSwatch(string hex, string label) { Hex = hex; Text = label; AccessibleName = label + " " + hex; Width = 84; Height = 78; FlatStyle = FlatStyle.Flat; FlatAppearance.BorderSize = 0; Cursor = Cursors.Hand; DoubleBuffered = true; Font = Palette.Font(8); Margin = new(0, 4, 8, 0); }
+    public ColorSwatch(string hex, string label, bool official = false) { Hex = hex; Official = official; Text = label; AccessibleName = label + " " + hex; Width = 84; Height = 78; FlatStyle = FlatStyle.Flat; FlatAppearance.BorderSize = 0; Cursor = Cursors.Hand; DoubleBuffered = true; Font = Palette.Font(8); Margin = new(0, 4, 8, 0); }
     protected override void OnPaint(PaintEventArgs e)
     {
         var g = e.Graphics; g.Clear(Parent?.BackColor ?? Palette.Card); g.SmoothingMode = SmoothingMode.AntiAlias;
         int d = Palette.Px(this, 30), x = (Width - d) / 2, y = Palette.Px(this, 5), gap = Palette.Px(this, 4);
-        using var brush = new SolidBrush(ColorTranslator.FromHtml(ScreenPalette.Preview(Hex))); g.FillEllipse(brush, x, y, d, d);
+        using var brush = new SolidBrush(ColorTranslator.FromHtml(ScreenPalette.Preview(Hex, Official))); g.FillEllipse(brush, x, y, d, d);
         using var edge = new Pen(Selected ? Palette.Accent : Palette.Border, Selected ? 2 : 1); g.DrawEllipse(edge, x - gap, y - gap, d + gap * 2, d + gap * 2);
         TextRenderer.DrawText(g, Text, Font, new Rectangle(0, y + d + gap * 2, Width, Height - y - d - gap * 2), Selected ? Palette.Accent : Palette.Text, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
         if (Focused) ControlPaint.DrawFocusRectangle(g, ClientRectangle);

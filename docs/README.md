@@ -6,6 +6,7 @@
 | --- | --- |
 | [USB 实时像素协议](USB_PIXEL_PROTOCOL.md) | 点阵布局、HID 分包、压缩与差分、ACK、CRC、帧提交和调度 |
 | [MCU 本地动画](MCU_ANIMATION.md) | RAM 缓冲、代码空间、整屏上推/揭幕/溶解/字符雨、独占和恢复 |
+| [官方 TempoHub 兼容性](TEMPOHUB_COMPATIBILITY.md) | 官方版本、实屏/听感确认与未测范围 |
 | [固件完整命令流程](FIRMWARE_USAGE.md) | 功能、依赖、原厂材料、备份、预检、升级、实屏确认与回退限制 |
 | [歌词时间轴与分页](../halo-studio-dotnet/docs/LYRICS.md) | YRC 逐字分页、无逐字时首尾两页、0.8 秒补偿和最小化同步 |
 | [固件与恢复](FIRMWARE.md) | 镜像、哈希、离线重建、更新前提、已验证范围与未解决边界 |

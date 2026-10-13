@@ -132,6 +132,26 @@ public static class SelfTests
         var paletteBefore = ScreenPalette.All; File.WriteAllText(badPalette, "{\"version\":1,\"colors\":[{\"input\":\"#FF6000\",\"preview\":\"bad\"}]}");
         Assert(ScreenPalette.Reload(badPalette) != null && ReferenceEquals(ScreenPalette.All, paletteBefore), "Invalid palette is rejected atomically without losing known colors");
         Assert(ScreenPalette.Reload(palettePath) == null && ScreenPalette.All["#FF4080"].Name == "桃紫", "Palette reload restores external appearance metadata");
+        Assert(ScreenPalette.Official.Count == 30 && ScreenPalette.Official["#00FF74"].Name == "官方翠绿" && ScreenPalette.Official["#FF9455"].Preview == "#FF9455", "TempoHub thirty presets retain official RGB and separate names");
+        var officialWhite = (whiteCal with { ThemeOfficialColors = new() { [whiteCal.Theme] = true } }).Validated();
+        Assert(officialWhite.OfficialScreenColor() && officialWhite.DeviceScreenColor() == "#FFFFFF" && whiteCal.DeviceScreenColor() == "#FFFF60", "Official white bypasses calibration without changing saved calibrated white");
+        Assert(JsonSerializer.Deserialize<Settings>(JsonSerializer.Serialize(officialWhite, Files.Json), Files.Json)!.DeviceScreenColor() == "#FFFFFF", "Official origin survives settings roundtrip");
+        Assert(!(officialWhite with { ThemeColors = [] }).Validated().OfficialScreenColor(), "Removing a custom color removes orphaned official origin");
+        Assert(!(officialWhite with { Themes = false }).OfficialScreenColor(), "Disabled themes do not apply a theme's official origin to the global color");
+        Assert(officialWhite.DeviceScreenColor("#FFFFFF", false) == "#FFFF60" && whiteCal.DeviceScreenColor("#FFFFFF", true) == "#FFFFFF", "Demo color origin explicitly overrides the selected theme");
+        foreach (var entry in ScreenPalette.Official.Values)
+        {
+            var chosen = (officialWhite with { ThemeColors = new() { [officialWhite.Theme] = entry.Input } }).Validated();
+            Assert(chosen.DeviceScreenColor() == entry.Input && Protocol.ScreenColor(chosen.DeviceScreenColor()).AsSpan(1, 3).SequenceEqual(Protocol.Rgb(entry.Input)), "Official preset preserves USB RGB: " + entry.Name);
+        }
+        var demoSettings = officialWhite with { Theme = "ion", ThemeColors = new() { ["paper"] = "#FFFFFF" }, ThemeOfficialColors = new() { ["paper"] = true } };
+        var officialDemo = Showcase.Render(new("theme", "official white", 5, "paper"), demoSettings, 0);
+        Assert(officialDemo.OfficialColor && demoSettings.DeviceScreenColor(officialDemo.Color, officialDemo.OfficialColor) == "#FFFFFF", "Showcase uses each stage's origin instead of active theme origin");
+        Assert(!Showcase.Render(new("title", "title", 5), demoSettings, 0).OfficialColor, "Fixed demo effect colors keep legacy calibration semantics");
+        var officialBefore = ScreenPalette.Official;
+        File.WriteAllText(badPalette, "{\"version\":1,\"colors\":[{\"input\":\"#FF6000\",\"preview\":\"#C7A34A\",\"name\":\"ok\",\"observation\":\"ok\",\"quick\":true}],\"official_colors\":[{\"input\":\"broken\",\"name\":\"bad\"}]}");
+        Assert(ScreenPalette.Reload(badPalette) != null && ReferenceEquals(officialBefore, ScreenPalette.Official), "Malformed official palette cannot replace either loaded group");
+        Assert(ScreenPalette.Reload(palettePath) == null, "Restore full palette after rejected official metadata");
         byte[] thermalSample = new byte[80]; "HALOTC02"u8.CopyTo(thermalSample);
         void Write32(int at, uint value) => System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(thermalSample.AsSpan(at), value);
         Write32(8, 2); Write32(12, 123); System.Buffers.Binary.BinaryPrimitives.WriteUInt64LittleEndian(thermalSample.AsSpan(24), 9000);

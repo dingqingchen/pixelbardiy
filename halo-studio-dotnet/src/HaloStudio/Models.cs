@@ -21,6 +21,7 @@ public sealed record Settings
     public bool Themes { get; init; } = true;
     public string Theme { get; init; } = "kitty";
     public Dictionary<string, string> ThemeColors { get; init; } = [];
+    public Dictionary<string, bool> ThemeOfficialColors { get; init; } = [];
     public int ScreenWhiteBlue { get; init; } = 255;
     public bool CpuTemperatureEnabled { get; init; } = true;
     public bool CpuTemperatureElevation { get; init; }
@@ -54,6 +55,7 @@ public sealed record Settings
         RhythmGain = Math.Clamp(RhythmGain, .4, 6),
         FanLimits = FanLimits ?? [],
         ThemeColors = (ThemeColors ?? []).Where(p => IsColor(p.Value)).ToDictionary(p => p.Key, p => p.Value.ToUpperInvariant()),
+        ThemeOfficialColors = (ThemeOfficialColors ?? []).Where(p => p.Value && IsColor((ThemeColors ?? []).GetValueOrDefault(p.Key))).ToDictionary(p => p.Key, p => true),
         Color = IsColor(Color) ? Color.ToUpperInvariant() : "#86D8F6",
         MonitorMetrics = MonitorMetrics ?? ["cpu", "ram"]
     };
@@ -61,7 +63,8 @@ public sealed record Settings
     // Existing theme/settings values remain device inputs for compatibility.
     // Appearance metadata lives in ScreenPalette and must not enter this path.
     // White correction only reduces blue; ambient lighting stays unchanged.
-    public string DeviceScreenColor(string? color = null) => (color ?? ScreenColor()).Equals("#FFFFFF", StringComparison.OrdinalIgnoreCase)
+    public bool OfficialScreenColor(string? theme = null) => (Themes || theme != null) && ThemeColors.ContainsKey(theme ?? Theme) && ThemeOfficialColors.GetValueOrDefault(theme ?? Theme);
+    public string DeviceScreenColor(string? color = null, bool? official = null) => !(official ?? OfficialScreenColor()) && (color ?? ScreenColor()).Equals("#FFFFFF", StringComparison.OrdinalIgnoreCase)
         ? $"#FFFF{Math.Clamp(ScreenWhiteBlue, 0, 255):X2}" : color ?? ScreenColor();
     public string ScreenColor(string? theme = null)
     {
@@ -114,7 +117,7 @@ public sealed record PixelFrame(byte[] Pixels, string Text, string Identity, boo
 public sealed record StudioState(string Status, Track Track, Snapshot Snapshot, PixelFrame? Frame,
     long Frames, long Dropped, long Writes, string Codec, int EncodedBytes, double FrameSeconds,
     double CpuPercent, double MemoryMB, double Peak, string TemperatureStatus, bool Connected,
-    string DemoStage = "", double DemoProgress = 0, string ScreenColor = "#86D8F6", string AudioDetail = "");
+    string DemoStage = "", double DemoProgress = 0, string ScreenColor = "#86D8F6", string AudioDetail = "", bool OfficialColor = false);
 
 public static class Files
 {

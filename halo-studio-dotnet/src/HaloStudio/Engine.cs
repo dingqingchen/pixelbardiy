@@ -6,7 +6,7 @@ public sealed class Engine : IAsyncDisposable
 {
     readonly string runtime; Settings settings; int revision; readonly CancellationTokenSource stop = new(); CancellationTokenSource? session;
     readonly Hardware hardware = new(); readonly MediaMonitor media = new(); readonly MusicPeak peak = new(); readonly Envelope envelope = new(); readonly LyricsStore lyrics;
-    Showcase? showcase; string frameColor = "#86D8F6";
+    Showcase? showcase; bool frameOfficial; string frameColor = "#86D8F6";
     public bool DemoRunning => Volatile.Read(ref showcase) != null;
     public void StartShowcase() { Volatile.Write(ref showcase, new Showcase(Path.Combine(AppContext.BaseDirectory, "demos", "showcase.json"))); Interlocked.Increment(ref revision); }
     public void StopShowcase() { Volatile.Write(ref showcase, null); Interlocked.Increment(ref revision); }
@@ -88,7 +88,7 @@ public sealed class Engine : IAsyncDisposable
                 if (demo != null)
                 {
                     var sample = demo.Poll(s);
-                    if (sample != null) { frame = sample.Frame; frameColor = sample.Color; renderedTheme = ""; controller?.Offer(frame, s.DeviceScreenColor(sample.Color), sample.Animation, sample.Urgent, sample.Interval); }
+                    if (sample != null) { frame = sample.Frame; frameColor = sample.Color; frameOfficial = sample.OfficialColor; renderedTheme = ""; controller?.Offer(frame, s.DeviceScreenColor(sample.Color, sample.OfficialColor), sample.Animation, sample.Urgent, sample.Interval); }
                     if (demo.Finished) { Interlocked.CompareExchange(ref showcase, null, demo); renderKey = ""; }
                 }
                 else if (s.Enabled && key != renderKey)
@@ -99,7 +99,7 @@ public sealed class Engine : IAsyncDisposable
                         if (mode == "歌词") next = next with { Identity = next.Identity + ":" + cueKey };
                         bool urgent = changed || mode == "歌词" && next.Identity != frame?.Identity;
                         byte animation = s.Transitions && frame != null && next.Identity != frame.Identity ? (renderedTheme != s.Theme ? Transitions.ThemeStyle(s.Theme) : Transitions.Style(s.PixelTransition)) : (byte)0;
-                        frame = next; frameColor = ScreenColor(s); renderedTheme = s.Theme; controller?.Offer(next, s.DeviceScreenColor(frameColor), animation, urgent);
+                        frame = next; frameColor = ScreenColor(s); frameOfficial = s.OfficialScreenColor(); renderedTheme = s.Theme; controller?.Offer(next, s.DeviceScreenColor(frameColor), animation, urgent);
                     }
                     catch (Exception e) when (e is InvalidDataException or ArgumentException or InvalidOperationException or KeyNotFoundException) { status = "主题绘制失败，保留上一画面：" + e.Message; Log(status); }
                     renderKey = key;
@@ -109,7 +109,7 @@ public sealed class Engine : IAsyncDisposable
                     process.Refresh(); TimeSpan current = process.TotalProcessorTime; cpu = 100 * (current - priorCpu).TotalMilliseconds / Math.Max(1, now - perfAt) / Environment.ProcessorCount; priorCpu = current; perfAt = now; memory = process.WorkingSet64 / 1048576.0; nextPerf = now + 5000;
                     Log($"perf cpu={cpu:F3}% rss={memory:F1}MB frames={controller?.Frames ?? 0} writes={link?.Writes ?? 0} codec={controller?.Codec} bytes={controller?.EncodedBytes} theme={s.Theme} playing={track.Playing} peak={signal:F3} demo={demo?.StageName} text={frame?.Text} cpu_temp={snapshot.Get("cpu_temp").Text()} thermal={hardware.Temperature.Detail}");
                 }
-                if (now >= nextEmit) { Changed?.Invoke(new(status + " · " + lyricSource + (mode == "歌词" && cue?.Timed == false ? " · 当前句回退，等待可用时间轴（无法提前）" : ""), track, snapshot, frame, controller?.Frames ?? 0, controller?.Dropped ?? 0, link?.Writes ?? 0, controller?.Codec ?? "预览", controller?.EncodedBytes ?? 0, controller?.FrameSeconds ?? 0, cpu, memory, signal, hardware.Temperature.Detail, controller?.Owned ?? false, demo?.StageName ?? "", demo?.Progress ?? 0, frameColor, peak.Detail)); nextEmit = now + (Visible ? (demo != null ? 125 : 500) : 3000); }
+                if (now >= nextEmit) { Changed?.Invoke(new(status + " · " + lyricSource + (mode == "歌词" && cue?.Timed == false ? " · 当前句回退，等待可用时间轴（无法提前）" : ""), track, snapshot, frame, controller?.Frames ?? 0, controller?.Dropped ?? 0, link?.Writes ?? 0, controller?.Codec ?? "预览", controller?.EncodedBytes ?? 0, controller?.FrameSeconds ?? 0, cpu, memory, signal, hardware.Temperature.Detail, controller?.Owned ?? false, demo?.StageName ?? "", demo?.Progress ?? 0, frameColor, peak.Detail, frameOfficial)); nextEmit = now + (Visible ? (demo != null ? 125 : 500) : 3000); }
                 await Task.Delay(rhythmActive ? 25 : demo != null || track.Playing ? 50 : 200, stop.Token);
             }
         }

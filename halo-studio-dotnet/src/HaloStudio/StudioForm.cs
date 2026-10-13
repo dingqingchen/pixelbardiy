@@ -14,6 +14,7 @@ public sealed partial class StudioForm : Form
     readonly List<Action> bindings = []; readonly List<ThemeTile> tiles = []; readonly List<ModernButton> navigation = []; readonly List<PagePanel> pages = []; readonly List<ColorSwatch> swatches = [];
     readonly ThemeGallery gallery = new();
     readonly FlowLayoutPanel colorChips = Row();
+    readonly FlowLayoutPanel officialChips = Row();
     readonly MetricPicker metrics = new();
     readonly SensorTable sensors = new();
     readonly TextBox fanKey = new() { PlaceholderText = "传感器键，例如 gpu0_fan0", AccessibleName = "风扇传感器键" }, fanMax = new() { PlaceholderText = "例如 3000", AccessibleName = "风扇额定最大 RPM" };
@@ -91,7 +92,7 @@ public sealed partial class StudioForm : Form
             BeginInvoke(() =>
         {
             if (auditing || IsDisposed || !Visible) return;
-            preview.Frame = value.Frame; preview.PixelColor = ColorTranslator.FromHtml(ScreenPalette.Preview(value.ScreenColor));
+            preview.Frame = value.Frame; preview.PixelColor = ColorTranslator.FromHtml(ScreenPalette.Preview(value.ScreenColor, value.OfficialColor));
             status.Text = previewMode ? "离线预览" : value.Connected ? "●  USB 已连接" : value.Status; status.ForeColor = value.Connected ? Color.FromArgb(28, 150, 111) : Palette.Muted;
             sidebarStatus.Text = value.Connected ? "●  Halo PixelBar 在线" : "○  等待音响连接"; sidebarStatus.ForeColor = status.ForeColor;
             sidebarTemp.Text = "CPU 温度  " + value.Snapshot.Get("cpu_temp").Text();
@@ -116,28 +117,36 @@ public sealed partial class StudioForm : Form
     {
         loading = true; try
         {
-            foreach (var bind in bindings) bind(); foreach (var tile in tiles) { tile.Selected = tile.Key == current.Theme; tile.SetColor(ScreenPalette.Preview(current.ScreenColor(tile.Key))); }
-            string hex = current.ScreenColor(); foreach (var swatch in swatches) { swatch.Selected = swatch.Hex.Equals(hex, StringComparison.OrdinalIgnoreCase); swatch.Invalidate(); }
-            colorStatus.Text = ScreenPalette.Description(hex) + "\n发送 RGB " + current.DeviceScreenColor(hex) + (current.ThemeColors.ContainsKey(current.Theme) ? " · 自定义" : " · 主题原色");
+            foreach (var bind in bindings) bind(); foreach (var tile in tiles) { tile.Selected = tile.Key == current.Theme; tile.SetColor(ScreenPalette.Preview(current.ScreenColor(tile.Key), current.OfficialScreenColor(tile.Key))); }
+            string hex = current.ScreenColor(); foreach (var swatch in swatches) { swatch.Selected = swatch.Official == current.OfficialScreenColor() && swatch.Hex.Equals(hex, StringComparison.OrdinalIgnoreCase); swatch.Invalidate(); }
+            colorStatus.Text = ScreenPalette.Description(hex, current.OfficialScreenColor()) + "\n发送 RGB " + current.DeviceScreenColor(hex) + (current.ThemeColors.ContainsKey(current.Theme) ? " · 自定义" : " · 主题原色");
         }
         finally { loading = false; }
     }
-    void SetThemeColor(string? color) { var colors = new Dictionary<string, string>(current.ThemeColors); if (color == null) colors.Remove(current.Theme); else colors[current.Theme] = color; Set(current with { ThemeColors = colors }); }
-    void PickThemeColor() { using var d = new ColorDialog { FullOpen = true, Color = ColorTranslator.FromHtml(current.ScreenColor()) }; if (d.ShowDialog(this) == DialogResult.OK) SetThemeColor($"#{d.Color.R:X2}{d.Color.G:X2}{d.Color.B:X2}"); }
+    void SetThemeColor(string? color, bool official = false)
+    {
+        var colors = new Dictionary<string, string>(current.ThemeColors); var origins = new Dictionary<string, bool>(current.ThemeOfficialColors);
+        if (color == null) colors.Remove(current.Theme); else colors[current.Theme] = color;
+        if (color != null && official) origins[current.Theme] = true; else origins.Remove(current.Theme);
+        Set(current with { ThemeColors = colors, ThemeOfficialColors = origins });
+    }
+    void PickThemeColor() => PickThemeColor(false);
+    void PickThemeColor(bool official) { using var d = new ColorDialog { FullOpen = true, Color = ColorTranslator.FromHtml(current.ScreenColor()), CustomColors = ScreenPalette.Official.Keys.Take(16).Select(h => ColorTranslator.ToOle(ColorTranslator.FromHtml(h))).ToArray() }; if (d.ShowDialog(this) == DialogResult.OK) SetThemeColor($"#{d.Color.R:X2}{d.Color.G:X2}{d.Color.B:X2}", official); }
     void LoadColorChips()
     {
-        colorChips.SuspendLayout(); foreach (var chip in swatches) chip.Dispose(); swatches.Clear(); colorChips.Controls.Clear();
-        foreach (var entry in ScreenPalette.All.Values.Where(e => e.Quick))
+        colorChips.SuspendLayout(); officialChips.SuspendLayout(); foreach (var chip in swatches) chip.Dispose(); swatches.Clear(); colorChips.Controls.Clear(); officialChips.Controls.Clear();
+        foreach (bool official in new[] { false, true })
+        foreach (var entry in (official ? ScreenPalette.Official : ScreenPalette.All).Values.Where(e => e.Quick))
         {
-            string input = entry.Input; var chip = new ColorSwatch(input, entry.Name) { AccessibleName = entry.Name + "，设备 RGB " + input + "，" + entry.Observation };
+            string input = entry.Input; var chip = new ColorSwatch(input, entry.Name, official) { AccessibleName = entry.Name + "，设备 RGB " + input + "，" + entry.Observation };
             // Startup scales the completed control tree once. Hot-loaded controls
             // are created after that pass and need the current DPI explicitly.
             if (AutoScaleMode == AutoScaleMode.Dpi) chip.Scale(new SizeF(DeviceDpi / 96f, DeviceDpi / 96f));
-            chip.Click += (_, _) => SetThemeColor(input); swatches.Add(chip); colorChips.Controls.Add(chip);
+            chip.Click += (_, _) => SetThemeColor(input, official); swatches.Add(chip); (official ? officialChips : colorChips).Controls.Add(chip);
         }
-        colorChips.ResumeLayout(true);
+        colorChips.ResumeLayout(true); officialChips.ResumeLayout(true);
     }
-    void ReloadColors() { var error = ScreenPalette.Reload(ScreenPalette.FilePath); LoadColorChips(); Sync(); if (latestState != null) preview.PixelColor = ColorTranslator.FromHtml(ScreenPalette.Preview(latestState.ScreenColor)); if (error != null) MessageBox.Show(this, error, "配色表"); }
+    void ReloadColors() { var error = ScreenPalette.Reload(ScreenPalette.FilePath); LoadColorChips(); Sync(); if (latestState != null) preview.PixelColor = ColorTranslator.FromHtml(ScreenPalette.Preview(latestState.ScreenColor, latestState.OfficialColor)); if (error != null) MessageBox.Show(this, error, "配色表"); }
     public void ApplyTestSettings(Settings s) { current = s.Validated(); engine.Configure(current); Sync(); }
     void LoadThemes()
     {
