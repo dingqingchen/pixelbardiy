@@ -4,7 +4,7 @@
 > **非官方实验项目 · 设备损坏与变砖风险**
 > 本项目主要代码由 **GPT-6 Astra** 完成，结合作者在本机设备上的实验与反馈迭代。项目**尚未经过完整、全面的测试，不保证不会损坏设备**，也不保证适用于所有硬件批次、固件或播放器版本。固件/硬件版本不匹配、刷写中断及其他未知问题，可能导致音响无法启动、显示异常、变砖或其他设备损坏。已提供的备份与回退流程不是通用救砖保证，显示 MCU 完全失效后的独立 USB 恢复尚未验证。请先阅读适配条件、备份和恢复边界，自行评估并承担使用风险。遇到问题欢迎通过 [GitHub Issues](https://github.com/woozyc/pixelbardiy/issues) 反馈，附版本和复现步骤，并隐藏设备序列号、路径和个人信息。
 
-将 Edifier Halo PixelBar 的 **256 × 32 点阵屏**变成桌面的延伸：看网易云歌词、电脑性能状态，也能选择自己喜欢的时钟、图案与配色。当前桌面版是 **C# / .NET 10 的 HaloStudio 2.6.3**，Python 旧版源码保留在独立目录。
+将 Edifier Halo PixelBar 的 **256 × 32 点阵屏**变成桌面的延伸：看网易云歌词、电脑性能状态，也能选择自己喜欢的时钟、图案与配色。当前桌面版是 **C# / .NET 10 的 HaloStudio 2.6.4**，Python 旧版源码保留在独立目录。
 
 ## 当前功能
 
@@ -15,7 +15,7 @@
 - **主题风格与颜色自定义：** 六套外部 JSON 主题统一覆盖时钟、监控、歌词，支持添加主题、更改布局／字体／图案／过场；内置主题快捷色、校准色和 30 个 TempoHub 官方预设色，逐主题保存选择。
 - **退出／崩溃后恢复默认显示：** 正常退出主动释放独占；程序崩溃或停止心跳后由 MCU 租约超时回收，恢复原厂时钟。本机已验证退出与停心跳恢复。
 - **保留官方默认功能：** 原厂功能路径保留，释放控制后可继续使用 TempoHub；已实测时钟、中文主题、音乐播放、静态灯光、亮度和自创文字正常。官方全部功能尚未逐项验证，详见下方记录。
-- **绿色便携、项目代码开源：** 解压运行，主程序无需管理员权限；日常显示只写 RAM，不擦写 Flash。独立温度采集首次默认关闭，主动启用后才记住选择并按需请求授权。项目原创代码公开，固件 BIN 中原厂专有部分的许可另计；不承诺零风险。
+- **绿色便携、项目代码开源：** 解压运行，主程序无需管理员权限；日常显示只写 RAM，不擦写 Flash。独立温度采集首次默认关闭，主动启用后经一次授权建立受保护的按需任务，以后启动复用授权。项目原创代码公开，固件 BIN 中原厂专有部分的许可另计；不承诺零风险。
 
 [![HaloStudio：Win11 风格界面、六套主题、歌词与系统监控](docs/images/halostudio-overview.png)](docs/images/halostudio-overview.png)
 
@@ -37,7 +37,7 @@
 
 | 内容 | 下载 / 说明 |
 | --- | --- |
-| 最新 Windows x64 应用与固件资料 | [HaloStudio C# 2.6.3](packages/HaloStudio-CSharp-2.6.3-win64.zip) |
+| 最新 Windows x64 应用与固件资料 | [HaloStudio C# 2.6.4](packages/HaloStudio-CSharp-2.6.4-win64.zip) |
 | MCU 固件与工程工具包 | [HPL2 固件工具包 2.6.0](packages/HaloPixelBar-MCU-2.6.0.zip) |
 | 下载校验 | [全部包的 SHA256](packages/SHA256SUMS.txt) |
 | C# 使用、配置与构建 | [新版说明](halo-studio-dotnet/README.md) |
@@ -46,7 +46,7 @@
 1. 完整解压 ZIP，运行其中 `HaloStudioNet/HaloStudioNet.exe`。包含 .NET 运行时，无需安装 Python 或 .NET；保留所有资源和依赖文件。
 2. 正常退出 TempoHub 或其他显示控制程序。导入**本机已完成实屏验证**的 MCU 安装记录，客户端按固件哈希启用对应能力；分发包不含个人设备记录。首次使用可先运行 `HaloStudioNet.exe --preview` 离线查看。
 3. 在“主题与屏幕”选择默认时钟或监控，播放网易云音乐时可自动显示歌词。在“设置”开启登录 Windows 后后台启动。
-4. 独立 CPU 温度采集首次默认关闭；需要时在“硬件监控”主动开启或点击“授权并重试”。开启后记住选择，下次启动自动恢复，驱动要求权限时可能再次弹出 UAC；关闭开关即可取消下次自动启用。
+4. 独立 CPU 温度采集首次默认关闭；需要时在“硬件监控”主动开启或点击“授权并重试”。首次确认一次 UAC 建立固定采集器的按需任务，此后开机和手动启动复用授权；关闭开关即停止调用。辅助文件保存在受保护目录，详见[授权与网速说明](halo-studio-dotnet/docs/STARTUP_NETWORK.md)。
 5. 关闭窗口会隐藏到托盘；“设置 → 退出并恢复原厂显示”才会停止显示控制。旧版本入口在“设置 → HaloStudio”内，切换前先释放显示权；未自动找到旧版时可手动选择 EXE。
 
 本机设置、歌词缓存、安装身份、运行日志都保存在 `runtime/`，不纳入 Git 或分发包。不要复制其他人的安装记录来绕过设备验证。
@@ -86,17 +86,17 @@
 | 音响 | Edifier Halo PixelBar，USB `VID 2D99 / PID A106`、`MI04`、主控报告 `1.3.7`；还需核对硬件及显示 MCU 镜像，不能只凭产品名判断兼容 |
 | 日常运行 | Windows x64 应用包已含 **.NET 10** 运行时；无需 Python、.NET SDK 或 TrafficMonitor。USB HID 使用系统驱动；需自己的、实屏验证过的 MCU 安装记录 |
 | 在线歌词 | 需能访问歌词接口；网易云歌曲 ID 与歌词版本应匹配。不要求开启桌面歌词。离线仅使用缓存或导入的 LRC，部分歌曲没有逐字数据 |
-| CPU 温度（可选） | 随包 HaloThermal / AMD 采集模块；复用已有 WinRing0/PawnIO，否则通过已校验的 PawnIO 组件加载。可能需要用户确认 UAC。独立通道面向 AMD Family 17h / 19h / 1Ah，其他硬件可能没有温度 |
+| CPU 温度（可选） | 随包 HaloThermal / AMD 采集模块；复用已有 WinRing0/PawnIO，否则通过已校验的 PawnIO 组件加载。首次需确认 UAC 建立固定采集器任务，之后复用；任务失效或采集器更新需重设。独立通道面向 AMD Family 17h / 19h / 1Ah，其他硬件可能没有温度 |
 | GPU / 主板监控（可选） | NVIDIA 指标需厂商驱动提供 NVML；主板其他传感器需可用的 LHM/OHM WMI 提供程序。缺少传感器不影响时钟/歌词，显示 `--` |
 | C# 源码编译 | Windows x64 + **.NET 10 SDK**（本机构建 10.0.401）；首次还原需网络。目标 API 版本为 Windows 10.0.19041，不能据此宣称旧系统已完整测试 |
 | 固件工程工具 | **Python 3.12 x64**、`legacy-python/requirements-dev.txt` 固定依赖（含 Unicorn 2.1.3、Keystone 0.9.2、Capstone 5.0.9、hidapi、PySide6、psutil）；另需自己的原厂包、镜像和备份记录，详见[完整命令流程](docs/FIRMWARE_USAGE.md) |
 
-应用包为 **2.6.3**，固件工具包仍为 **2.6.0** 发布资料；显示 MCU BIN 与 2.5.1 相同，已安装并验证相同 SHA 的设备**无需重新刷写**。本次歌词兼容性修复只需更新电脑端。
+应用包为 **2.6.4**，固件工具包仍为 **2.6.0** 发布资料；显示 MCU BIN 与 2.5.1 相同，已安装并验证相同 SHA 的设备**无需重新刷写**。本次后台启动、温度授权与网速修复只需更新电脑端。
 
 ## 源码与验证
 
 ```text
-halo-studio-dotnet/   C# 2.6.3 客户端、外部主题/色表、MCU 扩展源码与报告
+halo-studio-dotnet/   C# 2.6.4 客户端、外部主题/色表、MCU 扩展源码与报告
 legacy-python/       Python 旧版、依赖、测试与固件实验基线
 docs/                MCU 动画、USB 协议与显示链路的实现原理
 firmware/            当前与历史显示 MCU 镜像、校验值
@@ -111,7 +111,7 @@ cd halo-studio-dotnet
 ./scripts/verify.ps1
 ```
 
-GitHub Actions 分别验证 Python 与 C#。2.6.2 本机通过 397 项离线检查，覆盖首次温度采集关闭、主动启用／关闭持久化、旧设置迁移以及原有协议／歌词／配色回归；布局验证见[验证记录](halo-studio-dotnet/docs/VALIDATION.md)。新 MCU 的实屏、退出、停心跳恢复已在此前单独验证，本次没有刷写固件。离线检查不替代刷机后的实物确认。
+GitHub Actions 分别验证 Python 与 C#。2.6.4 本机通过 423 项离线检查及 30 组布局验证，覆盖温度首次关闭与持久化、后台隐藏启动、授权任务身份、网络接口复位及原有协议／歌词／配色回归；详细验证见[验证记录](halo-studio-dotnet/docs/VALIDATION.md)。新 MCU 的实屏、退出、停心跳恢复已在此前单独验证，本次没有刷写固件。离线检查不替代刷机后的实物确认。
 
 固件离线重建需要自行取得并核对原厂显示 MCU 镜像。先依照 [旧固件构建说明](legacy-python/docs/FIRMWARE.md)准备 `legacy-python/firmware-analysis/v137/mcu.bin`，安装 `legacy-python/requirements-dev.txt` 中的开发依赖，再运行 `python halo-studio-dotnet/firmware-color/validate_color.py`。`legacy-python/` 中的 Python/实验工具同时为新版验证提供基线；仿真不访问 USB，也不在 CI 中自动刷写设备。
 

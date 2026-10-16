@@ -99,7 +99,7 @@ public sealed record Metric(string Key, string Name, string Short, double? Value
         {
             string[] units = ["B", "K", "M", "G", "T"]; int i = 0;
             while (Math.Abs(v) >= 1024 && i < 4) { v /= 1024; i++; }
-            return v.ToString(v < 10 ? "0.00" : v < 100 ? "0.0" : "0") + units[i] + (compact ? "" : "/S");
+            return v.ToString(v < 10 ? "0.00" : v < 100 ? "0.0" : "0") + (compact ? units[i] : new[] { "B/s", "KiB/s", "MiB/s", "GiB/s", "TiB/s" }[i]);
         }
         return $"{v:0}{Unit}";
     }

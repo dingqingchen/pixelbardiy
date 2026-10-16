@@ -13,6 +13,9 @@ internal static class Program
         string runtime = Path.GetFullPath(Arg("--runtime", Path.Combine(AppContext.BaseDirectory, "runtime"))); Directory.CreateDirectory(runtime);
         try
         {
+            if (args.Contains("--install-thermal-task")) { ThermalTask.Install(); return 0; }
+            if (args.Contains("--network-probe")) { Task.Run(async () => { var network = new NetworkSampler(); var rows = new List<object>(); for (int i = 0; i < 6; i++) { rows.Add(new { At = i, Rate = network.Read(), Adapters = NetworkSampler.Enumerate() }); await Task.Delay(1000); } Files.Save(Arg("--output", Path.Combine(runtime, "network-probe.json")), rows); }).GetAwaiter().GetResult(); return 0; }
+            if (args.Contains("--temperature-probe")) { Task.Run(() => TemperatureDiagnostic.Run(Arg("--output", Path.Combine(runtime, "temperature-probe.json")))).GetAwaiter().GetResult(); return 0; }
             Designs.Reload(Path.GetFullPath(Arg("--themes", Path.Combine(AppContext.BaseDirectory, "themes"))));
             if (ScreenPalette.Reload(Path.Combine(AppContext.BaseDirectory, "palettes", "pixelbar.json")) is string paletteError) File.WriteAllText(Path.Combine(runtime, "palette-warning.txt"), paletteError);
             if (args.Contains("--self-test")) { SelfTests.Run(Arg("--output", Path.Combine(runtime, "self-test.json")), Arg("--fixtures", "")); return 0; }
@@ -45,8 +48,14 @@ internal static class Program
             string audit = Arg("--ui-audit", ""); if (preview && audit.Length > 0) { screenshotTimer = new() { Interval = 3500 }; screenshotTimer.Tick += (_, _) => { screenshotTimer.Stop(); form.AuditLayout(audit); }; screenshotTimer.Start(); }
             string inputs = Arg("--input-audit", ""); if (preview && inputs.Length > 0) { screenshotTimer = new() { Interval = 1500 }; screenshotTimer.Tick += (_, _) => { screenshotTimer.Stop(); form.AuditInputs(inputs); }; screenshotTimer.Start(); }
             string readme = Arg("--readme-shots", ""); if (preview && readme.Length > 0) { screenshotTimer = new() { Interval = 2000 }; screenshotTimer.Tick += (_, _) => { screenshotTimer.Stop(); form.CaptureReadme(readme); }; screenshotTimer.Start(); }
+            if (preview && args.Contains("--background-audit"))
+            {
+                bool everVisible = false, shown = false; form.VisibleChanged += (_, _) => everVisible |= form.Visible; form.Shown += (_, _) => shown = true;
+                screenshotTimer = new() { Interval = 2000 };
+                screenshotTimer.Tick += async (_, _) => { screenshotTimer.Stop(); Files.Save(Arg("--output", Path.Combine(runtime, "background-audit.json")), new { Passed = !everVisible && !shown && !form.Visible && !form.ShowInTaskbar && form.WorkerStarted, EverVisible = everVisible, Shown = shown, form.Visible, form.ShowInTaskbar, form.WorkerStarted }); await form.QuitAsync(); }; screenshotTimer.Start();
+            }
             Application.Run(form); closeTimer?.Dispose(); screenshotTimer?.Dispose(); sequenceTimer?.Dispose(); if (savedSettings != null) engine.Configure(savedSettings); ReleaseOwner(); return 0;
         }
-        catch (Exception e) { File.WriteAllText(Path.Combine(runtime, "last-error.txt"), e.ToString()); ReleaseOwner(); if (!args.Any(a => a is "--self-test" or "--lyrics-probe" or "--probe" or "--diagnostics" or "--transport-probe" or "--color-test" or "--white-test" or "--color-commission" or "--owner-probe")) MessageBox.Show(e.Message, "HaloStudio C#"); return 1; }
+        catch (Exception e) { File.WriteAllText(Path.Combine(runtime, "last-error.txt"), e.ToString()); ReleaseOwner(); if (!args.Any(a => a is "--install-thermal-task" or "--temperature-probe" or "--self-test" or "--lyrics-probe" or "--probe" or "--diagnostics" or "--transport-probe" or "--color-test" or "--white-test" or "--color-commission" or "--owner-probe")) MessageBox.Show(e.Message, "HaloStudio C#"); return 1; }
     }
 }

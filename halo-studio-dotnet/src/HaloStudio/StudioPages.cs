@@ -31,14 +31,15 @@ public sealed partial class StudioForm
     {
         var p = pages[1]; var cpu = Card(p, "CPU 温度", "独立按需采集，优先复用已加载的硬件驱动。");
         cpu.Controls.Add(thermal);
-        Setting(cpu, "独立温度采集", "首次默认关闭；主动开启后记住选择。开启可能弹出管理员授权，下次启动可能再次询问。", Toggle("独立温度采集", () => current.CpuTemperatureEnabled, v => { if (v) { engine.EnableTemperature(); current = engine.Config; Sync(); } else Set(current.WithTemperatureChoice(false)); }));
+        Setting(cpu, "独立温度采集", "首次默认关闭；首次开启需确认一次管理员授权，之后开机和手动启动均复用授权。", Toggle("独立温度采集", () => current.CpuTemperatureEnabled, v => { if (v) { engine.EnableTemperature(); current = engine.Config; Sync(); } else Set(current.WithTemperatureChoice(false)); }));
         cpu.Controls.Add(Row(Button("授权并重试", () => { engine.EnableTemperature(); current = engine.Config; Sync(); }, true)));
-        cpu.Controls.Add(Hint("主程序无需管理员权限，仅温度采集器可能请求授权。取消后本次运行不自动重复弹窗；可关闭开关取消下次自动启用。"));
+        cpu.Controls.Add(Hint("主程序保持普通权限。后台任务只按需启动固定温度采集器，退出即停止；程序位置变化或授权失效时需重新设置。"));
         var layout = Card(p, "显示编排");
         Setting(layout, "监控布局", "紧凑信息或单项图形仪表", Combo("监控布局", [("dense", "紧凑两行 · 八项状态"), ("compact", "双指标卡片"), ("value", "数值与图形仪表"), ("bar", "分段负载仪表"), ("graph", "历史曲线")], () => current.MonitorView, v => Set(current with { MonitorView = v })));
         Setting(layout, "双指标横向轮换", "横向切换时生效；整对模式优先同类配对", Combo("双指标横向轮换", [("pair", "每次一对 · 同类优先"), ("single", "每次一个 · 逐个接续")], () => current.PairAdvance, v => Set(current with { PairAdvance = v })));
         Setting(layout, "轮换指标", "按选择顺序轮流显示", Toggle("轮换指标", () => current.MonitorRotate, v => Set(current with { MonitorRotate = v })));
         Setting(layout, "轮换间隔", "单位：秒", Number("轮换间隔", 2, 120, () => current.RotationSeconds, v => Set(current with { RotationSeconds = (int)v })));
+        layout.Controls.Add(Hint("网速按活动物理网卡统计，避免 VPN 重复计数；单位为字节/秒，屏幕 K/M 对应 KiB/s、MiB/s（1024 进制），不是 Mbps。"));
         var selected = Card(p, "显示指标", "同类优先，余项就近配对；奇数时最后一项单独显示。可在列表内滚动。", maxHeight: 480); selected.Controls.Add(metrics);
         selected.Controls.Add(Button("应用指标选择", () => Set(current with { MonitorMetrics = metrics.SelectedKeys })));
         var fans = Card(p, "风扇额定转速", "输入额定最大 RPM，用于计算相对转速百分比。"); fanKey.PlaceholderText = "传感器键，例如 gpu0_fan0"; fanMax.PlaceholderText = "最大 RPM";

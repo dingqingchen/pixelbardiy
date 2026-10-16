@@ -21,12 +21,15 @@ public sealed partial class StudioForm : Form
     readonly FileSystemWatcher themeWatch; readonly System.Windows.Forms.Timer reloadTimer = new() { Interval = 500 };
     readonly InputCommit inputCommit;
     readonly Icon appIcon = Branding.Icon(); readonly Image logo = Branding.Logo();
+    bool suppressInitialShow, workerStarted;
+    internal bool WorkerStarted => workerStarted;
     bool loading, quitting, allowClose, auditing; volatile bool themeDirty; int pageIndex; Settings current; string? legacyLaunch; StudioState? latestState; string sensorSignature = "";
 
     public StudioForm(Engine worker, string directory, bool previewOnly, bool backgroundStart)
     {
         SuspendLayout();
         engine = worker; runtime = directory; previewMode = previewOnly; current = engine.Config;
+        suppressInitialShow = backgroundStart; ShowInTaskbar = !backgroundStart; engine.Visible = !backgroundStart;
         Text = previewOnly ? "HaloStudio · 离线预览" : "HaloStudio"; Icon = appIcon; ClientSize = new(1280, 900); MinimumSize = new(1020, 720); StartPosition = FormStartPosition.CenterScreen;
         BackColor = Palette.Background; ForeColor = Palette.Text; Font = Palette.Font(); AutoScaleMode = AutoScaleMode.None;
         var shell = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, Margin = new(0) };
@@ -77,12 +80,21 @@ public sealed partial class StudioForm : Form
         engine.Changed += OnState; themeWatch = new(Designs.DirectoryPath, "*.json") { NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite, EnableRaisingEvents = true };
         themeWatch.Changed += (_, _) => themeDirty = true; themeWatch.Created += (_, _) => themeDirty = true; themeWatch.Deleted += (_, _) => themeDirty = true; themeWatch.Renamed += (_, _) => themeDirty = true;
         reloadTimer.Tick += (_, _) => { if (themeDirty) { themeDirty = false; ReloadThemes(); } }; reloadTimer.Start();
-        Shown += (_, _) => { FitSidebar(); FitPreview(); foreach (var page in pages) { ResizePage(page); foreach (Control child in page.Controls) if (child.Tag is Action reflow) reflow(); } if (backgroundStart) Hide(); engine.Start(previewMode); };
+        Shown += (_, _) => { FitSidebar(); FitPreview(); foreach (var page in pages) { ResizePage(page); foreach (Control child in page.Controls) if (child.Tag is Action reflow) reflow(); } StartWorker(); };
         // This form is composed at runtime: scale the completed tree once. Setting
         // AutoScaleMode before adding children scales only the empty form on high DPI.
         float dpiScale = DeviceDpi / 96f; Scale(new SizeF(dpiScale, dpiScale));
         AutoScaleDimensions = new SizeF(DeviceDpi, DeviceDpi); AutoScaleMode = AutoScaleMode.Dpi;
         ResumeLayout(true);
+        if (backgroundStart) { _ = Handle; BeginInvoke((Action)StartWorker); }
+    }
+    void StartWorker() { if (workerStarted) return; workerStarted = true; engine.Visible = Visible; engine.Start(previewMode); }
+    protected override void SetVisibleCore(bool value)
+    {
+        // Suppress Application.Run's initial Show before any visible window is
+        // created. A hidden handle/message loop still services the tray/worker.
+        if (value && suppressInitialShow) { suppressInitialShow = false; base.SetVisibleCore(false); return; }
+        base.SetVisibleCore(value);
     }
     void OnState(StudioState value)
     {
@@ -168,7 +180,7 @@ public sealed partial class StudioForm : Form
     void ImportLrc() { using var d = new OpenFileDialog { Filter = "同步歌词|*.lrc|文本|*.txt" }; if (d.ShowDialog(this) == DialogResult.OK) Safe(() => engine.ImportLrc(d.FileName)); }
     void ImportDevice() { using var d = new OpenFileDialog { Filter = "本机验证记录|*.json" }; if (d.ShowDialog(this) != DialogResult.OK) return; Safe(() => { using var doc = JsonDocument.Parse(File.ReadAllText(d.FileName)); if (!doc.RootElement.TryGetProperty("candidate_sha256", out _)) throw new InvalidDataException("这不是 MCU 验证记录"); File.Copy(d.FileName, Path.Combine(runtime, "mcu-installation.json"), true); }); }
     void Safe(Action action) { try { action(); } catch (Exception e) { MessageBox.Show(this, e.Message, "HaloStudio"); } }
-    void ShowStudio() { Show(); WindowState = FormWindowState.Normal; Activate(); }
+    void ShowStudio() { ShowInTaskbar = true; Show(); WindowState = FormWindowState.Normal; Activate(); }
     static void OpenFolder(string path) => Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
     async Task SwitchLegacyAsync() { string? path = FindLegacy(); if (path == null) { using var d = new OpenFileDialog { Filter = "HaloStudio 旧版|HaloStudio.exe" }; if (d.ShowDialog(this) != DialogResult.OK) return; path = d.FileName; } legacyLaunch = path; await QuitAsync(); }
     static string? FindLegacy() { string? p = AppContext.BaseDirectory; for (int i = 0; i < 7 && p != null; i++, p = Path.GetDirectoryName(p.TrimEnd(Path.DirectorySeparatorChar))) { string f = Path.Combine(p, "halo-controller", "dist", "HaloStudio", "HaloStudio.exe"); if (File.Exists(f)) return f; } return null; }

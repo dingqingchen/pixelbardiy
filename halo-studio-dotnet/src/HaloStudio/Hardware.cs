@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 
 namespace HaloStudio;
@@ -7,7 +6,7 @@ namespace HaloStudio;
 public sealed class Hardware : IDisposable
 {
     public CpuTemperature Temperature { get; } = new();
-    ulong priorIdle, priorKernel, priorUser; long priorNetTx, priorNetRx, priorTime;
+    ulong priorIdle, priorKernel, priorUser; readonly NetworkSampler network = new();
     readonly Dictionary<string, Queue<double>> history = [];
     IntPtr nv; IntPtr gpu; bool nvTried; object? wmi; long nextWmi; readonly CounterSet counters = new();
     public async Task<Snapshot> SampleAsync(Dictionary<string, double> limits, bool temperatureEnabled = false, bool temperatureElevation = false)
@@ -20,9 +19,9 @@ public sealed class Hardware : IDisposable
         Add("ram_gb", "已用物理内存", "RAM", (mem.TotalPhys - mem.AvailPhys) / Math.Pow(1024, 3), "GB", "Windows");
         var countersNow = counters.Read(); Add("disk_read", "磁盘读取", "READ", countersNow.GetValueOrDefault("disk_read"), "B/s", "Windows PDH"); Add("disk_write", "磁盘写入", "WRITE", countersNow.GetValueOrDefault("disk_write"), "B/s", "Windows PDH");
         Add("frequency", "CPU 报告频率", "CPU", countersNow.GetValueOrDefault("frequency") / 1000, "GHz", "Windows Processor Information（非精确核心时钟）");
-        long tx = 0, rx = 0; foreach (var nic in NetworkInterface.GetAllNetworkInterfaces()) { if (nic.NetworkInterfaceType == NetworkInterfaceType.Loopback) continue; try { var s = nic.GetIPv4Statistics(); tx += s.BytesSent; rx += s.BytesReceived; } catch { } }
-        long now = Environment.TickCount64; double dt = (now - priorTime) / 1000.0;
-        Add("upload", "网络上传", "UP", priorTime > 0 ? Math.Max(0, (tx - priorNetTx) / dt) : null, "B/s", "Windows IP Helper"); Add("download", "网络下载", "DN", priorTime > 0 ? Math.Max(0, (rx - priorNetRx) / dt) : null, "B/s", "Windows IP Helper"); priorTime = now; priorNetTx = tx; priorNetRx = rx;
+        var rate = network.Read();
+        Add("upload", "网络上传", "UP", rate.Upload, "B/s", rate.Source);
+        Add("download", "网络下载", "DN", rate.Download, "B/s", rate.Source);
         InitNv(); if (gpu != IntPtr.Zero)
         {
             var util = Get<NvUtil>("nvmlDeviceGetUtilizationRates"); NvUtilization utilization = default; double? usage = util != null && util(gpu, out utilization) == 0 ? utilization.Gpu : null;
@@ -36,7 +35,7 @@ public sealed class Hardware : IDisposable
                 if (limits.TryGetValue(key, out double max) && max > 0 && rpm != null) Add(key + "_rated", "风扇/额定最大转速", $"F{i + 1}MAX", 100 * rpm / max, "%", "RPM / 用户额定最大转速", 100);
             }
         }
-        ReadWmi(rows, limits, now);
+        ReadWmi(rows, limits, Environment.TickCount64);
         var existingCpu = rows.FirstOrDefault(m => m.Unit == "C" && m.Short == "CPU" && m.Value is > 0 and <= 150);
         // Keep the stable key consumed by every theme, even when WMI supplies the value.
         double? cpuTemperature = existingCpu?.Value ?? await Temperature.ReadAsync(temperatureEnabled, temperatureElevation);

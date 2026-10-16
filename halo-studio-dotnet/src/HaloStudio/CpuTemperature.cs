@@ -17,6 +17,7 @@ public sealed class CpuTemperature : IDisposable
     public string Detail { get; private set; } = "等待按需采集 CPU 温度";
     static readonly Dictionary<string, string> hashes = new()
     {
+        ["HaloThermalTask.exe"] = "57aedf7e11005125cc575539b0f3fb1f5f6b80d3ff80ca3735e0ed44bba69fad",
         ["HaloThermal.exe"] = "6a10ae1d93fead056e819967b661e7b89783bee6770c2bf0bd3ff9a4ee6d1066",
         ["PawnIO_setup.exe"] = "1f519a22e47187f70a1379a48ca604981c4fcf694f4e65b734aaa74a9fba3032",
         ["AMDFamily17.bin"] = "dae74615761b78bdf064dfb3e136252ddcc6fc727d88f14738d0e5800d427a91"
@@ -58,7 +59,7 @@ public sealed class CpuTemperature : IDisposable
                 // Automatic restart tries existing drivers without elevating repeatedly.
                 bool requestElevation = elevate && !elevatedAttempted;
                 elevatedAttempted |= requestElevation;
-                Detail = requestElevation ? "等待 Windows 管理员授权…" : "检查现有温度驱动…";
+                Detail = requestElevation ? "正在准备温度采集（首次可能需要授权）…" : "检查已授权任务或现有温度驱动…";
                 starting = Task.Run(() => StartSession(requestElevation));
                 return null;
             }
@@ -77,7 +78,7 @@ public sealed class CpuTemperature : IDisposable
                     Detail = Status(status);
                     if (Decode(bytes, Environment.ProcessId, s.Process.Id, (ulong)Environment.TickCount64) is double value)
                     {
-                        Detail = "独立采集正常 · " + (bytes[64] == 1 ? "WinRing0" : "PawnIO") + (bytes[68] == 1 ? "（复用现有驱动）" : "");
+                        Detail = "独立采集正常 · " + (bytes[64] == 1 ? "WinRing0" : "PawnIO") + (bytes[68] == 1 ? "（复用现有驱动）" : "") + (s.Scheduled ? " · 已授权后台任务" : "");
                         return value;
                     }
                     if (status is not (0 or 1 or 12)) return null;
@@ -110,16 +111,22 @@ public sealed class CpuTemperature : IDisposable
             family is 0x17 or 0x19 or 0x1a && raw is not (0 or uint.MaxValue) && backend is 1 or 2 && reused <= 1 && samples > 0 &&
             stamp <= now && now - stamp <= 10000 && float.IsFinite(value) && value is > 0 and <= 150 ? value : null;
     }
-    static Session StartSession(bool elevate)
+    internal static void ValidateNative(string native, bool taskOnly = false)
     {
-        string native = Path.Combine(AppContext.BaseDirectory, "native");
         foreach (var (name, hash) in hashes)
         {
+            if (taskOnly && name == "HaloThermal.exe") continue;
             string path = Path.Combine(native, name);
             if (!File.Exists(path) || Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path))).ToLowerInvariant() != hash) throw new IOException("温度组件校验失败：" + name);
         }
+    }
+    static Session StartSession(bool elevate)
+    {
+        string native = Path.Combine(AppContext.BaseDirectory, "native"); ValidateNative(native);
+        if (elevate) ThermalTask.EnsureInstalled();
+        bool scheduled = ThermalTask.Ready();
         string exe = Path.Combine(native, "HaloThermal.exe");
-        if (!elevate)
+        if (!scheduled)
         {
             using var probe = Process.Start(new ProcessStartInfo(exe, "--probe") { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true })!;
             if (!probe.WaitForExit(3000)) throw new IOException("温度驱动探测超时");
@@ -135,7 +142,15 @@ public sealed class CpuTemperature : IDisposable
             result.Map = MemoryMappedFile.CreateNew(prefix, 80); result.View = result.Map.CreateViewAccessor(0, 80);
             result.View.WriteArray(0, "HALOTC02"u8.ToArray(), 0, 8); result.View.Write(8, 2u); result.View.Write(12, (uint)pid); result.View.Write(36, 1u);
             result.Request = new EventWaitHandle(false, EventResetMode.AutoReset, prefix + "-request");
-            result.Process = Process.Start(new ProcessStartInfo(exe, $"{pid} {token}") { UseShellExecute = elevate, Verb = elevate ? "runas" : "", CreateNoWindow = !elevate, WindowStyle = ProcessWindowStyle.Hidden, WorkingDirectory = native }) ?? throw new IOException("无法启动温度采集器");
+            if (scheduled)
+            {
+                if (!ThermalTask.TryRun(pid, token)) throw new IOException("温度后台授权失效，请重新授权");
+                long until = Environment.TickCount64 + 8000; uint helper = 0;
+                while (helper == 0 && Environment.TickCount64 < until) { helper = result.View.ReadUInt32(56); if (helper == 0) Thread.Sleep(25); }
+                if (helper == 0) throw new IOException("温度后台任务启动超时");
+                result.Process = Process.GetProcessById(checked((int)helper)); result.Scheduled = true;
+            }
+            else result.Process = Process.Start(new ProcessStartInfo(exe, $"{pid} {token}") { UseShellExecute = false, CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden, WorkingDirectory = native }) ?? throw new IOException("无法启动温度采集器");
             result.Request.Set(); return result;
         }
         catch { result.Dispose(); throw; }
@@ -143,7 +158,7 @@ public sealed class CpuTemperature : IDisposable
     sealed class Session : IDisposable
     {
         public MemoryMappedFile Map = null!; public MemoryMappedViewAccessor View = null!;
-        public EventWaitHandle Request = null!; public Process Process = null!;
+        public EventWaitHandle Request = null!; public Process Process = null!; public bool Scheduled;
         public void Dispose()
         {
             try { View?.Write(60, 1u); Request?.Set(); } catch { }
