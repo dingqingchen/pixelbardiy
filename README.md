@@ -57,7 +57,7 @@ HaloStudio 可以让 Edifier Halo PixelBar 显示网易云音乐歌词、电脑�
 以下是操作顺序；具体路径和准备命令以[完整固件流程](docs/FIRMWARE_USAGE.md)为准。
 
 1. 先保存并校验原厂文件、当前安装记录、已安装固件和应用备份，完成工具包中的离线验证。
-2. 音响通过 USB 接入电脑，短按音响电源键切换到**红灯的 USB 声卡模式**。正常退出 HaloStudio、TempoHub 和其他音响控制软件，只连接一台目标音响。
+2. 音响通过 USB 接入电脑，切换到**红灯的 USB 声卡模式**。正常退出 HaloStudio、TempoHub 和其他音响控制软件，只连接一台目标音响。
 3. 在 PowerShell 中按完整流程设置好 `$py` 并切换到工程根目录，先运行预检：
 
    ```powershell
@@ -70,7 +70,7 @@ HaloStudio 可以让 Edifier Halo PixelBar 显示网易云音乐歌词、电脑�
    & $py .\halo-studio-dotnet\firmware-color\stage_color.py --flash-authorized
    ```
 
-4. 传输完成后保持供电，等待音响自行重启，并亲眼确认屏幕显示正常。传输成功不等于刷后验证完成。若传输中断或出现异常，保留供电和日志，不要反复重试；按[故障反馈与回退说明](docs/FIRMWARE_USAGE.md#6-有条件的回退与故障反馈)处理。
+4. 传输完成后保持供电，等待音响自行重启，并亲眼确认屏幕显示正常。若传输中断或出现异常，保留供电和日志，不要反复重试；按[故障反馈与回退说明](docs/FIRMWARE_USAGE.md#6-有条件的回退与故障反馈)处理。
 5. 按[刷后验证步骤](docs/FIRMWARE_USAGE.md#5-重启后-ram-功能与超时恢复)运行画面和心跳超时测试，确认图形、文字、动画、退出后时钟等恢复功能均正常。
 
 ### 4. 启动 HaloStudio
@@ -82,7 +82,7 @@ HaloStudio 可以让 Edifier Halo PixelBar 显示网易云音乐歌词、电脑�
 5. 如需 CPU 温度，在「硬件监控」开启独立温度采集。此功能首次默认关闭；第一次开启需要确认一次 Windows 管理员授权，之后通常会复用授权。
 6. 可在「设置」开启开机后台启动。关闭窗口会隐藏到托盘；需要停止控制并恢复官方显示时，请选择「退出并恢复原厂显示」。
 
-本机设置、歌词缓存、设备验证记录和日志保存在应用的 `runtime/` 目录，请自行留存，不要将含设备信息的记录公开上传。需要详细设置或自行构建时，可查看 [C# 版说明](halo-studio-dotnet/README.md)；Python 旧版另见[旧版说明](legacy-python/README.md)。
+本机设置、歌词缓存、设备验证记录和日志保存在应用的 `runtime/` 目录，请自行留存，不要将含设备信息的记录公开上传。需要详细设置或自行构建时，可查看 [C# 版说明](halo-studio-dotnet/README.md)；Python 旧版另见[旧版说明](legacy-python/README.md)（已弃用）。
 
 ## 官方 TempoHub 兼容性实测
 
