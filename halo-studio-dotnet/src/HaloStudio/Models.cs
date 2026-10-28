@@ -5,6 +5,9 @@ namespace HaloStudio;
 
 public sealed record Settings
 {
+    public bool TelemetryEnabled { get; init; }
+    public int TelemetryPort { get; init; } = 20777;
+    public string TelemetryTheme { get; init; } = "01_lagonda_led84";
     public bool Enabled { get; init; } = true;
     public string Mode { get; init; } = "auto";
     public bool Seconds { get; init; }
@@ -45,6 +48,8 @@ public sealed record Settings
     public string PixelTransition { get; init; } = "up";
     public Settings Validated() => this with
     {
+        TelemetryPort = TelemetryReceiver.ValidPort(TelemetryPort) ? TelemetryPort : 20777,
+        TelemetryTheme = TelemetryDesigns.All.ContainsKey(TelemetryTheme) ? TelemetryTheme : TelemetryDesigns.All.Keys.FirstOrDefault() ?? TelemetryTheme,
         Theme = Designs.All.ContainsKey(Theme) ? Theme : Designs.All.Keys.FirstOrDefault() ?? Theme,
         IdleContent = IdleContent=="monitor"?"monitor":"clock",
         PowerProfile = PowerProfile=="balanced"?"balanced":"eco",
@@ -125,7 +130,7 @@ public sealed record PixelFrame(byte[] Pixels, string Text, string Identity, boo
 public sealed record StudioState(string Status, Track Track, Snapshot Snapshot, PixelFrame? Frame,
     long Frames, long Dropped, long Writes, string Codec, int EncodedBytes, double FrameSeconds,
     double CpuPercent, double MemoryMB, double Peak, string TemperatureStatus, bool Connected,
-    string DemoStage = "", double DemoProgress = 0, string ScreenColor = "#86D8F6", string AudioDetail = "", bool OfficialColor = false);
+    string DemoStage = "", double DemoProgress = 0, string ScreenColor = "#86D8F6", string AudioDetail = "", bool OfficialColor = false, string TelemetryStatus = "", bool TelemetryActive = false, bool TelemetryDemo = false);
 
 public static class Files
 {

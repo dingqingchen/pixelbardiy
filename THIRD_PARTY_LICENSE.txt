@@ -1,3 +1,7 @@
+Vehicle comparison photos have separate copyrights and licenses.
+See halo-studio-dotnet/telemetry-photos/CREDITS.md for sources, authors, licenses and resizing details.
+These photos are not covered by the code license.
+
 Repository layout: Python dependencies and original notices are in legacy-python/.
 C# client notices are in halo-studio-dotnet/THIRD_PARTY_LICENSE.txt.
 The relative paths below refer to legacy-python/.

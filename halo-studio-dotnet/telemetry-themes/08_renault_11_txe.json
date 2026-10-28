@@ -1,0 +1,194 @@
+{
+  "version": 1,
+  "id": "08_renault_11_txe",
+  "name": "Renault 11 TXE Electronic",
+  "description": "顶部转速带、指示灯与大幅俯视车形",
+  "color": "#FF6000",
+  "reference_year": "1984 · Digital",
+  "reference_source": "https://www.autoweek.nl/auto/1456/renault-11-txe-electronic/",
+  "sprites": {
+    "car": [
+      "..XXXXXXXX..",
+      "..X......X..",
+      ".XX.XXXX.XX.",
+      "XXX.X..X.XXX",
+      "..X.XXXX.X..",
+      "..X......X..",
+      "XXX.XXXX.XXX",
+      ".XX.X..X.XX.",
+      "..X.XXXX.X..",
+      "..XXXXXXXX.."
+    ],
+    "engine": [
+      "..XXXX....",
+      "..X..XXXXX",
+      "XXX......X",
+      "X........X",
+      "X..XXXX..X",
+      "XXXX..XXXX"
+    ],
+    "brake": [
+      "..XXXXX..",
+      ".X.....X.",
+      "X..XXX..X",
+      "X..X.X..X",
+      "X..XXX..X",
+      ".X.X...X.",
+      "..XXXXX.."
+    ],
+    "wedge": [
+      "....................XXXXXXXXXXXX.....................",
+      "...................X............X....................",
+      "..................X..............XX..................",
+      "...............XXX..XXXXXXXX.......XX................",
+      "............XXX....X.......X.........XXXXXXX.........",
+      ".........XXX......X.........XX..............XXXX.....",
+      ".....XXXX........X............XX................X....",
+      "..XXX............................................X...",
+      "XX.........XXXXXXX....................XXXXXXX.....XXX",
+      "X.........X.......X..................X.......X.......X",
+      "XXXXXXXXXXX.XXXXX.XXXXXXXXXXXXXXXXXXXX.XXXXX.XXXXXXXXX",
+      "..........X.X...X.X..................X.X...X.X........",
+      "..........X.XXXXX.X..................X.XXXXX.X........",
+      "...........XXXXXXX....................XXXXXXX........."
+    ],
+    "r11_top": [
+      "......XXXXXXXXXXXX......",
+      ".....XXXXX....XXXXX.....",
+      ".....X.............X....",
+      "....XXXXXXXXXXXXXXXX....",
+      "...X................X...",
+      ".X.X....XXXXXXXX....XX..",
+      ".X.X................XX..",
+      ".X.X................XX..",
+      ".X.X.XXXXXXXXXXXXXX.XX..",
+      "...X.X............X.X...",
+      "XX.X..X..........X..X.XX",
+      "...X..XXXXXXXXXXXX..X...",
+      "...X................X...",
+      "...X..XXXXXXXXXXXX..X...",
+      "...X..X..........X..X...",
+      "...XX.X..........X.XX...",
+      "...XX.X..........X.XX...",
+      "...XX.X..........X.XX...",
+      "...XX.X..........X.XX...",
+      "...XX.X..........X.XX...",
+      ".X.X..XXXXXXXXXXXX..XX..",
+      ".X.X................XX..",
+      ".X.X.XXXXXXXXXXXXXX.XX..",
+      ".X.X.X............X.XX..",
+      "....X.X..........X.X....",
+      "....X.XXXXXXXXXXXXX.....",
+      ".....X............X.....",
+      "......XXXXXXXXXXXX......"
+    ]
+  },
+  "commands": [
+    {
+      "op": "rect",
+      "x": 0,
+      "y": 0,
+      "w": 256,
+      "h": 32
+    },
+    {
+      "op": "line",
+      "x": 25,
+      "y": 1,
+      "x2": 25,
+      "y2": 30
+    },
+    {
+      "op": "line",
+      "x": 211,
+      "y": 1,
+      "x2": 211,
+      "y2": 30
+    },
+    {
+      "op": "micro",
+      "text": "R11",
+      "x": 5,
+      "y": 3
+    },
+    {
+      "op": "sprite",
+      "name": "engine",
+      "x": 7,
+      "y": 12,
+      "when": "engine"
+    },
+    {
+      "op": "sprite",
+      "name": "brake",
+      "x": 7,
+      "y": 22,
+      "when": "handbrake"
+    },
+    {
+      "op": "segments",
+      "x": 30,
+      "y": 3,
+      "w": 176,
+      "h": 5,
+      "ratio": "=rpm_ratio",
+      "count": 44
+    },
+    {
+      "op": "micro",
+      "text": "RPM ${rpm}",
+      "x": 30,
+      "y": 11
+    },
+    {
+      "op": "micro",
+      "text": "${clock}",
+      "x": 184,
+      "y": 11
+    },
+    {
+      "op": "micro",
+      "text": "THR",
+      "x": 30,
+      "y": 19
+    },
+    {
+      "op": "segments",
+      "x": 30,
+      "y": 26,
+      "w": 40,
+      "h": 4,
+      "ratio": "=throttle",
+      "count": 10
+    },
+    {
+      "op": "seven",
+      "text": "${speed}",
+      "x": 85,
+      "y": 16,
+      "dw": 12,
+      "h": 14,
+      "slots": 3,
+      "gap": 3,
+      "thick": 2
+    },
+    {
+      "op": "micro",
+      "text": "KM/H",
+      "x": 134,
+      "y": 24
+    },
+    {
+      "op": "micro",
+      "text": "G ${gear}",
+      "x": 168,
+      "y": 24
+    },
+    {
+      "op": "sprite",
+      "name": "r11_top",
+      "x": 222,
+      "y": 2
+    }
+  ]
+}

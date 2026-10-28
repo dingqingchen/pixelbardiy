@@ -6,9 +6,13 @@ public sealed class Engine : IAsyncDisposable
 {
     readonly string runtime; Settings settings; int revision; readonly CancellationTokenSource stop = new(); CancellationTokenSource? session;
     readonly Hardware hardware = new(); readonly MediaMonitor media = new(); readonly MusicPeak peak = new(); readonly Envelope envelope = new(); readonly LyricsStore lyrics;
+    readonly TelemetryReceiver telemetry = new(); TelemetrySprint? sprint;
+    public bool TelemetryDemoRunning => Volatile.Read(ref sprint) != null;
+    public void StartTelemetryDemo() { StopShowcase(); Volatile.Write(ref sprint,new TelemetrySprint()); Interlocked.Increment(ref revision); }
+    public void StopTelemetryDemo() { Volatile.Write(ref sprint,null); Interlocked.Increment(ref revision); }
     Showcase? showcase; bool frameOfficial; string frameColor = "#86D8F6";
     public bool DemoRunning => Volatile.Read(ref showcase) != null;
-    public void StartShowcase() { Volatile.Write(ref showcase, new Showcase(Path.Combine(AppContext.BaseDirectory, "demos", "showcase.json"))); Interlocked.Increment(ref revision); }
+    public void StartShowcase() { StopTelemetryDemo(); Volatile.Write(ref showcase, new Showcase(Path.Combine(AppContext.BaseDirectory, "demos", "showcase.json"))); Interlocked.Increment(ref revision); }
     public void StopShowcase() { Volatile.Write(ref showcase, null); Interlocked.Increment(ref revision); }
     RamController? controller; IHaloTransport? link; Task? runner; Track track = new(); Snapshot snapshot = Snapshot.Empty;
     PixelFrame? frame; double signal; string? rhythmColor; volatile bool rhythmActive; string status = "离线预览"; List<LyricLine> lines = []; string lyricSource = "等待网易云播放";
@@ -47,6 +51,7 @@ public sealed class Engine : IAsyncDisposable
     {
         long started = Environment.TickCount64, nextMedia = 0, nextMonitor = 0, nextEmit = 0, nextConnect = 0, nextPerf = Environment.TickCount64 + 5000, nextPeak = 0, nextOwner = 0; int oldRevision = -1; string renderKey = "", trackKey = "", renderedTheme = "";
         Task<Track>? mediaTask = null; Task<Snapshot>? sensorTask = null; Task<(List<LyricLine> Lines, string Source)>? lyricTask = null; CancellationTokenSource? lyricCancel = null; string fetchKey = ""; bool fetchOnline = Config.Online;
+        long nextTelemetry = 0; bool wasTelemetry = false;
         int importRevision = -1; string cueKey = "";
         using var process = Process.GetCurrentProcess(); TimeSpan priorCpu = process.TotalProcessorTime; long perfAt = started; double cpu = 0, memory = process.WorkingSet64 / 1048576.0; bool mediaPlaying = false; int metricRevision = 0;
         try
@@ -54,8 +59,18 @@ public sealed class Engine : IAsyncDisposable
             while (!stop.IsCancellationRequested)
             {
                 long now = Environment.TickCount64; var s = Config; int rev = Volatile.Read(ref revision); bool changed = rev != oldRevision; var demo = Volatile.Read(ref showcase); bool enabled = s.Enabled || demo != null; double elapsed = (now - started) / 1000.0;
+                await telemetry.ConfigureAsync(s.TelemetryEnabled,s.TelemetryPort,now);
+                var driveDemo = Volatile.Read(ref sprint);
+                if(driveDemo?.Elapsed >= TelemetrySprint.Duration) { Interlocked.CompareExchange(ref sprint,null,driveDemo); driveDemo=null; }
+                var car = driveDemo != null ? TelemetrySprint.At(driveDemo.Elapsed,now) : telemetry.Latest;
+                bool carActive = TelemetryPriority.Takeover(s.TelemetryEnabled,driveDemo != null,car,now);
+                enabled |= carActive;
+                string telemetryStatus = driveDemo != null ? "零百加速演示 · 模拟数据 · 16 秒后自动结束" : telemetry.Detail;
+                if(s.TelemetryEnabled && car != null && !carActive) telemetryStatus += " · 游戏暂停或数据已停止，继续日常显示";
+                if(wasTelemetry && !carActive) renderKey = "";
                 if (changed) { nextMedia = nextMonitor = 0; oldRevision = rev; }
                 if (!preview && enabled && controller == null && now >= nextConnect) { try { await SessionAsync(); renderKey = ""; } catch (Exception e) { status = e.Message; Log("Connect: " + e.Message); } nextConnect = Environment.TickCount64 + 5000; }
+                if (preview || controller?.Owned == true) driveDemo?.Begin();
                 if (!enabled && controller != null) { status = "正在释放音响显示权…"; await CloseSessionAsync(); status = "已暂停，原厂显示已恢复"; renderKey = ""; }
                 if (!preview && controller != null && now >= nextOwner) { nextOwner = now + 3000; if (TempoHubRunning()) { await CloseSessionAsync(); status = "TempoHub 正在运行，已释放音响"; nextConnect = now + 5000; } }
                 if (_pump is { IsCompleted: true }) { if (_pump.Exception != null) { status = _pump.Exception.GetBaseException().Message; Log("USB: " + status); } await CloseSessionAsync(); nextConnect = now + 5000; }
@@ -69,7 +84,7 @@ public sealed class Engine : IAsyncDisposable
                 if (mediaTask?.IsCompleted == true) { try { track = await mediaTask; } catch (Exception e) { Log("Media: " + e.Message); } mediaTask = null; }
                 if (mediaTask == null && now >= nextMedia) { mediaTask = media.PollAsync(mediaPlaying); nextMedia = now + (track.Playing ? (s.PowerProfile == "balanced" ? 100 : 200) : 1500); }
                 if (sensorTask?.IsCompleted == true) { try { snapshot = await sensorTask; metricRevision++; } catch (Exception e) { Log("Sensors: " + e.Message); } sensorTask = null; }
-                if (sensorTask == null && now >= nextMonitor && (MonitorVisible || (s.Enabled && s.IdleContent == "monitor"))) { sensorTask = hardware.SampleAsync(s.FanLimits, s.CpuTemperatureEnabled, s.CpuTemperatureElevation); nextMonitor = now + (s.PowerProfile == "balanced" ? 2000 : 3000); }
+                if (sensorTask == null && now >= nextMonitor && (MonitorVisible || (!carActive && s.Enabled && s.IdleContent == "monitor"))) { sensorTask = hardware.SampleAsync(s.FanLimits, s.CpuTemperatureEnabled, s.CpuTemperatureElevation); nextMonitor = now + (s.PowerProfile == "balanced" ? 2000 : 3000); }
                 if (track.Key != trackKey || fetchOnline != s.Online || importRevision != Volatile.Read(ref lyricImportRevision))
                 {
                     trackKey = track.Key; fetchOnline = s.Online; importRevision = Volatile.Read(ref lyricImportRevision); lines = []; lyricCancel?.Cancel(); lyricCancel?.Dispose(); lyricCancel = CancellationTokenSource.CreateLinkedTokenSource(stop.Token);
@@ -85,7 +100,25 @@ public sealed class Engine : IAsyncDisposable
                 cueKey = mode == "歌词" ? cue!.Key + ":" + s.Theme : "";
                 if (mode == "时钟" && s.IdleContent == "monitor") { mode = "系统监控"; text = ""; }
                 var clock = DateTime.Now; string key = $"{mode}|{text}|{cueKey}|{rev}|{(mode == "系统监控" ? metricRevision : 0)}|{(mode == "系统监控" && s.MonitorRotate ? (int)(elapsed / s.RotationSeconds) : 0)}|{(s.Animations ? (int)(elapsed / 2) : 0)}|{clock:yyyyMMdd}";
-                if (demo != null)
+                if (carActive && car != null)
+                {
+                    if(!wasTelemetry || changed || now >= nextTelemetry)
+                    {
+                        try
+                        {
+                            var next = TelemetryDesigns.Render(s.TelemetryTheme,car,driveDemo != null);
+                            var design = TelemetryDesigns.All.GetValueOrDefault(s.TelemetryTheme) ?? TelemetryDesigns.All.Values.First();
+                            // A changing value must never interrupt an in-flight USB frame or start a whole-screen slide.
+                            // The pump coalesces pending frames and only diffs against its acknowledged basis.
+                            bool urgent = !wasTelemetry || renderedTheme != "telemetry:"+s.TelemetryTheme;
+                            frame=next; frameColor=design.Color; frameOfficial=false; renderedTheme="telemetry:"+s.TelemetryTheme;
+                            controller?.Offer(next,s.DeviceScreenColor(frameColor,false),0,urgent);
+                        }
+                        catch(Exception e) when(e is InvalidDataException or ArgumentException or InvalidOperationException or KeyNotFoundException) { status="遥测主题绘制失败："+e.Message; Log(status); }
+                        nextTelemetry=now+(s.PowerProfile=="balanced"?125:200);
+                    }
+                }
+                else if (demo != null)
                 {
                     var sample = demo.Poll(s);
                     if (sample != null) { frame = sample.Frame; frameColor = sample.Color; frameOfficial = sample.OfficialColor; renderedTheme = ""; controller?.Offer(frame, s.DeviceScreenColor(sample.Color, sample.OfficialColor), sample.Animation, sample.Urgent, sample.Interval); }
@@ -104,18 +137,19 @@ public sealed class Engine : IAsyncDisposable
                     catch (Exception e) when (e is InvalidDataException or ArgumentException or InvalidOperationException or KeyNotFoundException) { status = "主题绘制失败，保留上一画面：" + e.Message; Log(status); }
                     renderKey = key;
                 }
+                wasTelemetry=carActive;
                 if (now >= nextPerf)
                 {
                     process.Refresh(); TimeSpan current = process.TotalProcessorTime; cpu = 100 * (current - priorCpu).TotalMilliseconds / Math.Max(1, now - perfAt) / Environment.ProcessorCount; priorCpu = current; perfAt = now; memory = process.WorkingSet64 / 1048576.0; nextPerf = now + 5000;
                     Log($"perf cpu={cpu:F3}% rss={memory:F1}MB frames={controller?.Frames ?? 0} writes={link?.Writes ?? 0} codec={controller?.Codec} bytes={controller?.EncodedBytes} theme={s.Theme} playing={track.Playing} peak={signal:F3} demo={demo?.StageName} text={frame?.Text} cpu_temp={snapshot.Get("cpu_temp").Text()} thermal={hardware.Temperature.Detail}");
                 }
-                if (now >= nextEmit) { Changed?.Invoke(new(status + " · " + lyricSource + (mode == "歌词" && cue?.Timed == false ? " · 当前句回退，等待可用时间轴（无法提前）" : ""), track, snapshot, frame, controller?.Frames ?? 0, controller?.Dropped ?? 0, link?.Writes ?? 0, controller?.Codec ?? "预览", controller?.EncodedBytes ?? 0, controller?.FrameSeconds ?? 0, cpu, memory, signal, hardware.Temperature.Detail, controller?.Owned ?? false, demo?.StageName ?? "", demo?.Progress ?? 0, frameColor, peak.Detail, frameOfficial)); nextEmit = now + (Visible ? (demo != null ? 125 : 500) : 3000); }
-                await Task.Delay(rhythmActive ? 25 : demo != null || track.Playing ? 50 : 200, stop.Token);
+                if (now >= nextEmit) { Changed?.Invoke(new(status + " · " + lyricSource + (mode == "歌词" && cue?.Timed == false ? " · 当前句回退，等待可用时间轴（无法提前）" : ""), track, snapshot, frame, controller?.Frames ?? 0, controller?.Dropped ?? 0, link?.Writes ?? 0, controller?.Codec ?? "预览", controller?.EncodedBytes ?? 0, controller?.FrameSeconds ?? 0, cpu, memory, signal, hardware.Temperature.Detail, controller?.Owned ?? false, demo?.StageName ?? "", demo?.Progress ?? 0, frameColor, peak.Detail, frameOfficial, telemetryStatus, carActive, driveDemo != null)); nextEmit = now + (Visible ? (demo != null || carActive ? 125 : 500) : 3000); }
+                await Task.Delay(rhythmActive ? 25 : demo != null || carActive || track.Playing ? 50 : 200, stop.Token);
             }
         }
         catch (OperationCanceledException) { }
         catch (Exception e) { LastError = e.ToString(); status = e.Message; Log("Engine: " + e); Changed?.Invoke(new(status, track, snapshot, frame, 0, 0, 0, "", 0, 0, cpu, memory, signal, hardware.Temperature.Detail, false)); }
-        finally { lyricCancel?.Cancel(); await CloseSessionAsync(); if (mediaTask != null) try { await mediaTask; } catch { } if (sensorTask != null) try { await sensorTask; } catch { } if (lyricTask != null) try { await lyricTask; } catch { } lyricCancel?.Dispose(); }
+        finally { lyricCancel?.Cancel(); await telemetry.DisposeAsync(); await CloseSessionAsync(); if (mediaTask != null) try { await mediaTask; } catch { } if (sensorTask != null) try { await sensorTask; } catch { } if (lyricTask != null) try { await lyricTask; } catch { } lyricCancel?.Dispose(); }
     }
     public async ValueTask DisposeAsync() { stop.Cancel(); if (runner != null) await runner; hardware.Dispose(); media.Dispose(); peak.Dispose(); lyrics.Dispose(); stop.Dispose(); }
 }

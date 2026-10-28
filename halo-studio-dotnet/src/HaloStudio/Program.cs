@@ -17,7 +17,11 @@ internal static class Program
             if (args.Contains("--network-probe")) { Task.Run(async () => { var network = new NetworkSampler(); var rows = new List<object>(); for (int i = 0; i < 6; i++) { rows.Add(new { At = i, Rate = network.Read(), Adapters = NetworkSampler.Enumerate() }); await Task.Delay(1000); } Files.Save(Arg("--output", Path.Combine(runtime, "network-probe.json")), rows); }).GetAwaiter().GetResult(); return 0; }
             if (args.Contains("--temperature-probe")) { Task.Run(() => TemperatureDiagnostic.Run(Arg("--output", Path.Combine(runtime, "temperature-probe.json")))).GetAwaiter().GetResult(); return 0; }
             Designs.Reload(Path.GetFullPath(Arg("--themes", Path.Combine(AppContext.BaseDirectory, "themes"))));
+            var telemetryErrors=TelemetryDesigns.Reload(Path.Combine(AppContext.BaseDirectory,"telemetry-themes"));
+            if(telemetryErrors.Length>0) File.WriteAllLines(Path.Combine(runtime,"telemetry-theme-warnings.txt"),telemetryErrors);
             if (ScreenPalette.Reload(Path.Combine(AppContext.BaseDirectory, "palettes", "pixelbar.json")) is string paletteError) File.WriteAllText(Path.Combine(runtime, "palette-warning.txt"), paletteError);
+            if(args.Contains("--telemetry-integration-test")) { Task.Run(()=>TelemetryIntegration.RunAsync(Arg("--output",Path.Combine(runtime,"telemetry-integration.json")))).GetAwaiter().GetResult();return 0; }
+            if(args.Contains("--telemetry-test")) { var checks=new List<string>(); string output=Arg("--output",Path.Combine(runtime,"telemetry-tests.json")); TelemetryTests.Run((ok,name)=>{ if(!ok)throw new Exception(name);checks.Add(name); },Path.GetDirectoryName(output)!); Files.Save(output,new {Passed=true,Count=checks.Count,Checks=checks}); return 0; }
             if (args.Contains("--self-test")) { SelfTests.Run(Arg("--output", Path.Combine(runtime, "self-test.json")), Arg("--fixtures", "")); return 0; }
             if (args.Contains("--lyrics-probe")) { Task.Run(() => LyricDiagnostic.Run(runtime, Arg("--output", Path.Combine(runtime, "lyric-probe.json")), int.Parse(Arg("--seconds", "30")))).GetAwaiter().GetResult(); return 0; }
             if (args.Contains("--probe")) { Files.Save(Arg("--output", Path.Combine(runtime, "probe.json")), HidTransport.Enumerate()); return 0; }
@@ -28,7 +32,7 @@ internal static class Program
             if (args.Contains("--owner-probe")) { bool available = false; string message = ""; using var test = new DeviceOwner(); try { test.Acquire(); available = true; } catch (IOException e) { message = e.Message; } Files.Save(Arg("--output", Path.Combine(runtime, "owner-probe.json")), new { Available = available, Message = message }); return 0; }
             if (args.Contains("--diagnostics")) { using var hardware = new Hardware(); using var peaks = new MusicPeak(); using var media = new MediaMonitor(); peaks.Read(); var track = media.PollAsync(peaks.Playing).GetAwaiter().GetResult(); var sensors = hardware.SampleAsync([]).GetAwaiter().GetResult(); Files.Save(Arg("--output", Path.Combine(runtime, "diagnostics.json")), new { Track = track, Snapshot = sensors, Peak = peaks.Read(), AudioDetail = peaks.Detail, AudioPlaying = peaks.Playing, Devices = HidTransport.Enumerate() }); return 0; }
             bool preview = args.Contains("--preview"); if (!preview) { owner = new(); owner.Acquire(); }
-            var engine = new Engine(runtime); if (args.Contains("--demo")) engine.StartShowcase(); if (args.Contains("--enable-temperature") && !preview) engine.EnableTemperature(); var form = new StudioForm(engine, runtime, preview, args.Contains("--background"));
+            var engine = new Engine(runtime); if(args.Contains("--telemetry-demo")) engine.StartTelemetryDemo(); if (args.Contains("--demo")) engine.StartShowcase(); if (args.Contains("--enable-temperature") && !preview) engine.EnableTemperature(); var form = new StudioForm(engine, runtime, preview, args.Contains("--background"));
             if (int.TryParse(Arg("--ui-page", "0"), out int page)) form.ShowPage(page);
             if (int.TryParse(Arg("--ui-width", "0"), out int width) && width > 0) form.ClientSize = new(width, form.ClientSize.Height);
             System.Windows.Forms.Timer? closeTimer = null, screenshotTimer = null, sequenceTimer = null;
@@ -56,6 +60,6 @@ internal static class Program
             }
             Application.Run(form); closeTimer?.Dispose(); screenshotTimer?.Dispose(); sequenceTimer?.Dispose(); if (savedSettings != null) engine.Configure(savedSettings); ReleaseOwner(); return 0;
         }
-        catch (Exception e) { File.WriteAllText(Path.Combine(runtime, "last-error.txt"), e.ToString()); ReleaseOwner(); if (!args.Any(a => a is "--install-thermal-task" or "--temperature-probe" or "--self-test" or "--lyrics-probe" or "--probe" or "--diagnostics" or "--transport-probe" or "--color-test" or "--white-test" or "--color-commission" or "--owner-probe")) MessageBox.Show(e.Message, "HaloStudio C#"); return 1; }
+        catch (Exception e) { File.WriteAllText(Path.Combine(runtime, "last-error.txt"), e.ToString()); ReleaseOwner(); if (!args.Any(a => a is "--install-thermal-task" or "--temperature-probe" or "--self-test" or "--telemetry-test" or "--telemetry-integration-test" or "--lyrics-probe" or "--probe" or "--diagnostics" or "--transport-probe" or "--color-test" or "--white-test" or "--color-commission" or "--owner-probe")) MessageBox.Show(e.Message, "HaloStudio C#"); return 1; }
     }
 }

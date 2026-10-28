@@ -1,0 +1,202 @@
+{
+  "version": 1,
+  "id": "01_lagonda_led84",
+  "name": "Aston Martin Lagonda Series 2",
+  "description": "红色数码阵列、四列状态窗",
+  "color": "#D8321C",
+  "reference_year": "1983 · LED 仪表",
+  "reference_source": "https://www.autoreview.nl/nieuws/id/34159/moderne-dashboards-onduidelijk-in-1984-konden-ze-er-ook-wat-van",
+  "sprites": {
+    "car": [
+      "..XXXXXXXX..",
+      "..X......X..",
+      ".XX.XXXX.XX.",
+      "XXX.X..X.XXX",
+      "..X.XXXX.X..",
+      "..X......X..",
+      "XXX.XXXX.XXX",
+      ".XX.X..X.XX.",
+      "..X.XXXX.X..",
+      "..XXXXXXXX.."
+    ],
+    "engine": [
+      "..XXXX....",
+      "..X..XXXXX",
+      "XXX......X",
+      "X........X",
+      "X..XXXX..X",
+      "XXXX..XXXX"
+    ],
+    "brake": [
+      "..XXXXX..",
+      ".X.....X.",
+      "X..XXX..X",
+      "X..X.X..X",
+      "X..XXX..X",
+      ".X.X...X.",
+      "..XXXXX.."
+    ],
+    "wedge": [
+      "....................XXXXXXXXXXXX.....................",
+      "...................X............X....................",
+      "..................X..............XX..................",
+      "...............XXX..XXXXXXXX.......XX................",
+      "............XXX....X.......X.........XXXXXXX.........",
+      ".........XXX......X.........XX..............XXXX.....",
+      ".....XXXX........X............XX................X....",
+      "..XXX............................................X...",
+      "XX.........XXXXXXX....................XXXXXXX.....XXX",
+      "X.........X.......X..................X.......X.......X",
+      "XXXXXXXXXXX.XXXXX.XXXXXXXXXXXXXXXXXXXX.XXXXX.XXXXXXXXX",
+      "..........X.X...X.X..................X.X...X.X........",
+      "..........X.XXXXX.X..................X.XXXXX.X........",
+      "...........XXXXXXX....................XXXXXXX........."
+    ]
+  },
+  "commands": [
+    {
+      "op": "line",
+      "x": 0,
+      "y": 0,
+      "x2": 255,
+      "y2": 0
+    },
+    {
+      "op": "line",
+      "x": 0,
+      "y": 31,
+      "x2": 255,
+      "y2": 31
+    },
+    {
+      "op": "line",
+      "x": 57,
+      "y": 2,
+      "x2": 57,
+      "y2": 29
+    },
+    {
+      "op": "line",
+      "x": 121,
+      "y": 2,
+      "x2": 121,
+      "y2": 29
+    },
+    {
+      "op": "line",
+      "x": 194,
+      "y": 2,
+      "x2": 194,
+      "y2": 29
+    },
+    {
+      "op": "micro",
+      "text": "LAGONDA",
+      "x": 3,
+      "y": 3
+    },
+    {
+      "op": "micro",
+      "text": "THR",
+      "x": 3,
+      "y": 12
+    },
+    {
+      "op": "segments",
+      "x": 20,
+      "y": 11,
+      "w": 32,
+      "h": 5,
+      "ratio": "=throttle",
+      "count": 8
+    },
+    {
+      "op": "micro",
+      "text": "BRK",
+      "x": 3,
+      "y": 22
+    },
+    {
+      "op": "segments",
+      "x": 20,
+      "y": 21,
+      "w": 32,
+      "h": 5,
+      "ratio": "=brake",
+      "count": 8
+    },
+    {
+      "op": "micro",
+      "text": "FUEL ${fuel}%",
+      "x": 62,
+      "y": 3
+    },
+    {
+      "op": "micro",
+      "text": "BOOST",
+      "x": 62,
+      "y": 12
+    },
+    {
+      "op": "micro",
+      "text": "${boost} PSI",
+      "x": 62,
+      "y": 21
+    },
+    {
+      "op": "micro",
+      "text": "SPEED KM/H",
+      "x": 126,
+      "y": 3
+    },
+    {
+      "op": "seven",
+      "text": "${speed}",
+      "x": 130,
+      "y": 11,
+      "dw": 15,
+      "h": 18,
+      "thick": 2,
+      "slots": 3,
+      "gap": 3
+    },
+    {
+      "op": "micro",
+      "text": "RPM",
+      "x": 199,
+      "y": 3
+    },
+    {
+      "op": "micro",
+      "text": "${rpm}",
+      "x": 219,
+      "y": 3
+    },
+    {
+      "op": "seven",
+      "text": "${gear}",
+      "x": 198,
+      "y": 12,
+      "dw": 6,
+      "h": 16,
+      "thick": 1,
+      "slots": 2,
+      "gap": 3
+    },
+    {
+      "op": "micro",
+      "text": "GEAR",
+      "x": 217,
+      "y": 13
+    },
+    {
+      "op": "segments",
+      "x": 217,
+      "y": 23,
+      "w": 35,
+      "h": 5,
+      "ratio": "=rpm_ratio",
+      "count": 9
+    }
+  ]
+}

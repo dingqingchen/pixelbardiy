@@ -9,6 +9,19 @@ public sealed partial class StudioForm
         if (!previewMode) throw new InvalidOperationException("Layout audit requires --preview");
         Directory.CreateDirectory(directory); var evidence = new List<object>(); var failures = new List<string>();
         auditing = true;
+        SelectPage(0); // PerformClick requires the palette controls to be visible.
+        if(navigation[5].Top >= navigation[3].Top) failures.Add("Driving telemetry must precede demo theater");
+        foreach(var tile in telemetryTiles)
+        {
+            var pair=CarPhotos.Get(tile.Key);
+            foreach(var photo in new[] { pair?.Exterior, pair?.Interior })
+            {
+                using var image=CarPhotos.Load(photo,480);
+                if(image is null) failures.Add("Missing or invalid car photo: "+tile.Key);
+            }
+        }
+        if(CarPhotos.Load(new CarPhoto("../outside.jpg","","","",""),480) is not null) failures.Add("Photo path escapes asset directory");
+        if(CarPhotos.Load(new CarPhoto("missing.jpg","","","",""),480) is not null) failures.Add("Missing photo fallback failed");
         // Reloading used to create unscaled chips at 150% DPI, clipping labels.
         var startupSwatches = swatches.Select(c => (c.Hex, c.Size, c.Margin)).ToArray();
         for (int reload = 0; reload < 3; reload++)
@@ -33,7 +46,7 @@ public sealed partial class StudioForm
         foreach (int logicalWidth in new[] { 1280, 1020, 1520, 1920, 1020, 1280 })
         {
             ClientSize = new(Palette.Px(this, logicalWidth), Palette.Px(this, 900));
-            for (int page = 0; page < 5; page++)
+            for (int page = 0; page < pages.Count; page++)
             {
                 SelectPage(page); pages[page].AutoScrollPosition = Point.Empty; PerformLayout(); Application.DoEvents();
                 if (page == 1) { UpdateSensors(manySensors); Application.DoEvents(); }
@@ -99,6 +112,21 @@ public sealed partial class StudioForm
                         if (tiles[i].Right > gallery.Width || tiles[i].Bottom > gallery.Height) failures.Add($"{logicalWidth}: tile outside gallery");
                         for (int j = i+1; j < tiles.Count; j++) if (tiles[i].Bounds.IntersectsWith(tiles[j].Bounds)) failures.Add($"{logicalWidth}: overlapping tiles");
                     }
+                }
+                if(page==5)
+                {
+                    for(int i=0;i<telemetryTiles.Count;i++)
+                    {
+                        var tile=telemetryTiles[i];
+                        if(tile.Right>telemetryGallery.Width || tile.Bottom>telemetryGallery.Height) failures.Add($"{logicalWidth}: driving tile outside gallery");
+                        for(int j=i+1;j<telemetryTiles.Count;j++) if(tile.Bounds.IntersectsWith(telemetryTiles[j].Bounds)) failures.Add($"{logicalWidth}: driving tiles overlap");
+                        foreach(Control photo in tile.Controls) if(photo.Right>tile.Width || photo.Bottom>tile.Height) failures.Add($"{logicalWidth}: car photo clipped");
+                    }
+                    // Capture real rendered cards, including off-screen photo controls.
+                    using var photoSheet=new Bitmap(telemetryGallery.Width,Math.Min(telemetryGallery.Height,Palette.Px(this,770)));
+                    telemetryGallery.DrawToBitmap(photoSheet,new(Point.Empty,photoSheet.Size));
+                    photoSheet.Save(Path.Combine(directory,$"{logicalWidth}-driving-photos.png"));
+                    pages[page].AutoScrollPosition=new Point(0,telemetryGallery.Top);Application.DoEvents();
                 }
                 string name = $"{evidence.Count:00}-{logicalWidth}-page{page}";
                 SaveScreenshot(Path.Combine(directory, name + ".png"));

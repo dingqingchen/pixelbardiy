@@ -1,0 +1,1885 @@
+{
+  "version": 1,
+  "id": "05_subaru_xt",
+  "name": "Subaru XT 4WD Turbo",
+  "description": "居中车尾与向远方汇聚的对称仪表",
+  "color": "#FF6000",
+  "reference_year": "1986 · 3D Digital",
+  "reference_source": "https://nosweb.jp/nostalgichero/articles/detail/1680",
+  "sprites": {
+    "xt_rear": [
+      "......XXXXXXXXXXXXXXXXXX......",
+      ".....X..................X.....",
+      ".....X.XXXXXXXXXXXXXXXX..X....",
+      "....X.X................X.X....",
+      "....XX..................X.X...",
+      "...XXXXXXXXXXXXXXXXXXXXXXX.X..",
+      ".XX.........................X.",
+      "X.XXXXXXXXXXXXXXXXXXXXXXXXXX.X",
+      "X.XXXXXXXX..........XXXXXXXX.X",
+      "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "X...........XXXXXX...........X",
+      "X.XXXXX.....X....X.....XXXXX.X",
+      "X...........XXXXXX...........X",
+      "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "..XXXX..................XXXX.."
+    ]
+  },
+  "commands": [
+    {
+      "op": "rect",
+      "x": 0,
+      "y": 0,
+      "w": 256,
+      "h": 32
+    },
+    {
+      "op": "line",
+      "x": 48,
+      "y": 1,
+      "x2": 48,
+      "y2": 30
+    },
+    {
+      "op": "line",
+      "x": 207,
+      "y": 1,
+      "x2": 207,
+      "y2": 30
+    },
+    {
+      "op": "micro",
+      "text": "KM/H",
+      "x": 16,
+      "y": 3
+    },
+    {
+      "op": "micro",
+      "text": "RPM",
+      "x": 222,
+      "y": 3
+    },
+    {
+      "op": "seven",
+      "text": "${speed}",
+      "x": 3,
+      "y": 10,
+      "dw": 12,
+      "h": 14,
+      "slots": 3,
+      "gap": 3,
+      "thick": 2
+    },
+    {
+      "op": "seven",
+      "text": "${rpm}",
+      "x": 211,
+      "y": 10,
+      "dw": 7,
+      "h": 14,
+      "slots": 4,
+      "gap": 3,
+      "thick": 1
+    },
+    {
+      "op": "micro",
+      "text": "${clock}",
+      "x": 15,
+      "y": 26
+    },
+    {
+      "op": "micro",
+      "text": "G${gear} ${drive}",
+      "x": 215,
+      "y": 26
+    },
+    {
+      "op": "micro",
+      "text": "THR",
+      "x": 61,
+      "y": 3
+    },
+    {
+      "op": "micro",
+      "text": "RPM",
+      "x": 184,
+      "y": 3
+    },
+    {
+      "op": "line",
+      "x": 122,
+      "y": 7,
+      "x2": 89,
+      "y2": 30
+    },
+    {
+      "op": "line",
+      "x": 133,
+      "y": 7,
+      "x2": 166,
+      "y2": 30
+    },
+    {
+      "op": "line",
+      "x": 124,
+      "y": 7,
+      "x2": 106,
+      "y2": 30
+    },
+    {
+      "op": "line",
+      "x": 131,
+      "y": 7,
+      "x2": 149,
+      "y2": 30
+    },
+    {
+      "op": "line",
+      "x": 127,
+      "y": "8+phase*4",
+      "x2": 128,
+      "y2": "8+phase*4"
+    },
+    {
+      "op": "line",
+      "x": 55,
+      "y": 29,
+      "x2": 55,
+      "y2": 29
+    },
+    {
+      "op": "rect",
+      "x": 55,
+      "y": 25,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-0,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 56,
+      "y": 29,
+      "x2": 56,
+      "y2": 29
+    },
+    {
+      "op": "rect",
+      "x": 56,
+      "y": 25,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-1,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 57,
+      "y": 28,
+      "x2": 57,
+      "y2": 28
+    },
+    {
+      "op": "rect",
+      "x": 57,
+      "y": 24,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-2,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 58,
+      "y": 28,
+      "x2": 58,
+      "y2": 28
+    },
+    {
+      "op": "rect",
+      "x": 58,
+      "y": 24,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-3,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 59,
+      "y": 28,
+      "x2": 59,
+      "y2": 28
+    },
+    {
+      "op": "rect",
+      "x": 59,
+      "y": 24,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-4,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 60,
+      "y": 27,
+      "x2": 60,
+      "y2": 27
+    },
+    {
+      "op": "rect",
+      "x": 60,
+      "y": 23,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-5,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 61,
+      "y": 27,
+      "x2": 61,
+      "y2": 27
+    },
+    {
+      "op": "rect",
+      "x": 61,
+      "y": 23,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-6,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 62,
+      "y": 27,
+      "x2": 62,
+      "y2": 27
+    },
+    {
+      "op": "rect",
+      "x": 62,
+      "y": 23,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-7,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 63,
+      "y": 26,
+      "x2": 63,
+      "y2": 26
+    },
+    {
+      "op": "rect",
+      "x": 63,
+      "y": 22,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-8,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 64,
+      "y": 26,
+      "x2": 64,
+      "y2": 26
+    },
+    {
+      "op": "rect",
+      "x": 64,
+      "y": 22,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-9,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 65,
+      "y": 26,
+      "x2": 65,
+      "y2": 26
+    },
+    {
+      "op": "rect",
+      "x": 65,
+      "y": 22,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-10,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 66,
+      "y": 25,
+      "x2": 66,
+      "y2": 25
+    },
+    {
+      "op": "rect",
+      "x": 66,
+      "y": 21,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-11,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 67,
+      "y": 25,
+      "x2": 67,
+      "y2": 25
+    },
+    {
+      "op": "rect",
+      "x": 67,
+      "y": 21,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-12,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 68,
+      "y": 25,
+      "x2": 68,
+      "y2": 25
+    },
+    {
+      "op": "rect",
+      "x": 68,
+      "y": 21,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-13,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 69,
+      "y": 25,
+      "x2": 69,
+      "y2": 25
+    },
+    {
+      "op": "rect",
+      "x": 69,
+      "y": 21,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-14,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 70,
+      "y": 24,
+      "x2": 70,
+      "y2": 24
+    },
+    {
+      "op": "rect",
+      "x": 70,
+      "y": 20,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-15,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 71,
+      "y": 24,
+      "x2": 71,
+      "y2": 24
+    },
+    {
+      "op": "rect",
+      "x": 71,
+      "y": 20,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-16,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 72,
+      "y": 24,
+      "x2": 72,
+      "y2": 24
+    },
+    {
+      "op": "rect",
+      "x": 72,
+      "y": 20,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-17,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 73,
+      "y": 23,
+      "x2": 73,
+      "y2": 23
+    },
+    {
+      "op": "rect",
+      "x": 73,
+      "y": 19,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-18,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 74,
+      "y": 23,
+      "x2": 74,
+      "y2": 23
+    },
+    {
+      "op": "rect",
+      "x": 74,
+      "y": 19,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-19,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 75,
+      "y": 23,
+      "x2": 75,
+      "y2": 23
+    },
+    {
+      "op": "rect",
+      "x": 75,
+      "y": 19,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-20,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 76,
+      "y": 22,
+      "x2": 76,
+      "y2": 22
+    },
+    {
+      "op": "rect",
+      "x": 76,
+      "y": 18,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-21,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 77,
+      "y": 22,
+      "x2": 77,
+      "y2": 22
+    },
+    {
+      "op": "rect",
+      "x": 77,
+      "y": 18,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-22,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 78,
+      "y": 22,
+      "x2": 78,
+      "y2": 22
+    },
+    {
+      "op": "rect",
+      "x": 78,
+      "y": 18,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-23,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 79,
+      "y": 21,
+      "x2": 79,
+      "y2": 21
+    },
+    {
+      "op": "rect",
+      "x": 79,
+      "y": 17,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-24,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 80,
+      "y": 21,
+      "x2": 80,
+      "y2": 21
+    },
+    {
+      "op": "rect",
+      "x": 80,
+      "y": 17,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-25,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 81,
+      "y": 21,
+      "x2": 81,
+      "y2": 21
+    },
+    {
+      "op": "rect",
+      "x": 81,
+      "y": 17,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-26,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 82,
+      "y": 20,
+      "x2": 82,
+      "y2": 20
+    },
+    {
+      "op": "rect",
+      "x": 82,
+      "y": 16,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-27,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 83,
+      "y": 20,
+      "x2": 83,
+      "y2": 20
+    },
+    {
+      "op": "rect",
+      "x": 83,
+      "y": 16,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-28,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 84,
+      "y": 20,
+      "x2": 84,
+      "y2": 20
+    },
+    {
+      "op": "rect",
+      "x": 84,
+      "y": 16,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-29,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 85,
+      "y": 19,
+      "x2": 85,
+      "y2": 19
+    },
+    {
+      "op": "rect",
+      "x": 85,
+      "y": 15,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-30,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 86,
+      "y": 19,
+      "x2": 86,
+      "y2": 19
+    },
+    {
+      "op": "rect",
+      "x": 86,
+      "y": 15,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-31,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 87,
+      "y": 19,
+      "x2": 87,
+      "y2": 19
+    },
+    {
+      "op": "rect",
+      "x": 87,
+      "y": 15,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-32,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 88,
+      "y": 18,
+      "x2": 88,
+      "y2": 18
+    },
+    {
+      "op": "rect",
+      "x": 88,
+      "y": 14,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-33,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 89,
+      "y": 18,
+      "x2": 89,
+      "y2": 18
+    },
+    {
+      "op": "rect",
+      "x": 89,
+      "y": 14,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-34,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 90,
+      "y": 18,
+      "x2": 90,
+      "y2": 18
+    },
+    {
+      "op": "rect",
+      "x": 90,
+      "y": 14,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-35,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 91,
+      "y": 17,
+      "x2": 91,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 91,
+      "y": 13,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-36,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 92,
+      "y": 17,
+      "x2": 92,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 92,
+      "y": 13,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-37,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 93,
+      "y": 17,
+      "x2": 93,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 93,
+      "y": 13,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-38,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 94,
+      "y": 16,
+      "x2": 94,
+      "y2": 16
+    },
+    {
+      "op": "rect",
+      "x": 94,
+      "y": 12,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-39,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 95,
+      "y": 16,
+      "x2": 95,
+      "y2": 16
+    },
+    {
+      "op": "rect",
+      "x": 95,
+      "y": 12,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-40,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 96,
+      "y": 16,
+      "x2": 96,
+      "y2": 16
+    },
+    {
+      "op": "rect",
+      "x": 96,
+      "y": 12,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-41,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 97,
+      "y": 16,
+      "x2": 97,
+      "y2": 16
+    },
+    {
+      "op": "rect",
+      "x": 97,
+      "y": 12,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-42,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 98,
+      "y": 15,
+      "x2": 98,
+      "y2": 15
+    },
+    {
+      "op": "rect",
+      "x": 98,
+      "y": 11,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-43,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 99,
+      "y": 15,
+      "x2": 99,
+      "y2": 15
+    },
+    {
+      "op": "rect",
+      "x": 99,
+      "y": 11,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-44,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 100,
+      "y": 15,
+      "x2": 100,
+      "y2": 15
+    },
+    {
+      "op": "rect",
+      "x": 100,
+      "y": 11,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-45,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 101,
+      "y": 14,
+      "x2": 101,
+      "y2": 14
+    },
+    {
+      "op": "rect",
+      "x": 101,
+      "y": 10,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-46,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 102,
+      "y": 14,
+      "x2": 102,
+      "y2": 14
+    },
+    {
+      "op": "rect",
+      "x": 102,
+      "y": 10,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-47,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 103,
+      "y": 14,
+      "x2": 103,
+      "y2": 14
+    },
+    {
+      "op": "rect",
+      "x": 103,
+      "y": 10,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-48,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 104,
+      "y": 13,
+      "x2": 104,
+      "y2": 13
+    },
+    {
+      "op": "rect",
+      "x": 104,
+      "y": 9,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-49,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 105,
+      "y": 13,
+      "x2": 105,
+      "y2": 13
+    },
+    {
+      "op": "rect",
+      "x": 105,
+      "y": 9,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-50,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 106,
+      "y": 13,
+      "x2": 106,
+      "y2": 13
+    },
+    {
+      "op": "rect",
+      "x": 106,
+      "y": 9,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-51,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 107,
+      "y": 12,
+      "x2": 107,
+      "y2": 12
+    },
+    {
+      "op": "rect",
+      "x": 107,
+      "y": 8,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-52,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 108,
+      "y": 12,
+      "x2": 108,
+      "y2": 12
+    },
+    {
+      "op": "rect",
+      "x": 108,
+      "y": 8,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(throttle*54-53,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 200,
+      "y": 29,
+      "x2": 200,
+      "y2": 29
+    },
+    {
+      "op": "rect",
+      "x": 200,
+      "y": 25,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-0,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 199,
+      "y": 29,
+      "x2": 199,
+      "y2": 29
+    },
+    {
+      "op": "rect",
+      "x": 199,
+      "y": 25,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-1,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 198,
+      "y": 28,
+      "x2": 198,
+      "y2": 28
+    },
+    {
+      "op": "rect",
+      "x": 198,
+      "y": 24,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-2,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 197,
+      "y": 28,
+      "x2": 197,
+      "y2": 28
+    },
+    {
+      "op": "rect",
+      "x": 197,
+      "y": 24,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-3,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 196,
+      "y": 28,
+      "x2": 196,
+      "y2": 28
+    },
+    {
+      "op": "rect",
+      "x": 196,
+      "y": 24,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-4,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 195,
+      "y": 27,
+      "x2": 195,
+      "y2": 27
+    },
+    {
+      "op": "rect",
+      "x": 195,
+      "y": 23,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-5,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 194,
+      "y": 27,
+      "x2": 194,
+      "y2": 27
+    },
+    {
+      "op": "rect",
+      "x": 194,
+      "y": 23,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-6,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 193,
+      "y": 27,
+      "x2": 193,
+      "y2": 27
+    },
+    {
+      "op": "rect",
+      "x": 193,
+      "y": 23,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-7,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 192,
+      "y": 26,
+      "x2": 192,
+      "y2": 26
+    },
+    {
+      "op": "rect",
+      "x": 192,
+      "y": 22,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-8,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 191,
+      "y": 26,
+      "x2": 191,
+      "y2": 26
+    },
+    {
+      "op": "rect",
+      "x": 191,
+      "y": 22,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-9,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 190,
+      "y": 26,
+      "x2": 190,
+      "y2": 26
+    },
+    {
+      "op": "rect",
+      "x": 190,
+      "y": 22,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-10,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 189,
+      "y": 25,
+      "x2": 189,
+      "y2": 25
+    },
+    {
+      "op": "rect",
+      "x": 189,
+      "y": 21,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-11,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 188,
+      "y": 25,
+      "x2": 188,
+      "y2": 25
+    },
+    {
+      "op": "rect",
+      "x": 188,
+      "y": 21,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-12,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 187,
+      "y": 25,
+      "x2": 187,
+      "y2": 25
+    },
+    {
+      "op": "rect",
+      "x": 187,
+      "y": 21,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-13,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 186,
+      "y": 25,
+      "x2": 186,
+      "y2": 25
+    },
+    {
+      "op": "rect",
+      "x": 186,
+      "y": 21,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-14,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 185,
+      "y": 24,
+      "x2": 185,
+      "y2": 24
+    },
+    {
+      "op": "rect",
+      "x": 185,
+      "y": 20,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-15,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 184,
+      "y": 24,
+      "x2": 184,
+      "y2": 24
+    },
+    {
+      "op": "rect",
+      "x": 184,
+      "y": 20,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-16,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 183,
+      "y": 24,
+      "x2": 183,
+      "y2": 24
+    },
+    {
+      "op": "rect",
+      "x": 183,
+      "y": 20,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-17,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 182,
+      "y": 23,
+      "x2": 182,
+      "y2": 23
+    },
+    {
+      "op": "rect",
+      "x": 182,
+      "y": 19,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-18,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 181,
+      "y": 23,
+      "x2": 181,
+      "y2": 23
+    },
+    {
+      "op": "rect",
+      "x": 181,
+      "y": 19,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-19,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 180,
+      "y": 23,
+      "x2": 180,
+      "y2": 23
+    },
+    {
+      "op": "rect",
+      "x": 180,
+      "y": 19,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-20,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 179,
+      "y": 22,
+      "x2": 179,
+      "y2": 22
+    },
+    {
+      "op": "rect",
+      "x": 179,
+      "y": 18,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-21,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 178,
+      "y": 22,
+      "x2": 178,
+      "y2": 22
+    },
+    {
+      "op": "rect",
+      "x": 178,
+      "y": 18,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-22,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 177,
+      "y": 22,
+      "x2": 177,
+      "y2": 22
+    },
+    {
+      "op": "rect",
+      "x": 177,
+      "y": 18,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-23,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 176,
+      "y": 21,
+      "x2": 176,
+      "y2": 21
+    },
+    {
+      "op": "rect",
+      "x": 176,
+      "y": 17,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-24,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 175,
+      "y": 21,
+      "x2": 175,
+      "y2": 21
+    },
+    {
+      "op": "rect",
+      "x": 175,
+      "y": 17,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-25,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 174,
+      "y": 21,
+      "x2": 174,
+      "y2": 21
+    },
+    {
+      "op": "rect",
+      "x": 174,
+      "y": 17,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-26,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 173,
+      "y": 20,
+      "x2": 173,
+      "y2": 20
+    },
+    {
+      "op": "rect",
+      "x": 173,
+      "y": 16,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-27,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 172,
+      "y": 20,
+      "x2": 172,
+      "y2": 20
+    },
+    {
+      "op": "rect",
+      "x": 172,
+      "y": 16,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-28,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 171,
+      "y": 20,
+      "x2": 171,
+      "y2": 20
+    },
+    {
+      "op": "rect",
+      "x": 171,
+      "y": 16,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-29,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 170,
+      "y": 19,
+      "x2": 170,
+      "y2": 19
+    },
+    {
+      "op": "rect",
+      "x": 170,
+      "y": 15,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-30,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 169,
+      "y": 19,
+      "x2": 169,
+      "y2": 19
+    },
+    {
+      "op": "rect",
+      "x": 169,
+      "y": 15,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-31,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 168,
+      "y": 19,
+      "x2": 168,
+      "y2": 19
+    },
+    {
+      "op": "rect",
+      "x": 168,
+      "y": 15,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-32,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 167,
+      "y": 18,
+      "x2": 167,
+      "y2": 18
+    },
+    {
+      "op": "rect",
+      "x": 167,
+      "y": 14,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-33,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 166,
+      "y": 18,
+      "x2": 166,
+      "y2": 18
+    },
+    {
+      "op": "rect",
+      "x": 166,
+      "y": 14,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-34,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 165,
+      "y": 18,
+      "x2": 165,
+      "y2": 18
+    },
+    {
+      "op": "rect",
+      "x": 165,
+      "y": 14,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-35,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 164,
+      "y": 17,
+      "x2": 164,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 164,
+      "y": 13,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-36,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 163,
+      "y": 17,
+      "x2": 163,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 163,
+      "y": 13,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-37,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 162,
+      "y": 17,
+      "x2": 162,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 162,
+      "y": 13,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-38,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 161,
+      "y": 16,
+      "x2": 161,
+      "y2": 16
+    },
+    {
+      "op": "rect",
+      "x": 161,
+      "y": 12,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-39,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 160,
+      "y": 16,
+      "x2": 160,
+      "y2": 16
+    },
+    {
+      "op": "rect",
+      "x": 160,
+      "y": 12,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-40,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 159,
+      "y": 16,
+      "x2": 159,
+      "y2": 16
+    },
+    {
+      "op": "rect",
+      "x": 159,
+      "y": 12,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-41,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 158,
+      "y": 16,
+      "x2": 158,
+      "y2": 16
+    },
+    {
+      "op": "rect",
+      "x": 158,
+      "y": 12,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-42,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 157,
+      "y": 15,
+      "x2": 157,
+      "y2": 15
+    },
+    {
+      "op": "rect",
+      "x": 157,
+      "y": 11,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-43,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 156,
+      "y": 15,
+      "x2": 156,
+      "y2": 15
+    },
+    {
+      "op": "rect",
+      "x": 156,
+      "y": 11,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-44,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 155,
+      "y": 15,
+      "x2": 155,
+      "y2": 15
+    },
+    {
+      "op": "rect",
+      "x": 155,
+      "y": 11,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-45,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 154,
+      "y": 14,
+      "x2": 154,
+      "y2": 14
+    },
+    {
+      "op": "rect",
+      "x": 154,
+      "y": 10,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-46,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 153,
+      "y": 14,
+      "x2": 153,
+      "y2": 14
+    },
+    {
+      "op": "rect",
+      "x": 153,
+      "y": 10,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-47,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 152,
+      "y": 14,
+      "x2": 152,
+      "y2": 14
+    },
+    {
+      "op": "rect",
+      "x": 152,
+      "y": 10,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-48,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 151,
+      "y": 13,
+      "x2": 151,
+      "y2": 13
+    },
+    {
+      "op": "rect",
+      "x": 151,
+      "y": 9,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-49,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 150,
+      "y": 13,
+      "x2": 150,
+      "y2": 13
+    },
+    {
+      "op": "rect",
+      "x": 150,
+      "y": 9,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-50,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 149,
+      "y": 13,
+      "x2": 149,
+      "y2": 13
+    },
+    {
+      "op": "rect",
+      "x": 149,
+      "y": 9,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-51,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 148,
+      "y": 12,
+      "x2": 148,
+      "y2": 12
+    },
+    {
+      "op": "rect",
+      "x": 148,
+      "y": 8,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-52,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 147,
+      "y": 12,
+      "x2": 147,
+      "y2": 12
+    },
+    {
+      "op": "rect",
+      "x": 147,
+      "y": 8,
+      "w": 1,
+      "h": 5,
+      "fill": true,
+      "when": "clamp(rpm_ratio*54-53,0,1)"
+    },
+    {
+      "op": "erase",
+      "x": 112,
+      "y": 15,
+      "w": 32,
+      "h": 16
+    },
+    {
+      "op": "sprite",
+      "name": "xt_rear",
+      "x": 113,
+      "y": 16
+    }
+  ]
+}

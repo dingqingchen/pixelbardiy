@@ -105,6 +105,15 @@ public sealed class ThemeTile : Control
     {
         Key = key; caption = design.Name; description = design.Description; color = ScreenPalette.Preview(design.Color);
         pixels = Designs.Render("20:26", "时钟", new Settings { Theme = key }, 0, Showcase.Sample(0), new(2026, 10, 13, 20, 26, 0));
+        Init();
+    }
+    public ThemeTile(string key, TelemetryDesign design)
+    {
+        Key=key; caption=design.Name; description=design.Description; color=ScreenPalette.Preview(design.Color);
+        pixels=TelemetryDesigns.Render(key,TelemetrySprint.At(9),true); Init();
+    }
+    void Init()
+    {
         DoubleBuffered = true; ResizeRedraw = true; Cursor = Cursors.Hand; Height = 158; Margin = new(0); TabStop = true; AccessibleRole = AccessibleRole.PushButton; AccessibleName = caption;
         MouseEnter += (_, _) => { hover = true; Invalidate(); }; MouseLeave += (_, _) => { hover = false; Invalidate(); }; KeyDown += (_, e) => { if (e.KeyCode is Keys.Enter or Keys.Space) OnClick(EventArgs.Empty); };
     }
@@ -126,10 +135,11 @@ public sealed class ThemeTile : Control
 }
 public sealed class ThemeGallery : Panel
 {
-    public ThemeGallery() { DoubleBuffered = true; ResizeRedraw = true; Margin = new(0, 0, 0, 8); }
+    readonly int minimumTileWidth, tileHeight;
+    public ThemeGallery(int minimumTileWidth = 290, int tileHeight = 164) { this.minimumTileWidth = minimumTileWidth; this.tileHeight = tileHeight; DoubleBuffered = true; ResizeRedraw = true; Margin = new(0, 0, 0, 8); }
     protected override void OnLayout(LayoutEventArgs e)
     {
-        base.OnLayout(e); int gap = Palette.Px(this, 14), min = Palette.Px(this, 290), h = Palette.Px(this, 164);
+        base.OnLayout(e); int gap = Palette.Px(this, 14), min = Palette.Px(this, minimumTileWidth), h = Palette.Px(this, tileHeight);
         int columns = Math.Clamp((Width + gap) / (min + gap), 1, 3), tileWidth = (Width - gap * (columns - 1)) / columns;
         for (int i = 0; i < Controls.Count; i++) Controls[i].SetBounds(i % columns * (tileWidth + gap), i / columns * (h + gap), tileWidth, h);
         int rows = (Controls.Count + columns - 1) / columns; int height = rows == 0 ? 0 : rows * (h + gap) - gap; if (Height != height) Height = height;

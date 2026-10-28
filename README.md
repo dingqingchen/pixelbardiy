@@ -11,6 +11,7 @@ HaloStudio 可以让 Edifier Halo PixelBar 显示网易云音乐歌词、电脑�
 ## 主要功能
 
 - **USB 像素直绘**：刷入提供的 MCU 固件后，电脑可通过 USB 直接在音响屏幕上绘制和更新像素画面，更多自定义潜力。
+- **地平线 6 驾驶遥测（2.7.0 源码）**：15 款复古车型仪表，收到游戏数据才接管屏幕；暂停或断流后恢复歌词、时钟或监控。支持独立的零百加速演示。已验证模拟数据传输，真实驾驶待实测；[配置与主题说明](halo-studio-dotnet/docs/FORZA_TELEMETRY.md)。
 - **电脑性能监控**：显示 CPU、内存、网速、磁盘、显卡和可获取的温度、风扇转速。可以选择紧凑两行、双指标卡片、仪表或曲线等布局，也可以轮换显示。监控设计和硬件检测参考了 [TrafficMonitor](https://github.com/zhongyang219/TrafficMonitor)，感谢其开源项目；日常使用不需要先启动 TrafficMonitor。
 - **自定义主题与颜色**：内置六套风格不同的主题，时钟、监控和歌词都能使用；可以换颜色、选择动画，也可以通过编辑主题文件添加新设计。
 - **网易云音乐歌词**：播放时自动显示歌词，不必打开桌面歌词或让网易云停留在歌词页面。支持歌词时间调整和导入本地 LRC 文件。
@@ -19,9 +20,9 @@ HaloStudio 可以让 Edifier Halo PixelBar 显示网易云音乐歌词、电脑�
 
 ## 效果展示
 
-[![HaloStudio 界面、主题、歌词和系统监控](docs/images/halostudio-overview.png)](docs/images/halostudio-overview.png)
+[![HaloStudio 界面、歌词、系统监控和地平线 6 遥测](docs/images/halostudio-overview.png)](docs/images/halostudio-overview.png)
 
-图中展示了软件界面和六套主题，监控数值及歌词为演示内容。画面由程序生成，实际屏幕颜色可能有所不同。
+软件界面与像素预览；监控、歌词和地平线遥测使用模拟数据。
 
 ## 不足与限制
 

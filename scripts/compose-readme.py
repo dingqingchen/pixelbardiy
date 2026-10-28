@@ -11,7 +11,15 @@ p = argparse.ArgumentParser(description=__doc__)
 p.add_argument("captures", type=Path)
 p.add_argument("output", type=Path)
 args = p.parse_args()
-W, H = 2400, 3470
+W = 2400
+MARGIN, GAP = 64, 40
+COL = (W - MARGIN*2 - GAP)//2
+with Image.open(args.captures / "ui-0.png") as ui:
+    WINDOW_H = round(ui.height*COL/ui.width)+48
+STRIP_H = round(COL*216/1536)
+NORMAL_Y = MARGIN + WINDOW_H + 50
+TELEMETRY_Y = NORMAL_Y + 50 + 2*(STRIP_H+24) + 30
+H = TELEMETRY_Y + 56 + 3*(STRIP_H+68) + MARGIN - 28
 canvas = Image.new("RGB", (W, H), "#F2F5FC")
 d = ImageDraw.Draw(canvas)
 INK, MUTED, ACCENT = "#182840", "#617189", "#5367ED"
@@ -68,46 +76,21 @@ def strip(name, x, y, width):
     return height
 
 
-def section(n, heading, detail, y):
-    d.rounded_rectangle((80, y+3, 139, y+54), 13, fill=ACCENT)
-    text(94, y+7, n, 26, "white", True)
-    text(158, y, heading, 36, bold=True)
-    text(158, y+57, detail, 25, MUTED)
+# Real client screenshots and rendered pixel frames; no promotional copy.
+window("ui-0.png", MARGIN, MARGIN, COL)
+window("ui-5.png", MARGIN+COL+GAP, MARGIN, COL)
+text(MARGIN, NORMAL_Y, "时钟 · 歌词 · 系统监控", 30, bold=True)
+for i, name in enumerate(["theme-kitty", "theme-amber", "lyric-1", "monitor-dense"]):
+    strip(name, MARGIN+(i%2)*(COL+GAP), NORMAL_Y+50+(i//2)*(STRIP_H+24), COL)
 
-
-text(80, 57, "HALO STUDIO", 72, bold=True)
-text(83, 158, "把音乐、时间与电脑状态，放进 256 × 32 像素。", 34, MUTED)
-text(2045, 80, "PIXEL BAR", 25, ACCENT, True)
-text(2078, 121, "C#  2.6.2", 24, MUTED)
-for x, label in [(83, "网易云歌词"), (320, "系统监控"), (539, "主题与配色")]:
-    d.rounded_rectangle((x, 229, x+198, 282), 26, fill="#E4E9FF")
-    text(x+24, 237, label, 26, ACCENT, True)
-
-section("01", "一个界面，六种性格", "外部 JSON 主题 · 统一覆盖时钟、歌词与监控", 340)
-window("ui-0.png", 80, 465, 1400)
-themes = [("ion", "科幻 · 离子仪表"), ("matrix", "科幻 · 雷达终端"),
-          ("amber", "复古 · 琥珀音响"), ("kitty", "可爱 · 猫咪乐谱"),
-          ("peach", "可爱 · 桃兔甜点"), ("paper", "简约 · 月白书页")]
-for i, (key, label) in enumerate(themes):
-    y = 455 + i * 170
-    text(1540, y, label, 28, bold=True)
-    strip("theme-"+key, 1540, y+51, 780)
-
-section("02", "听见歌词，也看见状态", "真实客户端页面 · 独立温度采集首次关闭，主动开启后记住选择", 1570)
-window("ui-1.png", 80, 1695, 1090)
-window("ui-2.png", 1230, 1695, 1090)
-
-section("03", "每一帧，都有自己的表达", "原生点阵渲染 · 多种监控编排 · 按歌词时间切换", 2590)
-d.rounded_rectangle((80, 2710, 1170, 3305), 28, fill="white", outline="#DFE5F2", width=2)
-d.rounded_rectangle((1230, 2710, 2320, 3305), 28, fill="white", outline="#DFE5F2", width=2)
-text(113, 2730, "歌词片段 / 原创示例", 27, bold=True)
-text(1263, 2730, "监控编排 / 模拟指标", 27, bold=True)
-for i in range(3):
-    strip("lyric-" + str(i+1), 113, 2792+i*162, 1024)
-for i, kind in enumerate(["dense", "compact", "bar"]):
-    strip("monitor-"+kind, 1263, 2792+i*162, 1024)
-text(80, 3345, "真实客户端控件与主题渲染器截图，使用模拟指标及原创歌词；窗口配 Win11 风格展示边框。", 24, MUTED)
-text(80, 3387, "非音响实拍，颜色仅为近似预览。日常画面写入 RAM，退出或心跳超时后恢复原厂时钟。", 24, MUTED)
+text(MARGIN, TELEMETRY_Y, "地平线 6", 30, bold=True)
+examples = [("05_subaru_xt", "Subaru XT"), ("15_vector_w8", "Vector W8"),
+            ("02_citroen_bx_digit", "Citroën BX Digit"), ("08_renault_11_txe", "Renault 11"),
+            ("10_alfa_romeo_90", "Alfa Romeo 90"), ("14_vauxhall_astra_gte", "Vauxhall Astra")]
+for i,(key,label) in enumerate(examples):
+    x=MARGIN+(i%2)*(COL+GAP); y=TELEMETRY_Y+56+(i//2)*(STRIP_H+68)
+    text(x,y,label,26,color=MUTED)
+    strip("telemetry-"+key,x,y+40,COL)
 args.output.parent.mkdir(parents=True, exist_ok=True)
 canvas.save(args.output, optimize=True)
 print(f"{args.output}: {W} x {H}, {args.output.stat().st_size:,} bytes")

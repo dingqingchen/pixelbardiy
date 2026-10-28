@@ -1,0 +1,242 @@
+{
+  "01_lagonda_led84": {
+    "exterior": {
+      "file": "01_lagonda_led84-exterior.jpg",
+      "caption": "Series 2 外观",
+      "source": "https://commons.wikimedia.org/wiki/File:Aston_Martin_Lagonda_md-f.jpg",
+      "credit": "CZmarlin  — Christopher Ziemnowicz, releases all rights but a photo credit would be appreciated if this image is used anywhere other than Wikipedia. Please leave a note at Wikipedia here. Thank you!",
+      "license": "Public domain"
+    },
+    "interior": {
+      "file": "01_lagonda_led84-interior.jpg",
+      "caption": "内饰 / 原车仪表",
+      "source": "https://www.autoreview.nl/nieuws/id/34159/moderne-dashboards-onduidelijk-in-1984-konden-ze-er-ook-wat-van",
+      "credit": "原始图片来源见链接",
+      "license": "第三方参考照片 · 版权归原作者"
+    }
+  },
+  "02_citroen_bx_digit": {
+    "exterior": {
+      "file": "02_citroen_bx_digit-exterior.jpg",
+      "caption": "1985 · BX 19 Digit",
+      "source": "https://commons.wikimedia.org/wiki/File:Citroen_BX_19_Digit_1985_Montlhery_Juin_2012.jpg",
+      "credit": "Lebubu93",
+      "license": "CC BY-SA 3.0"
+    },
+    "interior": {
+      "file": "02_citroen_bx_digit-interior.jpg",
+      "caption": "内饰 / 原车仪表",
+      "source": "https://www.quizz.biz/quizz-1008557.html",
+      "credit": "原始图片来源见链接",
+      "license": "第三方参考照片 · 版权归原作者"
+    }
+  },
+  "03_nissan_300zx_z31": {
+    "exterior": {
+      "file": "03_nissan_300zx_z31-exterior.jpg",
+      "caption": "1985 · Z31 外观",
+      "source": "https://commons.wikimedia.org/wiki/File:1985_Nissan_300ZX_(32701817244).jpg",
+      "credit": "Riley from Christchurch, New Zealand",
+      "license": "CC BY 2.0"
+    },
+    "interior": {
+      "file": "03_nissan_300zx_z31-interior.jpg",
+      "caption": "内饰 / 原车仪表",
+      "source": "https://2.bp.blogspot.com/-aMtOevT-W4Q/WXKgN-cXTLI/AAAAAAAAPRU/Fr6KaO28jLUJXPA3KGojv7lEhicglqcTgCLcBGAs/s1600/1984Z31NISSANFAIRLADYZ300ZXDIGITAL%2B1.jpg",
+      "credit": "原始图片来源见链接",
+      "license": "第三方参考照片 · 版权归原作者"
+    }
+  },
+  "04_corvette_c4_84": {
+    "exterior": {
+      "file": "04_corvette_c4_84-exterior.jpg",
+      "caption": "1984 · Corvette C4",
+      "source": "https://commons.wikimedia.org/wiki/File:1984-Corvette-C4.jpg",
+      "credit": "{Vegavairbob (talk) 06:28, 25 December 2009 (UTC)}",
+      "license": "CC BY-SA 3.0"
+    },
+    "interior": {
+      "file": "04_corvette_c4_84-interior.jpg",
+      "caption": "内饰 / 原车仪表",
+      "source": "https://www.corvetteblogger.com/2016/09/07/corvettes-ebay-1984-corvette-865-original-miles/",
+      "credit": "原始图片来源见链接",
+      "license": "第三方参考照片 · 版权归原作者"
+    }
+  },
+  "05_subaru_xt": {
+    "exterior": {
+      "file": "05_subaru_xt-exterior.jpg",
+      "caption": "1986 · XT 4WD Turbo",
+      "source": "https://commons.wikimedia.org/wiki/File:1986_Subaru_XT_1.8_4WD_Turbo_(8881531564).jpg",
+      "credit": "Niels de Wit from Lunteren, The Netherlands",
+      "license": "CC BY 2.0"
+    },
+    "interior": {
+      "file": "05_subaru_xt-interior.jpg",
+      "caption": "内饰 / 原车仪表",
+      "source": "https://www.virtualparking.net/post/2630/1986-subaru-xt-turbo",
+      "credit": "原始图片来源见链接",
+      "license": "第三方参考照片 · 版权归原作者"
+    }
+  },
+  "06_toyota_soarer_z20": {
+    "exterior": {
+      "file": "06_toyota_soarer_z20-exterior.jpg",
+      "caption": "1986 · Soarer Z20",
+      "source": "https://commons.wikimedia.org/wiki/File:1986_Toyota_Soarer_(GZ20)_Coupe.jpg",
+      "credit": "Coolalabright",
+      "license": "CC BY 4.0"
+    },
+    "interior": {
+      "file": "06_toyota_soarer_z20-interior.jpg",
+      "caption": "内饰 / 原车仪表",
+      "source": "https://magazynauto.pl/uzywane/uzywana-toyota-soarer-ii-z20-historia-wersje-silniki-zalety-wady-usterki-ceny-opinia%2Caid%2C5635",
+      "credit": "原始图片来源见链接",
+      "license": "第三方参考照片 · 版权归原作者"
+    }
+  },
+  "07_celica_supra": {
+    "exterior": {
+      "file": "07_celica_supra-exterior.jpg",
+      "caption": "1984 · Celica Supra 2.8",
+      "source": "https://commons.wikimedia.org/wiki/File:1984_Toyota_Celica_Supra_2.8_Auto_(53660786258).jpg",
+      "credit": "Kieran White from Manchester, England",
+      "license": "CC BY 2.0"
+    },
+    "interior": {
+      "file": "07_celica_supra-interior.jpg",
+      "caption": "内饰 / 原车仪表",
+      "source": "https://www.toyota.nl/ontdek-toyota/nieuws/celica-supra-illustreert-kwaliteit-toyota",
+      "credit": "原始图片来源见链接",
+      "license": "第三方参考照片 · 版权归原作者"
+    }
+  },
+  "08_renault_11_txe": {
+    "exterior": {
+      "file": "08_renault_11_txe-exterior.jpg",
+      "caption": "1986 · TXE Electronic",
+      "source": "https://commons.wikimedia.org/wiki/File:1986_Renault_11_TXE_Electronic_1.7.jpg",
+      "credit": "Vauxford",
+      "license": "CC BY-SA 4.0"
+    },
+    "interior": {
+      "file": "08_renault_11_txe-interior.jpg",
+      "caption": "内饰 / 原车仪表",
+      "source": "https://www.autoweek.nl/auto/1456/renault-11-txe-electronic/",
+      "credit": "原始图片来源见链接",
+      "license": "第三方参考照片 · 版权归原作者"
+    }
+  },
+  "09_fiat_tipo_dgt": {
+    "exterior": {
+      "file": "09_fiat_tipo_dgt-exterior.jpg",
+      "caption": "Tipo DGT 外观",
+      "source": "https://commons.wikimedia.org/wiki/File:Fiat_Tipo_DGT_front.JPG",
+      "credit": "Corvettec6r",
+      "license": "Public domain"
+    },
+    "interior": {
+      "file": "09_fiat_tipo_dgt-interior.jpg",
+      "caption": "内饰 / 原车仪表",
+      "source": "https://thedriver.it/stories/fiat-tipo-storia-modelli-versioni",
+      "credit": "原始图片来源见链接",
+      "license": "第三方参考照片 · 版权归原作者"
+    }
+  },
+  "10_alfa_romeo_90": {
+    "exterior": {
+      "file": "10_alfa_romeo_90-exterior.jpg",
+      "caption": "1985 · 90 Gold Cloverleaf",
+      "source": "https://commons.wikimedia.org/wiki/File:1985_Alfa_Romeo_90_Gold_Cloverleaf_2.5_V6_(32048215746).jpg",
+      "credit": "Kieran White from Manchester, England",
+      "license": "CC BY 2.0"
+    },
+    "interior": {
+      "file": "10_alfa_romeo_90-interior.jpg",
+      "caption": "内饰 / 原车仪表",
+      "source": "https://betterparts.org/alfa-romeo/alfa-romeo-90.html",
+      "credit": "原始图片来源见链接",
+      "license": "第三方参考照片 · 版权归原作者"
+    }
+  },
+  "11_audi_quattro": {
+    "exterior": {
+      "file": "11_audi_quattro-exterior.jpg",
+      "caption": "1985 · Audi quattro",
+      "source": "https://commons.wikimedia.org/wiki/File:1985_Audi_Quattro.jpg",
+      "credit": "Calreyn88",
+      "license": "CC0"
+    },
+    "interior": {
+      "file": "11_audi_quattro-interior.jpg",
+      "caption": "内饰 / 原车仪表",
+      "source": "https://www.autocar.co.uk/slideshow/dazzling-dashboards-70s-and-80s-0",
+      "credit": "原始图片来源见链接",
+      "license": "第三方参考照片 · 版权归原作者"
+    }
+  },
+  "12_honda_city_turbo": {
+    "exterior": {
+      "file": "12_honda_city_turbo-exterior.jpg",
+      "caption": "1983 · City Turbo II",
+      "source": "https://commons.wikimedia.org/wiki/File:Honda_City_turbo_II.jpg",
+      "credit": "Rikita",
+      "license": "CC BY 4.0"
+    },
+    "interior": {
+      "file": "12_honda_city_turbo-interior.jpg",
+      "caption": "内饰 / 原车仪表",
+      "source": "https://www.gqjapan.jp/article/20241202-hideo-nakano-my-car-history-vol1",
+      "credit": "原始图片来源见链接",
+      "license": "第三方参考照片 · 版权归原作者"
+    }
+  },
+  "13_buick_riviera_gcc": {
+    "exterior": {
+      "file": "13_buick_riviera_gcc-exterior.jpg",
+      "caption": "1986 · Riviera T-Type",
+      "source": "https://commons.wikimedia.org/wiki/File:1986_Buick_Riviera_T-Type_in_Maroon,_front_right.jpg",
+      "credit": "Accord14",
+      "license": "CC BY-SA 4.0"
+    },
+    "interior": {
+      "file": "13_buick_riviera_gcc-interior.jpg",
+      "caption": "内饰 / 原车仪表",
+      "source": "https://www.carscoops.com/2021/10/the-buick-riviera-had-a-touchscreen-display-way-back-in-1986/",
+      "credit": "原始图片来源见链接",
+      "license": "第三方参考照片 · 版权归原作者"
+    }
+  },
+  "14_vauxhall_astra_gte": {
+    "exterior": {
+      "file": "14_vauxhall_astra_gte-exterior.jpg",
+      "caption": "1990 · Mk2 GTE 16V",
+      "source": "https://commons.wikimedia.org/wiki/File:1990_Vauxhall_Astra_GTE_16V_(14598582672).jpg",
+      "credit": "Kieran White from Manchester, England",
+      "license": "CC BY 2.0"
+    },
+    "interior": {
+      "file": "14_vauxhall_astra_gte-interior.jpg",
+      "caption": "内饰 / 原车仪表",
+      "source": "https://www.adrianflux.co.uk/cult-classics/vauxhall-astra-gte/",
+      "credit": "原始图片来源见链接",
+      "license": "第三方参考照片 · 版权归原作者"
+    }
+  },
+  "15_vector_w8": {
+    "exterior": {
+      "file": "15_vector_w8-exterior.jpg",
+      "caption": "1992 · W8 Twin Turbo",
+      "source": "https://commons.wikimedia.org/wiki/File:Vector_W8_Twin_Turbo_white_1992.jpg",
+      "credit": "Mike's Car Pix",
+      "license": "CC BY-SA 2.0"
+    },
+    "interior": {
+      "file": "15_vector_w8-interior.jpg",
+      "caption": "内饰 / 原车仪表",
+      "source": "https://monochrome-watches.com/the-petrolhead-corner-vector-motors-all-american-supercar-m12-w8-twin-turbo-avtech-wx-3-roadster-prototype-gerald-jerry-wiegert-rm-sothebys/",
+      "credit": "原始图片来源见链接",
+      "license": "第三方参考照片 · 版权归原作者"
+    }
+  }
+}

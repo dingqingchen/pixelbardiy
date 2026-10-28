@@ -1,0 +1,896 @@
+{
+  "version": 1,
+  "id": "09_fiat_tipo_dgt",
+  "name": "Fiat Tipo DGT",
+  "description": "矩形数码车速与横贯式状态表",
+  "color": "#60FF30",
+  "reference_year": "1988 · DGT",
+  "reference_source": "https://www.largus.fr/actualite-automobile/compteurs-numeriques-cetait-mieux-avant-10228400-12236455-photos.html",
+  "sprites": {
+    "car": [
+      "..XXXXXXXX..",
+      "..X......X..",
+      ".XX.XXXX.XX.",
+      "XXX.X..X.XXX",
+      "..X.XXXX.X..",
+      "..X......X..",
+      "XXX.XXXX.XXX",
+      ".XX.X..X.XX.",
+      "..X.XXXX.X..",
+      "..XXXXXXXX.."
+    ],
+    "engine": [
+      "..XXXX....",
+      "..X..XXXXX",
+      "XXX......X",
+      "X........X",
+      "X..XXXX..X",
+      "XXXX..XXXX"
+    ],
+    "brake": [
+      "..XXXXX..",
+      ".X.....X.",
+      "X..XXX..X",
+      "X..X.X..X",
+      "X..XXX..X",
+      ".X.X...X.",
+      "..XXXXX.."
+    ],
+    "wedge": [
+      "....................XXXXXXXXXXXX.....................",
+      "...................X............X....................",
+      "..................X..............XX..................",
+      "...............XXX..XXXXXXXX.......XX................",
+      "............XXX....X.......X.........XXXXXXX.........",
+      ".........XXX......X.........XX..............XXXX.....",
+      ".....XXXX........X............XX................X....",
+      "..XXX............................................X...",
+      "XX.........XXXXXXX....................XXXXXXX.....XXX",
+      "X.........X.......X..................X.......X.......X",
+      "XXXXXXXXXXX.XXXXX.XXXXXXXXXXXXXXXXXXXX.XXXXX.XXXXXXXXX",
+      "..........X.X...X.X..................X.X...X.X........",
+      "..........X.XXXXX.X..................X.XXXXX.X........",
+      "...........XXXXXXX....................XXXXXXX........."
+    ]
+  },
+  "commands": [
+    {
+      "op": "line",
+      "x": 0,
+      "y": 0,
+      "x2": 255,
+      "y2": 0
+    },
+    {
+      "op": "line",
+      "x": 0,
+      "y": 31,
+      "x2": 255,
+      "y2": 31
+    },
+    {
+      "op": "line",
+      "x": 79,
+      "y": 2,
+      "x2": 79,
+      "y2": 29
+    },
+    {
+      "op": "micro",
+      "text": "TIPO DGT",
+      "x": 3,
+      "y": 3
+    },
+    {
+      "op": "micro",
+      "text": "THR",
+      "x": 3,
+      "y": 11
+    },
+    {
+      "op": "line",
+      "x": 20,
+      "y": 14,
+      "x2": 23,
+      "y2": 14
+    },
+    {
+      "op": "rect",
+      "x": 20,
+      "y": 11,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(throttle*9-0,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 26,
+      "y": 14,
+      "x2": 29,
+      "y2": 14
+    },
+    {
+      "op": "rect",
+      "x": 26,
+      "y": 11,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(throttle*9-1,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 32,
+      "y": 14,
+      "x2": 35,
+      "y2": 14
+    },
+    {
+      "op": "rect",
+      "x": 32,
+      "y": 11,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(throttle*9-2,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 38,
+      "y": 14,
+      "x2": 41,
+      "y2": 14
+    },
+    {
+      "op": "rect",
+      "x": 38,
+      "y": 11,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(throttle*9-3,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 44,
+      "y": 14,
+      "x2": 47,
+      "y2": 14
+    },
+    {
+      "op": "rect",
+      "x": 44,
+      "y": 11,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(throttle*9-4,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 50,
+      "y": 14,
+      "x2": 53,
+      "y2": 14
+    },
+    {
+      "op": "rect",
+      "x": 50,
+      "y": 11,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(throttle*9-5,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 56,
+      "y": 14,
+      "x2": 59,
+      "y2": 14
+    },
+    {
+      "op": "rect",
+      "x": 56,
+      "y": 11,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(throttle*9-6,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 62,
+      "y": 14,
+      "x2": 65,
+      "y2": 14
+    },
+    {
+      "op": "rect",
+      "x": 62,
+      "y": 11,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(throttle*9-7,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 68,
+      "y": 14,
+      "x2": 71,
+      "y2": 14
+    },
+    {
+      "op": "rect",
+      "x": 68,
+      "y": 11,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(throttle*9-8,0,1)"
+    },
+    {
+      "op": "micro",
+      "text": "BRK",
+      "x": 3,
+      "y": 18
+    },
+    {
+      "op": "line",
+      "x": 20,
+      "y": 21,
+      "x2": 23,
+      "y2": 21
+    },
+    {
+      "op": "rect",
+      "x": 20,
+      "y": 18,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(brake*9-0,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 26,
+      "y": 21,
+      "x2": 29,
+      "y2": 21
+    },
+    {
+      "op": "rect",
+      "x": 26,
+      "y": 18,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(brake*9-1,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 32,
+      "y": 21,
+      "x2": 35,
+      "y2": 21
+    },
+    {
+      "op": "rect",
+      "x": 32,
+      "y": 18,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(brake*9-2,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 38,
+      "y": 21,
+      "x2": 41,
+      "y2": 21
+    },
+    {
+      "op": "rect",
+      "x": 38,
+      "y": 18,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(brake*9-3,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 44,
+      "y": 21,
+      "x2": 47,
+      "y2": 21
+    },
+    {
+      "op": "rect",
+      "x": 44,
+      "y": 18,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(brake*9-4,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 50,
+      "y": 21,
+      "x2": 53,
+      "y2": 21
+    },
+    {
+      "op": "rect",
+      "x": 50,
+      "y": 18,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(brake*9-5,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 56,
+      "y": 21,
+      "x2": 59,
+      "y2": 21
+    },
+    {
+      "op": "rect",
+      "x": 56,
+      "y": 18,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(brake*9-6,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 62,
+      "y": 21,
+      "x2": 65,
+      "y2": 21
+    },
+    {
+      "op": "rect",
+      "x": 62,
+      "y": 18,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(brake*9-7,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 68,
+      "y": 21,
+      "x2": 71,
+      "y2": 21
+    },
+    {
+      "op": "rect",
+      "x": 68,
+      "y": 18,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(brake*9-8,0,1)"
+    },
+    {
+      "op": "micro",
+      "text": "BST",
+      "x": 3,
+      "y": 25
+    },
+    {
+      "op": "line",
+      "x": 20,
+      "y": 28,
+      "x2": 23,
+      "y2": 28
+    },
+    {
+      "op": "rect",
+      "x": 20,
+      "y": 25,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(boost*9-0,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 26,
+      "y": 28,
+      "x2": 29,
+      "y2": 28
+    },
+    {
+      "op": "rect",
+      "x": 26,
+      "y": 25,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(boost*9-1,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 32,
+      "y": 28,
+      "x2": 35,
+      "y2": 28
+    },
+    {
+      "op": "rect",
+      "x": 32,
+      "y": 25,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(boost*9-2,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 38,
+      "y": 28,
+      "x2": 41,
+      "y2": 28
+    },
+    {
+      "op": "rect",
+      "x": 38,
+      "y": 25,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(boost*9-3,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 44,
+      "y": 28,
+      "x2": 47,
+      "y2": 28
+    },
+    {
+      "op": "rect",
+      "x": 44,
+      "y": 25,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(boost*9-4,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 50,
+      "y": 28,
+      "x2": 53,
+      "y2": 28
+    },
+    {
+      "op": "rect",
+      "x": 50,
+      "y": 25,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(boost*9-5,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 56,
+      "y": 28,
+      "x2": 59,
+      "y2": 28
+    },
+    {
+      "op": "rect",
+      "x": 56,
+      "y": 25,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(boost*9-6,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 62,
+      "y": 28,
+      "x2": 65,
+      "y2": 28
+    },
+    {
+      "op": "rect",
+      "x": 62,
+      "y": 25,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(boost*9-7,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 68,
+      "y": 28,
+      "x2": 71,
+      "y2": 28
+    },
+    {
+      "op": "rect",
+      "x": 68,
+      "y": 25,
+      "w": 4,
+      "h": 4,
+      "fill": true,
+      "when": "clamp(boost*9-8,0,1)"
+    },
+    {
+      "op": "seven",
+      "text": "${speed}",
+      "x": 89,
+      "y": 3,
+      "dw": 15,
+      "h": 21,
+      "thick": 2,
+      "slots": 3,
+      "gap": 3
+    },
+    {
+      "op": "micro",
+      "text": "KM/H",
+      "x": 105,
+      "y": 26
+    },
+    {
+      "op": "micro",
+      "text": "RPM ${rpm}",
+      "x": 151,
+      "y": 3
+    },
+    {
+      "op": "line",
+      "x": 152,
+      "y": 17,
+      "x2": 154,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 152,
+      "y": 12,
+      "w": 3,
+      "h": 6,
+      "fill": true,
+      "when": "clamp(rpm_ratio*20-0,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 157,
+      "y": 17,
+      "x2": 159,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 157,
+      "y": 12,
+      "w": 3,
+      "h": 6,
+      "fill": true,
+      "when": "clamp(rpm_ratio*20-1,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 162,
+      "y": 17,
+      "x2": 164,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 162,
+      "y": 12,
+      "w": 3,
+      "h": 6,
+      "fill": true,
+      "when": "clamp(rpm_ratio*20-2,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 167,
+      "y": 17,
+      "x2": 169,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 167,
+      "y": 12,
+      "w": 3,
+      "h": 6,
+      "fill": true,
+      "when": "clamp(rpm_ratio*20-3,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 172,
+      "y": 17,
+      "x2": 174,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 172,
+      "y": 12,
+      "w": 3,
+      "h": 6,
+      "fill": true,
+      "when": "clamp(rpm_ratio*20-4,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 176,
+      "y": 17,
+      "x2": 178,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 176,
+      "y": 12,
+      "w": 3,
+      "h": 6,
+      "fill": true,
+      "when": "clamp(rpm_ratio*20-5,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 181,
+      "y": 17,
+      "x2": 183,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 181,
+      "y": 12,
+      "w": 3,
+      "h": 6,
+      "fill": true,
+      "when": "clamp(rpm_ratio*20-6,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 186,
+      "y": 17,
+      "x2": 188,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 186,
+      "y": 12,
+      "w": 3,
+      "h": 6,
+      "fill": true,
+      "when": "clamp(rpm_ratio*20-7,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 191,
+      "y": 17,
+      "x2": 193,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 191,
+      "y": 12,
+      "w": 3,
+      "h": 6,
+      "fill": true,
+      "when": "clamp(rpm_ratio*20-8,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 196,
+      "y": 17,
+      "x2": 198,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 196,
+      "y": 12,
+      "w": 3,
+      "h": 6,
+      "fill": true,
+      "when": "clamp(rpm_ratio*20-9,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 201,
+      "y": 17,
+      "x2": 203,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 201,
+      "y": 12,
+      "w": 3,
+      "h": 6,
+      "fill": true,
+      "when": "clamp(rpm_ratio*20-10,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 206,
+      "y": 17,
+      "x2": 208,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 206,
+      "y": 12,
+      "w": 3,
+      "h": 6,
+      "fill": true,
+      "when": "clamp(rpm_ratio*20-11,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 211,
+      "y": 17,
+      "x2": 213,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 211,
+      "y": 12,
+      "w": 3,
+      "h": 6,
+      "fill": true,
+      "when": "clamp(rpm_ratio*20-12,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 216,
+      "y": 17,
+      "x2": 218,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 216,
+      "y": 12,
+      "w": 3,
+      "h": 6,
+      "fill": true,
+      "when": "clamp(rpm_ratio*20-13,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 221,
+      "y": 17,
+      "x2": 223,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 221,
+      "y": 12,
+      "w": 3,
+      "h": 6,
+      "fill": true,
+      "when": "clamp(rpm_ratio*20-14,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 226,
+      "y": 17,
+      "x2": 228,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 226,
+      "y": 12,
+      "w": 3,
+      "h": 6,
+      "fill": true,
+      "when": "clamp(rpm_ratio*20-15,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 230,
+      "y": 17,
+      "x2": 232,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 230,
+      "y": 12,
+      "w": 3,
+      "h": 6,
+      "fill": true,
+      "when": "clamp(rpm_ratio*20-16,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 235,
+      "y": 17,
+      "x2": 237,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 235,
+      "y": 12,
+      "w": 3,
+      "h": 6,
+      "fill": true,
+      "when": "clamp(rpm_ratio*20-17,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 240,
+      "y": 17,
+      "x2": 242,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 240,
+      "y": 12,
+      "w": 3,
+      "h": 6,
+      "fill": true,
+      "when": "clamp(rpm_ratio*20-18,0,1)"
+    },
+    {
+      "op": "line",
+      "x": 245,
+      "y": 17,
+      "x2": 247,
+      "y2": 17
+    },
+    {
+      "op": "rect",
+      "x": 245,
+      "y": 12,
+      "w": 3,
+      "h": 6,
+      "fill": true,
+      "when": "clamp(rpm_ratio*20-19,0,1)"
+    },
+    {
+      "op": "micro",
+      "text": "G ${gear}",
+      "x": 153,
+      "y": 24
+    },
+    {
+      "op": "micro",
+      "text": "F ${fuel}%",
+      "x": 184,
+      "y": 24
+    },
+    {
+      "op": "micro",
+      "text": "${clock}",
+      "x": 235,
+      "y": 24
+    }
+  ]
+}

@@ -40,12 +40,14 @@ public sealed partial class StudioForm : Form
         brand.Controls.Add(new PictureBox { Image = logo, SizeMode = PictureBoxSizeMode.Zoom, Location = new(0, 4), Size = new(43, 43) });
         var name = Label("HaloStudio", 13, true); name.Location = new(53, 5); brand.Controls.Add(name);
         var edition = Label("PIXEL BAR", 9, false, Palette.Muted); edition.Location = new(54, 32); brand.Controls.Add(edition); nav.Controls.Add(brand);
-        string[] labels = ["主题与屏幕", "硬件监控", "音乐与灯光", "演示剧场", "设置"];
-        string[] glyphs = ["\uE790", "\uE9D9", "\uE8D6", "\uE768", "\uE713"];
+        string[] labels = ["主题与屏幕", "硬件监控", "音乐与灯光", "演示剧场", "设置", "驾驶遥测"];
+        string[] glyphs = ["\uE790", "\uE9D9", "\uE8D6", "\uE768", "\uE713", "\uE7F4"];
         for (int i = 0; i < labels.Length; i++)
         {
             int index = i; var b = Button(labels[i], () => SelectPage(index)); b.Glyph = glyphs[i]; b.Width = 212; b.Height = 50; b.BackColor = Palette.Sidebar; b.Margin = new(0, 0, 0, 6); navigation.Add(b); nav.Controls.Add(b);
         }
+        // Reorder visually while keeping the existing page IDs stable.
+        nav.Controls.SetChildIndex(navigation[5], 4);
         var bottom = Stack(); bottom.Dock = DockStyle.Bottom; bottom.AutoSize = true; bottom.AutoSizeMode = AutoSizeMode.GrowAndShrink;
         bottom.Controls.Add(sidebarStatus); bottom.Controls.Add(sidebarTemp); bottom.Controls.Add(Label("256 × 32  ·  全像素直绘", 8, false, Palette.Muted));
         var hide = Button("隐藏到托盘", Hide); hide.Width = 210; hide.Margin = new(0, 5, 0, 5); hide.BackColor = Palette.Sidebar; bottom.Controls.Add(hide); sidebar.Controls.Add(bottom);
@@ -70,7 +72,7 @@ public sealed partial class StudioForm : Form
         liveGrid.Controls.Add(preview, 0, 1); liveGrid.SetColumnSpan(preview, 2); song.AutoSize = false; song.AutoEllipsis = true; song.Dock = DockStyle.Fill; song.Margin = new(0, 5, 0, 0); song.ForeColor = Palette.Muted; liveGrid.Controls.Add(song, 0, 2); liveGrid.SetColumnSpan(song, 2); live.Controls.Add(liveGrid); main.Controls.Add(live, 0, 1);
         main.Controls.Add(body, 0, 2); performance.AutoSize = false; performance.Dock = DockStyle.Fill; performance.TextAlign = ContentAlignment.MiddleRight; performance.ForeColor = Palette.Muted; main.Controls.Add(performance, 0, 3);
         for (int i = 0; i < labels.Length; i++) { var page = new PagePanel { Dock = DockStyle.Fill }; body.Controls.Add(page); pages.Add(page); }
-        BuildDisplay(); BuildMonitor(); BuildMusic(); BuildDemo(); BuildDevice(); LoadThemes(); Sync(); SelectPage(0);
+        BuildDisplay(); BuildMonitor(); BuildMusic(); BuildDemo(); BuildDevice(); BuildTelemetry(); LoadThemes(); Sync(); SelectPage(0);
         inputCommit = new(this); Application.AddMessageFilter(inputCommit);
         Deactivate += (_, _) => { if (!quitting) inputCommit.Commit(false); };
         tray = new NotifyIcon { Icon = appIcon, Text = "HaloStudio", Visible = true }; var menu = new ContextMenuStrip();
@@ -108,12 +110,14 @@ public sealed partial class StudioForm : Form
             status.Text = previewMode ? "离线预览" : value.Connected ? "●  USB 已连接" : value.Status; status.ForeColor = value.Connected ? Color.FromArgb(28, 150, 111) : Palette.Muted;
             sidebarStatus.Text = value.Connected ? "●  Halo PixelBar 在线" : "○  等待音响连接"; sidebarStatus.ForeColor = status.ForeColor;
             sidebarTemp.Text = "CPU 温度  " + value.Snapshot.Get("cpu_temp").Text();
-            song.Text = value.DemoStage.Length > 0 ? value.DemoStage : value.Track.Title.Length > 0 ? (value.Track.Playing ? "正在播放  " : "已暂停  ") + value.Track.Title + " · " + value.Track.Artist : "默认显示 · " + (current.IdleContent == "clock" ? "时钟" : "系统监控");
+            song.Text = value.TelemetryActive ? value.Frame?.Text ?? "驾驶遥测" : value.DemoStage.Length > 0 ? value.DemoStage : value.Track.Title.Length > 0 ? (value.Track.Playing ? "正在播放  " : "已暂停  ") + value.Track.Title + " · " + value.Track.Artist : "默认显示 · " + (current.IdleContent == "clock" ? "时钟" : "系统监控");
             performance.Text = $"CPU {value.CpuPercent:F2}%   ·   内存 {value.MemoryMB:F0} MB   ·   {value.Frames} 帧已确认   ·   {value.FrameSeconds:F2} s / 帧";
             musicTitle.Text = value.Track.Title.Length > 0 ? value.Track.Title + "  /  " + value.Track.Artist : "等待网易云播放";
             lyric.Text = value.Frame?.Identity.StartsWith("歌词:") == true ? value.Frame.Text : value.Track.RealtimeLyric.Length > 0 ? value.Track.RealtimeLyric : "暂无当前句";
             musicDetail.Text = value.Track.Provider + " · " + value.Status; thermal.Text = value.TemperatureStatus;
             demoStatus.Text = value.DemoStage.Length > 0 ? value.DemoStage : "准备播放 · 结束后自动回到日常"; demoProgress.Value = Math.Clamp((int)(value.DemoProgress * 1000), 0, 1000);
+            telemetryStatusLabel.Text=value.TelemetryStatus;
+            bool wasLoading=loading; loading=true; telemetryDemoToggle.Checked=value.TelemetryDemo; loading=wasLoading;
             if (engine.MonitorVisible) UpdateSensors(value.Snapshot);
         });
         }
@@ -129,6 +133,7 @@ public sealed partial class StudioForm : Form
     {
         loading = true; try
         {
+            foreach (var tile in telemetryTiles) tile.Selected=tile.Key==current.TelemetryTheme;
             foreach (var bind in bindings) bind(); foreach (var tile in tiles) { tile.Selected = tile.Key == current.Theme; tile.SetColor(ScreenPalette.Preview(current.ScreenColor(tile.Key), current.OfficialScreenColor(tile.Key))); }
             string hex = current.ScreenColor(); foreach (var swatch in swatches) { swatch.Selected = swatch.Official == current.OfficialScreenColor() && swatch.Hex.Equals(hex, StringComparison.OrdinalIgnoreCase); swatch.Invalidate(); }
             colorStatus.Text = ScreenPalette.Description(hex, current.OfficialScreenColor()) + "\n发送 RGB " + current.DeviceScreenColor(hex) + (current.ThemeColors.ContainsKey(current.Theme) ? " · 自定义" : " · 主题原色");
@@ -169,12 +174,12 @@ public sealed partial class StudioForm : Form
     }
     void ReloadThemes() { Safe(() => { var errors = Designs.Reload(Designs.DirectoryPath); current = current.Validated(); engine.Configure(current); LoadThemes(); Sync(); if (errors.Length > 0) MessageBox.Show(this, string.Join("\n", errors), "部分主题未能加载"); }); }
     void StartDemo() { Safe(engine.StartShowcase); SelectPage(3); }
-    public void ShowPage(int index) => SelectPage(Math.Clamp(index, 0, 4));
+    public void ShowPage(int index) => SelectPage(Math.Clamp(index, 0, pages.Count-1));
     void SelectPage(int index)
     {
         pageIndex = index; for (int i = 0; i < pages.Count; i++) { pages[i].Visible = i == index; navigation[i].Selected = i == index; navigation[i].Invalidate(); }
         pages[index].BringToFront(); heading.Text = navigation[index].Text;
-        subtitle.Text = new[] { "选择设计，调好颜色，让屏幕属于你。", "实时状态、温度与显示编排。", "当前这一句，与音乐的每一次起伏。", "从代码之雨启程，走过六种像素设计。", "启动、连接与应用管理。" }[index];
+        subtitle.Text = new[] { "选择设计，调好颜色，让屏幕属于你。", "实时状态、温度与显示编排。", "当前这一句，与音乐的每一次起伏。", "从代码之雨启程，走过六种像素设计。", "启动、连接与应用管理。", "15 款复古电子仪表，让游戏数据变成车速与刻度。" }[index];
         engine.MonitorVisible = Visible && index == 1; ResizePage(pages[index]);
     }
     void ImportLrc() { using var d = new OpenFileDialog { Filter = "同步歌词|*.lrc|文本|*.txt" }; if (d.ShowDialog(this) == DialogResult.OK) Safe(() => engine.ImportLrc(d.FileName)); }

@@ -28,8 +28,8 @@ public static class Designs
         }
         if (next.Count == 0) throw new InvalidDataException("无可用主题: " + string.Join("；", errors)); All = next; DirectoryPath = directory; return errors.ToArray();
     }
-    static readonly HashSet<string> operations = ["line", "rect", "round", "circle", "star", "sprite", "small", "raster", "digits", "text", "tag", "erase", "invert", "segments", "history", "dial", "repeat", "metrics"];
-    static void Validate(JsonElement a) { if (a.ValueKind != JsonValueKind.Array || a.GetArrayLength() > 512) throw new InvalidDataException("命令列表无效"); foreach (var e in a.EnumerateArray()) { string op = e.GetProperty("op").GetString()!; if (!operations.Contains(op)) throw new InvalidDataException("未知操作: " + op); if (op is "repeat" or "metrics") Validate(e.GetProperty("commands")); } }
+    static readonly HashSet<string> operations = ["line", "rect", "round", "circle", "star", "sprite", "small", "raster", "digits", "text", "tag", "erase", "invert", "segments", "history", "dial", "repeat", "metrics", "micro", "seven"];
+    internal static void Validate(JsonElement a) { if (a.ValueKind != JsonValueKind.Array || a.GetArrayLength() > 512) throw new InvalidDataException("命令列表无效"); foreach (var e in a.EnumerateArray()) { string op = e.GetProperty("op").GetString()!; if (!operations.Contains(op)) throw new InvalidDataException("未知操作: " + op); if (op is "repeat" or "metrics") Validate(e.GetProperty("commands")); } }
     public static LyricViewport LyricViewport(Settings s)
     {
         var d = All.GetValueOrDefault(s.Themes ? s.Theme : "paper") ?? All.Values.First();
@@ -74,6 +74,12 @@ public static class Designs
         if (scene == "pair") { identity += ":" + string.Join("+", ctx.Selected.Select(m => m.Key)); text = string.Join(" / ", ctx.Selected.Select(m => m.Label + " " + m.Text())); }
         if (mode == "歌词") identity += ":" + text; if (scene == "dense") identity += ":dense"; Execute(d.Scenes.GetProperty(scene), ctx); return new(c.Data, text, identity, ctx.LyricPart == 1, ctx.LyricPart);
     }
+    internal static byte[] RenderCommands(JsonElement commands, Dictionary<string,string[]> sprites, Dictionary<string,double> numbers, Dictionary<string,string> text)
+    {
+        var c = new PixelCanvas(); var d = new Design("", "#FFFFFF", "#FFFFFF", "", default, sprites);
+        var ctx = new Context(c,d,new Settings(),Snapshot.Empty) { Numbers = numbers, Text = text };
+        Execute(commands,ctx); return c.Data;
+    }
     sealed class Context(PixelCanvas canvas, Design design, Settings settings, Snapshot snapshot)
     {
         public LyricScroll? LyricScroll; public int LyricPart; public LyricCue? LyricCue;
@@ -94,6 +100,8 @@ public static class Designs
             string op = e.GetProperty("op").GetString()!; int x = I(e, "x", ctx), y = I(e, "y", ctx), w = I(e, "w", ctx), h = I(e, "h", ctx);
             switch (op)
             {
+                case "micro": TelemetryFont.Micro(c, S(e,"text",ctx),x,y); break;
+                case "seven": TelemetryFont.Seven(c,S(e,"text",ctx),x,y,I(e,"dw",ctx,10),h,I(e,"thick",ctx,2),I(e,"gap",ctx,3),I(e,"slots",ctx,3)); break;
                 case "line": c.Line(x, y, I(e, "x2", ctx), I(e, "y2", ctx)); break;
                 case "rect": c.Rect(x, y, w, h, B(e, "fill")); break;
                 case "round": c.Round(x, y, w, h, I(e, "r", ctx, 3)); break;

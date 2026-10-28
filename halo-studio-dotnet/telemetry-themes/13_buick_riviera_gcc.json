@@ -1,0 +1,192 @@
+{
+  "version": 1,
+  "id": "13_buick_riviera_gcc",
+  "name": "Buick Riviera GCC",
+  "description": "绿色 CRT 按钮与横向信息页",
+  "color": "#60FF30",
+  "reference_year": "1986 · CRT Touchscreen",
+  "reference_source": "https://www.carscoops.com/2021/10/the-buick-riviera-had-a-touchscreen-display-way-back-in-1986/",
+  "sprites": {
+    "car": [
+      "..XXXXXXXX..",
+      "..X......X..",
+      ".XX.XXXX.XX.",
+      "XXX.X..X.XXX",
+      "..X.XXXX.X..",
+      "..X......X..",
+      "XXX.XXXX.XXX",
+      ".XX.X..X.XX.",
+      "..X.XXXX.X..",
+      "..XXXXXXXX.."
+    ],
+    "engine": [
+      "..XXXX....",
+      "..X..XXXXX",
+      "XXX......X",
+      "X........X",
+      "X..XXXX..X",
+      "XXXX..XXXX"
+    ],
+    "brake": [
+      "..XXXXX..",
+      ".X.....X.",
+      "X..XXX..X",
+      "X..X.X..X",
+      "X..XXX..X",
+      ".X.X...X.",
+      "..XXXXX.."
+    ],
+    "wedge": [
+      "....................XXXXXXXXXXXX.....................",
+      "...................X............X....................",
+      "..................X..............XX..................",
+      "...............XXX..XXXXXXXX.......XX................",
+      "............XXX....X.......X.........XXXXXXX.........",
+      ".........XXX......X.........XX..............XXXX.....",
+      ".....XXXX........X............XX................X....",
+      "..XXX............................................X...",
+      "XX.........XXXXXXX....................XXXXXXX.....XXX",
+      "X.........X.......X..................X.......X.......X",
+      "XXXXXXXXXXX.XXXXX.XXXXXXXXXXXXXXXXXXXX.XXXXX.XXXXXXXXX",
+      "..........X.X...X.X..................X.X...X.X........",
+      "..........X.XXXXX.X..................X.XXXXX.X........",
+      "...........XXXXXXX....................XXXXXXX........."
+    ]
+  },
+  "commands": [
+    {
+      "op": "rect",
+      "x": 0,
+      "y": 0,
+      "w": 256,
+      "h": 32
+    },
+    {
+      "op": "line",
+      "x": 1,
+      "y": 8,
+      "x2": 254,
+      "y2": 8
+    },
+    {
+      "op": "line",
+      "x": 1,
+      "y": 30,
+      "x2": 254,
+      "y2": 30
+    },
+    {
+      "op": "micro",
+      "text": "GRAPHIC CONTROL CENTER",
+      "x": 4,
+      "y": 2
+    },
+    {
+      "op": "micro",
+      "text": "${clock}",
+      "x": 235,
+      "y": 2
+    },
+    {
+      "op": "line",
+      "x": 83,
+      "y": 10,
+      "x2": 83,
+      "y2": 29
+    },
+    {
+      "op": "line",
+      "x": 145,
+      "y": 10,
+      "x2": 145,
+      "y2": 29
+    },
+    {
+      "op": "line",
+      "x": 196,
+      "y": 10,
+      "x2": 196,
+      "y2": 29
+    },
+    {
+      "op": "seven",
+      "text": "${speed}",
+      "x": 5,
+      "y": 11,
+      "dw": 13,
+      "h": 18,
+      "thick": 2,
+      "slots": 3,
+      "gap": 3
+    },
+    {
+      "op": "micro",
+      "text": "KM/H",
+      "x": 55,
+      "y": 21
+    },
+    {
+      "op": "micro",
+      "text": "ENGINE",
+      "x": 88,
+      "y": 11
+    },
+    {
+      "op": "micro",
+      "text": "${rpm} RPM",
+      "x": 88,
+      "y": 20
+    },
+    {
+      "op": "segments",
+      "x": 88,
+      "y": 27,
+      "w": 50,
+      "h": 3,
+      "ratio": "=rpm_ratio",
+      "count": 12
+    },
+    {
+      "op": "micro",
+      "text": "GEAR",
+      "x": 151,
+      "y": 11
+    },
+    {
+      "op": "raster",
+      "text": "${gear}",
+      "x": 161,
+      "y": 20
+    },
+    {
+      "op": "micro",
+      "text": "THR",
+      "x": 201,
+      "y": 11
+    },
+    {
+      "op": "segments",
+      "x": 218,
+      "y": 12,
+      "w": 31,
+      "h": 4,
+      "ratio": "=throttle",
+      "count": 7
+    },
+    {
+      "op": "micro",
+      "text": "BRK",
+      "x": 201,
+      "y": 22
+    },
+    {
+      "op": "segments",
+      "x": 218,
+      "y": 23,
+      "w": 31,
+      "h": 4,
+      "ratio": "=brake",
+      "count": 7
+    }
+  ]
+}
