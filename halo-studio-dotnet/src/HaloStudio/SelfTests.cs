@@ -152,7 +152,7 @@ public static class SelfTests
         File.WriteAllText(badPalette, "{\"version\":1,\"colors\":[{\"input\":\"#FF6000\",\"preview\":\"#C7A34A\",\"name\":\"ok\",\"observation\":\"ok\",\"quick\":true}],\"official_colors\":[{\"input\":\"broken\",\"name\":\"bad\"}]}");
         Assert(ScreenPalette.Reload(badPalette) != null && ReferenceEquals(officialBefore, ScreenPalette.Official), "Malformed official palette cannot replace either loaded group");
         Assert(ScreenPalette.Reload(palettePath) == null, "Restore full palette after rejected official metadata");
-        StartupNetworkTests.Run(Assert);
+        StartupNetworkTests.Run(Assert); DeviceOwnerTests.Run(Assert);
         var freshTemperature = new Settings().Validated();
         Assert(!freshTemperature.CpuTemperatureEnabled && !freshTemperature.CpuTemperatureElevation && freshTemperature.CpuTemperatureOptIn == false, "First launch has no temperature collection or elevation opt-in");
         var legacyDefaultTemperature = JsonSerializer.Deserialize<Settings>("{\"cpu_temperature_enabled\":true,\"cpu_temperature_elevation\":false}", Files.Json)!.Validated();
