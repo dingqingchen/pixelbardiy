@@ -11,7 +11,7 @@ HaloStudio 可以让 Edifier Halo PixelBar 显示网易云音乐歌词、电脑�
 ## 主要功能
 
 - **USB 像素直绘**：刷入提供的 MCU 固件后，电脑可通过 USB 直接在音响屏幕上绘制和更新像素画面，更多自定义潜力。
-- **地平线 6 驾驶遥测（2.7.0 源码）**：15 款复古车型仪表，收到游戏数据才接管屏幕；暂停或断流后恢复歌词、时钟或监控。支持独立的零百加速演示。已验证模拟数据传输，真实驾驶待实测；[配置与主题说明](halo-studio-dotnet/docs/FORZA_TELEMETRY.md)。
+- **地平线 6 驾驶遥测（2.7.0）**：15 款复古车型仪表，收到游戏数据才接管屏幕；暂停或断流后恢复歌词、时钟或监控。支持独立的零百加速演示。已在真实游戏中验证自动进入、退出遥测和画面动画；[配置与主题说明](halo-studio-dotnet/docs/FORZA_TELEMETRY.md)。
 - **电脑性能监控**：显示 CPU、内存、网速、磁盘、显卡和可获取的温度、风扇转速。可以选择紧凑两行、双指标卡片、仪表或曲线等布局，也可以轮换显示。监控设计和硬件检测参考了 [TrafficMonitor](https://github.com/zhongyang219/TrafficMonitor)，感谢其开源项目；日常使用不需要先启动 TrafficMonitor。
 - **自定义主题与颜色**：内置六套风格不同的主题，时钟、监控和歌词都能使用；可以换颜色、选择动画，也可以通过编辑主题文件添加新设计。
 - **网易云音乐歌词**：播放时自动显示歌词，不必打开桌面歌词或让网易云停留在歌词页面。支持歌词时间调整和导入本地 LRC 文件。
@@ -38,11 +38,15 @@ HaloStudio 可以让 Edifier Halo PixelBar 显示网易云音乐歌词、电脑�
 
 ### 1. 下载文件
 
-- [下载 HaloStudio C# 2.6.4（Windows x64）](packages/HaloStudio-CSharp-2.6.4-win64.zip)：日常使用的软件，已包含 .NET 运行环境。
+- [下载 HaloStudio C# 2.7.0（Windows x64）](https://github.com/woozyc/pixelbardiy/releases/download/v2.7.0/HaloStudio-CSharp-2.7.0-win64.zip)：日常使用的软件，已包含 .NET 运行环境。
 - [下载 MCU 固件与工程工具包 2.6.0](packages/HaloPixelBar-MCU-2.6.0.zip)：用于满足下述前提的固件更新和验证。
-- [下载文件校验值](packages/SHA256SUMS.txt)；有需要时可用 PowerShell 的 `Get-FileHash 文件路径 -Algorithm SHA256` 对照。
+- [v2.7.0 发布页](https://github.com/woozyc/pixelbardiy/releases/tag/v2.7.0) · [电脑端校验值](https://github.com/woozyc/pixelbardiy/releases/download/v2.7.0/SHA256SUMS.txt) · [固件包校验值](packages/HaloPixelBar-MCU-2.6.0.zip.sha256)。可用 PowerShell 的 `Get-FileHash 文件路径 -Algorithm SHA256` 对照。
 
 ### 2. 确认固件与刷机前提
+
+本项目使用的是 **花再 Halo PixelBar 2025 款「常规版」**，2026-04-22 购入，**USB 一线通供电及连接**。不是「强化版」，也不是 2026 款独立电源适配器供电的型号。新款尚未测试，请勿直接套用这里的固件。
+
+官方 [2025 年说明书](https://cn-oss.edifier.com/Uploads/images/2025/06/17/2025061713502517501394251794.pdf) 将 Halo PixelBar 的产品型号列为 **EDF286015**；这里作为官方参考型号，尚未单独核对本机铭牌编号。本机 USB 标识为 `VID 2D99 / PID A106 / MI04`。
 
 当前固件 SHA256 为：
 
@@ -81,7 +85,8 @@ HaloStudio 可以让 Edifier Halo PixelBar 显示网易云音乐歌词、电脑�
 3. 在「主题与屏幕」选择主题、颜色，以及没有歌词时显示时钟还是系统监控；在「硬件监控」选择要显示的指标和布局。
 4. 在「主题与屏幕」将「播放音乐时」设为「自动显示歌词」，然后播放网易云音乐。在「音乐与灯光」可以调整歌词时间轴偏移或导入 LRC 文件；歌词默认提前约 0.8 秒刷新。
 5. 如需 CPU 温度，在「硬件监控」开启独立温度采集。此功能首次默认关闭；第一次开启需要确认一次 Windows 管理员授权，之后通常会复用授权。
-6. 可在「设置」开启开机后台启动。关闭窗口会隐藏到托盘；需要停止控制并恢复官方显示时，请选择「退出并恢复原厂显示」。
+6. 如需游戏仪表，在「驾驶遥测」选择主题并开启接收；在地平线 6 中开启 Data Out，地址填 `127.0.0.1`、端口填 `20777`。没有游戏数据时仍显示日常内容；「遥测演示」可直接播放当前主题的零百加速动画，详见[遥测设置](halo-studio-dotnet/docs/FORZA_TELEMETRY.md)。
+7. 可在「设置」开启开机后台启动。关闭窗口会隐藏到托盘；需要停止控制并恢复官方显示时，请选择「退出并恢复原厂显示」。
 
 本机设置、歌词缓存、设备验证记录和日志保存在应用的 `runtime/` 目录，请自行留存，不要将含设备信息的记录公开上传。需要详细设置或自行构建时，可查看 [C# 版说明](halo-studio-dotnet/README.md)；Python 旧版另见[旧版说明](legacy-python/README.md)（已弃用）。
 
@@ -117,7 +122,7 @@ HaloStudio 可以让 Edifier Halo PixelBar 显示网易云音乐歌词、电脑�
 | --- | --- |
 | Windows | **Windows 11 专业版，64 位，26H2，OS Build 26300.9457**；这是本机测试环境，不代表所有 Windows 版本已验证 |
 | 网易云音乐 | **Windows 桌面版 3.1.41.205564**；独立播放进度只对已核对模块指纹启用，更新播放器后可能需要重新适配 |
-| 音响 | Edifier Halo PixelBar，USB `VID 2D99 / PID A106`、`MI04`、主控报告 `1.3.7`；还需核对硬件及显示 MCU 镜像，不能只凭产品名判断兼容 |
+| 音响 | **花再 Halo PixelBar 2025 款常规版，USB 一线通**，2026-04-22 购入；非强化版、非 2026 款独立电源型号。官方说明书参考型号 EDF286015（本机铭牌未核对）；USB `VID 2D99 / PID A106`、`MI04`、主控报告 `1.3.7`；还需核对硬件及显示 MCU 镜像，不能只凭产品名判断兼容 |
 | 日常运行 | Windows x64 应用包已含 **.NET 10** 运行时；无需 Python、.NET SDK 或 TrafficMonitor。USB HID 使用系统驱动；需自己的、实屏验证过的 MCU 安装记录 |
 | 在线歌词 | 需能访问歌词接口；网易云歌曲 ID 与歌词版本应匹配。不要求开启桌面歌词。离线仅使用缓存或导入的 LRC，部分歌曲没有逐字数据 |
 | CPU 温度（可选） | 随包 HaloThermal / AMD 采集模块；复用已有 WinRing0/PawnIO，否则通过已校验的 PawnIO 组件加载。首次需确认 UAC 建立固定采集器任务，之后复用；任务失效或采集器更新需重设。独立通道面向 AMD Family 17h / 19h / 1Ah，其他硬件可能没有温度 |
@@ -125,12 +130,12 @@ HaloStudio 可以让 Edifier Halo PixelBar 显示网易云音乐歌词、电脑�
 | C# 源码编译 | Windows x64 + **.NET 10 SDK**（本机构建 10.0.401）；首次还原需网络。目标 API 版本为 Windows 10.0.19041，不能据此宣称旧系统已完整测试 |
 | 固件工程工具 | **Python 3.12 x64**、`legacy-python/requirements-dev.txt` 固定依赖（含 Unicorn 2.1.3、Keystone 0.9.2、Capstone 5.0.9、hidapi、PySide6、psutil）；另需自己的原厂包、镜像和备份记录，详见[完整命令流程](docs/FIRMWARE_USAGE.md) |
 
-应用包为 **2.6.4**，固件工具包仍为 **2.6.0** 发布资料；显示 MCU BIN 与 2.5.1 相同，已安装并验证相同 SHA 的设备**无需重新刷写**。本次后台启动、温度授权与网速修复只需更新电脑端。
+应用包为 **2.7.0**，固件工具包仍为 **2.6.0** 发布资料；显示 MCU BIN 与 2.5.1 相同，已安装并验证相同 SHA 的设备**无需重新刷写**。本次地平线遥测只需更新电脑端。2026-10-29，使用者在真实地平线 6 游戏中确认自动进入遥测、退出遥测和显示动画均正常；游戏的具体构建号未记录。
 
 ## 源码与验证
 
 ```text
-halo-studio-dotnet/   C# 2.6.4 客户端、外部主题/色表、MCU 扩展源码与报告
+halo-studio-dotnet/   C# 2.7.0 客户端、外部主题/色表、15 套遥测仪表、MCU 扩展源码与报告
 legacy-python/       Python 旧版、依赖、测试与固件实验基线
 docs/                MCU 动画、USB 协议与显示链路的实现原理
 firmware/            当前与历史显示 MCU 镜像、校验值
@@ -145,7 +150,7 @@ cd halo-studio-dotnet
 ./scripts/verify.ps1
 ```
 
-GitHub Actions 分别验证 Python 与 C#。2.6.4 本机通过 423 项离线检查及 30 组布局验证，覆盖温度首次关闭与持久化、后台隐藏启动、授权任务身份、网络接口复位及原有协议／歌词／配色回归；详细验证见[验证记录](halo-studio-dotnet/docs/VALIDATION.md)。新 MCU 的实屏、退出、停心跳恢复已在此前单独验证，本次没有刷写固件。离线检查不替代刷机后的实物确认。
+GitHub Actions 分别验证 Python 与 C#，版本标签还会触发电脑端打包与 Release 发布。2.7.0 本机通过 1031 项离线检查、8 项模拟 UDP / 显示优先级联调检查及 36 组布局验证；使用者另已确认真实游戏的遥测进入、退出和动画正常。详细验证见[验证记录](halo-studio-dotnet/docs/VALIDATION.md)。新 MCU 的实屏、退出、停心跳恢复已在此前单独验证，本次没有刷写固件。离线检查不替代刷机后的实物确认。
 
 固件离线重建需要自行取得并核对原厂显示 MCU 镜像。先依照 [旧固件构建说明](legacy-python/docs/FIRMWARE.md)准备 `legacy-python/firmware-analysis/v137/mcu.bin`，安装 `legacy-python/requirements-dev.txt` 中的开发依赖，再运行 `python halo-studio-dotnet/firmware-color/validate_color.py`。`legacy-python/` 中的 Python/实验工具同时为新版验证提供基线；仿真不访问 USB，也不在 CI 中自动刷写设备。
 

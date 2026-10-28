@@ -1,22 +1,23 @@
 AMD temperature sampler: adapted from LibreHardwareMonitor, MPL-2.0.
 Copyright (C) LibreHardwareMonitor and Contributors.
-Full license: licenses/LibreHardwareMonitor/LICENSE in packaged app.
+Full license: thermal-native/references/LHM/LICENSE in this package.
 Ported source: thermal-native/halo_thermal.c in HaloStudio source workspace.
 
 PawnIO AMDFamily17 module (unmodified): LGPL-2.1-or-later.
 Copyright (C) 2025 namazso <admin@namazso.eu>.
-Full license, upstream module source, provenance: licenses/PawnIO in packaged app.
+License, upstream module source and provenance: thermal-native/references/PawnIO-LGPL-2.1.txt, AMDFamily17.p and PawnIO-source.json in this package.
 Source: https://github.com/namazso/PawnIO.Modules
 Official signed installer: https://github.com/namazso/PawnIO.Setup/releases/tag/2.2.0
 
-PySide6/Qt for Python: LGPL-3.0/GPL-3.0/commercial upstream distribution.
-Unmodified Python wheels and their license/metadata files are packaged.
-Source and licensing: https://code.qt.io/cgit/pyside/pyside-setup.git/
-Qt sources: https://download.qt.io/official_releases/qt/
-Other dependencies retain their included upstream license and metadata.
+.NET runtime: Microsoft and .NET contributors, MIT and other component licenses.
+See HaloStudioNet/licenses/Microsoft.NETCore.App.Runtime.win-x64/ and
+HaloStudioNet/licenses/Microsoft.WindowsDesktop.App.Runtime.win-x64/.
+This C# app package does not ship Python or PySide6/Qt.
+Vehicle comparison photos have separate copyrights and licenses; see
+HaloStudioNet/telemetry-photos/CREDITS.md and manifest.json. Photos are not MIT code.
 
 halo/vendor_core.py derives from Seraph310/halo-pixelbar-mcp (MIT).
-Protocol/lyrics references also credit HaloPixelToolBox; see licenses directory.
+Protocol/lyrics references also credit HaloPixelToolBox; see thermal-native/references/LICENSE-*.txt.
 The display MCU image includes proprietary Edifier code and is not MIT licensed.
 
 MIT License

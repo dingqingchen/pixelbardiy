@@ -1,0 +1,43 @@
+name: Release Windows app
+on:
+  push:
+    tags:
+      - 'v*'
+permissions:
+  contents: write
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Check tag version
+        run: |
+          $version=([xml](Get-Content halo-studio-dotnet/src/HaloStudio/HaloStudio.csproj -Raw)).Project.PropertyGroup.Version
+          if($env:GITHUB_REF_NAME -ne "v$version"){throw 'Tag and application version differ'}
+          if(!(Test-Path "docs/releases/$env:GITHUB_REF_NAME.md")){throw 'Release notes missing'}
+      - name: Build and package
+        run: |
+          ./halo-studio-dotnet/scripts/build.ps1
+          ./halo-studio-dotnet/scripts/package.ps1
+      - name: Verify extracted release package
+        run: |
+          $version=$env:GITHUB_REF_NAME.Substring(1)
+          ./halo-studio-dotnet/scripts/verify-package.ps1 -Archive "halo-studio-dotnet/packages/HaloStudio-CSharp-$version-win64.zip" -Version $version
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          $version=$env:GITHUB_REF_NAME.Substring(1)
+          gh release create $env:GITHUB_REF_NAME "halo-studio-dotnet/packages/HaloStudio-CSharp-$version-win64.zip" "halo-studio-dotnet/packages/SHA256SUMS.txt" --verify-tag --title "HaloStudio v$version" --notes-file "docs/releases/$env:GITHUB_REF_NAME.md" --latest
+          if($LASTEXITCODE -ne 0){throw 'Release publication failed'}

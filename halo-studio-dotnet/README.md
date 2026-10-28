@@ -8,7 +8,7 @@ Halo PixelBar 的独立 Windows 客户端，采用 C# / .NET 10 / WinForms 重�
 
 ## 2.7.0 地平线 6 驾驶遥测
 
-新增 15 款复古车型仪表，动态显示车速、挡位、转速、油门、刹车和增压。手动开启后只在有效游戏数据到达时接管屏幕，暂停或断流后恢复原来的歌词、时钟或监控。当前主题支持独立的 16 秒零百加速演示；布局在 `telemetry-themes/*.json` 中运行时加载。[设置步骤、主题列表和实现说明](docs/FORZA_TELEMETRY.md)。现有 RAM 直绘固件无需重刷。已完成模拟 UDP 与显示传输验证，真实游戏驾驶仍待验证。
+新增 15 款复古车型仪表，动态显示车速、挡位、转速、油门、刹车和增压。手动开启后只在有效游戏数据到达时接管屏幕，暂停或断流后恢复原来的歌词、时钟或监控。当前主题支持独立的 16 秒零百加速演示；布局在 `telemetry-themes/*.json` 中运行时加载。[设置步骤、主题列表和实现说明](docs/FORZA_TELEMETRY.md)。现有 RAM 直绘固件无需重刷。已完成模拟 UDP 与显示传输验证，2026-10-29，使用者已在真实地平线 6 游戏中确认自动进入遥测、退出遥测和显示动画均正常；游戏构建号未记录。
 
 ## 2.6.4 后台启动、温度与网速
 
@@ -37,7 +37,9 @@ Halo PixelBar 的独立 Windows 客户端，采用 C# / .NET 10 / WinForms 重�
 测试环境：Windows 11 专业版 x64，26H2 / **26300.9457**；网易云 **3.1.41.205564**；构建 SDK **.NET 10.0.401**。应用包自带 .NET 10，无需 Python、SDK 或 TrafficMonitor；在线取词需网络，温度驱动可能需 UAC，GPU 指标需 NVML。CPU 独立温度通道面向 AMD 17h/19h/1Ah，其余传感器取决于驱动支持。源码目标 API 10.0.19041 不表示所有旧版 Windows 已验证。固件工程才需要 Python 3.12 和固定工具依赖，详见 [固件命令流程](docs/FIRMWARE_USAGE.md)。
 ## 使用
 
-运行 `dist/HaloStudioNet/HaloStudioNet.exe`。安装包随附 .NET 运行时，不需要另外安装 .NET。
+从 [v2.7.0 Release](https://github.com/woozyc/pixelbardiy/releases/tag/v2.7.0) 下载 Windows x64 ZIP 并完整解压，运行 `HaloStudioNet/HaloStudioNet.exe`。源码构建后的入口为 `dist/HaloStudioNet/HaloStudioNet.exe`。安装包随附 .NET 运行时，不需要另外安装 .NET。
+
+测试设备是 **花再 Halo PixelBar 2025 款常规版，USB 一线通**，2026-04-22 购入；不是强化版或 2026 款独立电源适配器型号。官方 2025 年说明书列出的参考型号为 EDF286015，本机铭牌编号未单独核对。
 
 1. 从旧 HaloStudio 托盘菜单正常退出，等待音响恢复原厂时钟。
 2. 打开新程序。本机测试包会复制既有 MCU 验证记录；分发包不包含设备身份信息，需要从设备页导入自己的 `mcu-installation.json`。
