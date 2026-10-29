@@ -98,7 +98,7 @@ public sealed class Engine : IAsyncDisposable
                     if (cue != null) { text = cue.Text; mode = "歌词"; }
                 }
                 cueKey = mode == "歌词" ? cue!.Key + ":" + s.Theme : "";
-                if (mode == "时钟" && s.IdleContent == "monitor") { mode = "系统监控"; text = ""; }
+                if (mode == "时钟" && s.MonitorEnabled && (Designs.All.GetValueOrDefault(s.Theme)?.Monitor ?? false)) { mode = "系统监控"; text = ""; }
                 var clock = DateTime.Now; string key = $"{mode}|{text}|{cueKey}|{s.Theme}|{s.MonitorView}|{rev}|{(mode == "系统监控" ? metricRevision : 0)}|{(mode == "系统监控" && s.MonitorRotate ? (int)(elapsed / s.RotationSeconds) : 0)}|{(s.Animations ? (int)(elapsed / 2) : 0)}|{clock:yyyyMMdd}";
                 if (carActive && car != null)
                 {

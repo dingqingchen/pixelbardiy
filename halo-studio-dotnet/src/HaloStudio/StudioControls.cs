@@ -104,12 +104,11 @@ public sealed class ThemeTile : Control
     public ThemeTile(string key, Design design, Settings preview)
     {
         Key = key; caption = design.Name; description = design.Description; color = ScreenPalette.Preview(design.Color);
-        // The gallery must show the same content type as the screen: with
-        // "默认画面 = 系统监控" every theme preview is its monitor design, not
-        // the clock thumbnail that made the tiles look unrelated to the device.
+        // Themes that carry a monitor dashboard preview it while the hardware
+        // monitor switch is on; clock-only themes always preview their clock.
+        bool monitor = preview.MonitorEnabled && design.Monitor;
         var settings = preview with { Theme = key, Themes = true };
-        string mode = settings.IdleContent == "monitor" ? "系统监控" : "时钟";
-        pixels = Designs.Render(mode == "时钟" ? "20:26" : "", mode, settings, 0, Showcase.Sample(0), new(2026, 10, 13, 20, 26, 0));
+        pixels = Designs.Render(monitor ? "" : "20:26", monitor ? "系统监控" : "时钟", settings, 0, Showcase.Sample(0), new(2026, 10, 13, 20, 26, 0));
         Init();
     }
     public ThemeTile(string key, TelemetryDesign design)
@@ -132,11 +131,11 @@ public sealed class ThemeTile : Control
         var box = new Rectangle(pad, Palette.Px(this, 51), Width - pad * 2, Palette.Px(this, 48));
         using var strip = new SolidBrush(Color.FromArgb(20, 26, 39)); using var stripPath = Palette.Rounded(box, Palette.Px(this, 6)); g.FillPath(strip, stripPath);
         int w = Math.Min(box.Width - Palette.Px(this, 12), box.Height * 8 - Palette.Px(this, 16)); w -= w % 8; int h = w / 8;
-        g.InterpolationMode = InterpolationMode.NearestNeighbor; g.PixelOffsetMode = PixelOffsetMode.Half; g.DrawImage(thumbnail, new Rectangle(box.X + (box.Width-w)/2, box.Y+(box.Height-h)/2, w, h), 0, 0, 256, 32, GraphicsUnit.Pixel);
+        g.InterpolationMode = InterpolationMode.NearestNeighbor; g.PixelOffsetMode = PixelOffsetMode.Half; g.DrawImage(thumbnail, new Rectangle(box.X + (box.Width - w) / 2, box.Y + (box.Height - h) / 2, w, h), 0, 0, 256, 32, GraphicsUnit.Pixel);
         using var small = Palette.Font(9); TextRenderer.DrawText(g, description, small, new Rectangle(pad, Palette.Px(this, 113), Width - pad * 2, Height - Palette.Px(this, 119)), Palette.Muted, TextFormatFlags.WordBreak | TextFormatFlags.EndEllipsis);
         if (Focused) ControlPaint.DrawFocusRectangle(g, new Rectangle(5, 5, Width-10, Height-10));
     }
-    protected override void Dispose(bool disposing) { if (disposing) thumbnail?.Dispose(); base.Dispose(disposing); }
+    protected override void Dispose(bool disposing) { if (disposing) { thumbnail?.Dispose(); } base.Dispose(disposing); }
 }
 public sealed class ThemeGallery : Panel
 {

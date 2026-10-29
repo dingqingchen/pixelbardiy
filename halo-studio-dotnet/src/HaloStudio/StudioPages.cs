@@ -5,7 +5,7 @@ public sealed partial class StudioForm
     void BuildDisplay()
     {
         var p = pages[0]; p.Controls.Add(gallery);
-        p.Controls.Add(Hint("主题预览跟随“默认画面”和“监控布局”：预览里是时钟还是监控，屏幕上就是同一种内容类型；要看每套主题的时钟设计，请把默认画面改成“图形时钟”。"));
+        p.Controls.Add(Hint("主题卡片显示该主题的实际画面：带硬件监控的主题（性能仪表、监控 · 霓虹/仪表/曲线）在开关开启时显示监控，其余主题显示表盘。"));
         var colors = Card(p, "主题配色", "色卡与预览依据实屏观感近似显示。整屏共色，每个主题独立保存。");
         colors.Controls.Add(colorStatus); colors.Controls.Add(colorChips); LoadColorChips();
         colors.Controls.Add(Row(Button("设备 RGB…", PickThemeColor), Button("恢复主题原色", () => SetThemeColor(null))));
@@ -14,7 +14,7 @@ public sealed partial class StudioForm
         Setting(colors, "白色偏蓝校正", "仅用于主题／校准白色；官方配色不受影响，255 为关闭", Number("白色蓝色分量", 0, 255, () => current.ScreenWhiteBlue, v => Set(current with { ScreenWhiteBlue = (int)v })));
         var daily = Card(p, "日常显示");
         Setting(daily, "屏幕显示", "关闭后恢复原厂时钟", Toggle("屏幕显示", () => current.Enabled, v => Set(current with { Enabled = v })));
-        Setting(daily, "默认画面", "没有歌词时显示的内容", Combo("默认画面", [("clock", "图形时钟"), ("monitor", "系统监控")], () => current.IdleContent, v => Set(current with { IdleContent = v })));
+        Setting(daily, "硬件监控", "开启后，带监控的主题显示监控仪表；关闭则显示表盘。不会自动轮换。", Toggle("显示硬件监控", () => current.MonitorEnabled, v => Set(current with { MonitorEnabled = v })));
         Setting(daily, "播放音乐时", "自动跟随网易云当前歌词", Combo("播放音乐时", [("auto", "自动显示歌词"), ("idle", "保持默认画面")], () => current.Mode, v => Set(current with { Mode = v })));
         Setting(daily, "秒数", "时钟显示秒数", Toggle("显示秒数", () => current.Seconds, v => Set(current with { Seconds = v })));
         Setting(daily, "主题设计", "使用选中主题的布局与装饰", Toggle("主题设计", () => current.Themes, v => Set(current with { Themes = v })));

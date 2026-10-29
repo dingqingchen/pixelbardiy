@@ -1,0 +1,484 @@
+{
+  "version": 1,
+  "id": "neon",
+  "transition": "wipe",
+  "name": "监控 · 霓虹",
+  "color": "#5CFFB0",
+  "accent": "#B6FFE0",
+  "description": "四宫格 / 分段负载 / 霓虹绿",
+  "sprites": {
+    "cat": [
+      "X.........X",
+      "XX.......XX",
+      "X.XXXXXXX.X",
+      "X.........X",
+      "X..X...X..X",
+      "X.........X",
+      "X....X....X",
+      "X...X.X...X",
+      ".X.......X.",
+      "..XXXXXXX.."
+    ],
+    "bunny": [
+      "..XX...XX..",
+      "..XX...XX..",
+      "..XX...XX..",
+      ".XXXXXXXXX.",
+      "X.........X",
+      "X..X...X..X",
+      "X.........X",
+      ".X...X...X.",
+      "..XXXXXXX.."
+    ],
+    "heart": [
+      ".XX.XX.",
+      "XXXXXXX",
+      "XXXXXXX",
+      ".XXXXX.",
+      "..XXX..",
+      "...X..."
+    ]
+  },
+  "scenes": {
+    "clock": [
+      {
+        "op": "digits",
+        "text": "${time}",
+        "x": 8,
+        "y": 3,
+        "w": 159,
+        "h": 26,
+        "style": "ion"
+      },
+      {
+        "op": "line",
+        "x": 174,
+        "y": 0,
+        "x2": 168,
+        "y2": 31
+      },
+      {
+        "op": "tag",
+        "text": "${day}",
+        "x": 184,
+        "y": 1,
+        "w": 32
+      },
+      {
+        "op": "small",
+        "text": "${date}",
+        "x": 224,
+        "y": 3,
+        "right": 255
+      },
+      {
+        "op": "small",
+        "text": "SEC ${second}",
+        "x": 184,
+        "y": 17,
+        "when": "=seconds"
+      },
+      {
+        "op": "small",
+        "text": "LOCAL",
+        "x": 184,
+        "y": 17,
+        "when": "=1-seconds"
+      },
+      {
+        "op": "repeat",
+        "count": 16,
+        "commands": [
+          {
+            "op": "line",
+            "x": "=181+i*4",
+            "y": "=29-(3-2*(i%4))",
+            "x2": "=181+i*4",
+            "y2": 30
+          }
+        ],
+        "var": "i",
+        "start": 0,
+        "step": 1
+      },
+      {
+        "op": "rect",
+        "x": "=181+phase*8",
+        "y": 26,
+        "w": 5,
+        "h": 2,
+        "fill": true
+      }
+    ],
+    "lyric": [
+      {
+        "op": "repeat",
+        "count": 4,
+        "commands": [
+          {
+            "op": "line",
+            "x": "=1+i*5",
+            "y": 30,
+            "x2": "=12+i*5",
+            "y2": 1
+          }
+        ],
+        "var": "i",
+        "start": 0,
+        "step": 1
+      },
+      {
+        "op": "line",
+        "x": 37,
+        "y": 0,
+        "x2": 214,
+        "y2": 0
+      },
+      {
+        "op": "line",
+        "x": 76,
+        "y": 31,
+        "x2": 239,
+        "y2": 31
+      },
+      {
+        "op": "repeat",
+        "count": 7,
+        "commands": [
+          {
+            "op": "line",
+            "x": 243,
+            "y": "=2+i*4",
+            "x2": 251,
+            "y2": "=2+i*4"
+          }
+        ],
+        "var": "i",
+        "start": 0,
+        "step": 1
+      },
+      {
+        "op": "rect",
+        "x": 245,
+        "y": "=2+phase*4",
+        "w": 10,
+        "h": 2,
+        "fill": true
+      },
+      {
+        "op": "text",
+        "text": "${text}",
+        "x": 39,
+        "y": 4,
+        "w": 197,
+        "h": 24,
+        "size": 18,
+        "bold": true
+      }
+    ],
+    "single": [
+      {
+        "op": "tag",
+        "text": "${label}",
+        "x": 1,
+        "y": 0,
+        "w": 126
+      },
+      {
+        "op": "text",
+        "text": "${value}",
+        "x": 1,
+        "y": 11,
+        "w": 128,
+        "h": 21,
+        "font": "round",
+        "size": 23,
+        "bold": true
+      },
+      {
+        "op": "line",
+        "x": 132,
+        "y": 2,
+        "x2": 132,
+        "y2": 29
+      },
+      {
+        "op": "line",
+        "x": 141,
+        "y": 4,
+        "x2": 250,
+        "y2": 4,
+        "when": "=valid*(1-graph)*(1-instrument)"
+      },
+      {
+        "op": "small",
+        "text": "0",
+        "x": 140,
+        "y": 23,
+        "when": "=valid*(1-graph)*(1-instrument)"
+      },
+      {
+        "op": "small",
+        "text": "${maxlabel}",
+        "x": 0,
+        "y": 23,
+        "right": 253,
+        "when": "=valid*(1-graph)*(1-instrument)"
+      },
+      {
+        "op": "segments",
+        "x": 143,
+        "y": 10,
+        "w": 108,
+        "h": 10,
+        "count": 18,
+        "ratio": "=ratio",
+        "slant": true,
+        "when": "=valid*(1-graph)*(1-instrument)"
+      },
+      {
+        "op": "repeat",
+        "count": 8,
+        "commands": [
+          {
+            "op": "rect",
+            "x": "=145+i*14",
+            "y": 6,
+            "w": 1,
+            "h": 1,
+            "fill": true
+          }
+        ],
+        "var": "i",
+        "start": 0,
+        "step": 1,
+        "when": "=valid*(1-graph)*(1-instrument)"
+      },
+      {
+        "op": "dial",
+        "x": 171,
+        "y": 25,
+        "r": 14,
+        "ratio": "=ratio",
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "small",
+        "text": "LEVEL",
+        "x": 207,
+        "y": 5,
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "small",
+        "text": "${maxlabel}",
+        "x": 214,
+        "y": 20,
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "line",
+        "x": 142,
+        "y": 30,
+        "x2": 198,
+        "y2": 30,
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "line",
+        "x": 142,
+        "y": 1,
+        "x2": 151,
+        "y2": 1,
+        "when": "=valid*instrument"
+      },
+      {
+        "op": "history",
+        "x": 142,
+        "y": 5,
+        "w": 109,
+        "h": 21,
+        "when": "=valid*graph",
+        "area": false
+      },
+      {
+        "op": "erase",
+        "x": 140,
+        "y": 1,
+        "w": 116,
+        "h": 31,
+        "when": "=1-valid"
+      },
+      {
+        "op": "small",
+        "text": "NO SENSOR",
+        "x": 147,
+        "y": 12,
+        "when": "=1-valid"
+      }
+    ],
+    "pair": [
+      {
+        "op": "metrics",
+        "count": 2,
+        "commands": [
+          {
+            "op": "small",
+            "text": "${label}",
+            "x": "=x+4",
+            "y": 1
+          },
+          {
+            "op": "digits",
+            "text": "${value}",
+            "x": "=x+3",
+            "y": 11,
+            "w": 118,
+            "h": 18,
+            "style": "round"
+          },
+          {
+            "op": "segments",
+            "x": "=x+4",
+            "y": 30,
+            "w": 117,
+            "h": 2,
+            "count": 23,
+            "ratio": "=ratio"
+          }
+        ]
+      },
+      {
+        "op": "line",
+        "x": 127,
+        "y": 2,
+        "x2": 127,
+        "y2": 29
+      }
+    ],
+    "dense": [
+      {
+        "op": "metrics",
+        "items": [
+          {
+            "key": "cpu",
+            "label": "CPU",
+            "short": "CPU",
+            "unit": "",
+            "x": 0,
+            "w": 63,
+            "y": 0
+          },
+          {
+            "key": "gpu0",
+            "label": "GPU",
+            "short": "GPU",
+            "unit": "",
+            "x": 64,
+            "w": 63,
+            "y": 0
+          },
+          {
+            "key": "ram",
+            "label": "RAM",
+            "short": "RAM",
+            "unit": "",
+            "x": 128,
+            "w": 63,
+            "y": 0
+          },
+          {
+            "key": "gpu0_vram",
+            "label": "VRAM",
+            "short": "VRAM",
+            "unit": "",
+            "x": 192,
+            "w": 63,
+            "y": 0
+          },
+          {
+            "key": "cpu_temp",
+            "label": "C",
+            "short": "C",
+            "unit": "",
+            "x": 0,
+            "w": 63,
+            "y": 16
+          },
+          {
+            "key": "gpu0_temp",
+            "label": "G",
+            "short": "G",
+            "unit": "",
+            "x": 64,
+            "w": 63,
+            "y": 16
+          },
+          {
+            "key": "fps",
+            "label": "FPS",
+            "short": "FPS",
+            "unit": "",
+            "x": 128,
+            "w": 63,
+            "y": 16
+          },
+          {
+            "key": "frametime",
+            "label": "FT",
+            "short": "FT",
+            "unit": "",
+            "x": 192,
+            "w": 63,
+            "y": 16
+          }
+        ],
+        "commands": [
+          {
+            "op": "small",
+            "text": "${label} ${compact}",
+            "x": "=x+1",
+            "y": "=y"
+          },
+          {
+            "op": "segments",
+            "x": "=x+1",
+            "y": "=y+9",
+            "w": "=w-2",
+            "h": 4,
+            "count": 12
+          }
+        ]
+      },
+      {
+        "op": "line",
+        "x": 64,
+        "y": 0,
+        "x2": 64,
+        "y2": 31
+      },
+      {
+        "op": "line",
+        "x": 128,
+        "y": 0,
+        "x2": 128,
+        "y2": 31
+      },
+      {
+        "op": "line",
+        "x": 192,
+        "y": 0,
+        "x2": 192,
+        "y2": 31
+      },
+      {
+        "op": "line",
+        "x": 0,
+        "y": 15,
+        "x2": 255,
+        "y2": 15
+      }
+    ]
+  },
+  "monitor": true
+}

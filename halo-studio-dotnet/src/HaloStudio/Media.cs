@@ -23,8 +23,12 @@ public sealed class MediaMonitor : IDisposable
             manager ??= await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
             var relevant = manager.GetSessions().Where(s => SupportedApps.Any(x => s.SourceAppUserModelId.Contains(x, StringComparison.OrdinalIgnoreCase))).ToArray();
             var current = manager.GetCurrentSession();
-            var session = relevant.FirstOrDefault(s => s.SourceAppUserModelId == current?.SourceAppUserModelId)
-                ?? relevant.FirstOrDefault(s => s.GetPlaybackInfo().PlaybackStatus == GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing)
+            // Prefer an actually playing session: a paused Apple Music window can
+            // otherwise stay "current" and hide a playing NetEase session.
+            var playingSessions = relevant.Where(s => s.GetPlaybackInfo().PlaybackStatus == GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing).ToArray();
+            var session = playingSessions.FirstOrDefault(s => s.SourceAppUserModelId == current?.SourceAppUserModelId)
+                ?? playingSessions.FirstOrDefault()
+                ?? relevant.FirstOrDefault(s => s.SourceAppUserModelId == current?.SourceAppUserModelId)
                 ?? relevant.FirstOrDefault();
             if (session == null) { lastApp = ""; return local ?? new(); }
             string app = session.SourceAppUserModelId; long now = Environment.TickCount64;
@@ -59,6 +63,28 @@ public sealed class MediaMonitor : IDisposable
         catch { return local ?? new(); }
     }
     static bool IsNetEase(string app) => new[] { "cloudmusic", "netease", "网易", "music163" }.Any(x => app.Contains(x, StringComparison.OrdinalIgnoreCase));
+    public static async Task<object[]> SessionsAsync()
+    {
+        var manager = await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
+        var list = new List<object>();
+        foreach (var session in manager.GetSessions())
+        {
+            try
+            {
+                var properties = await session.TryGetMediaPropertiesAsync(); var timeline = session.GetTimelineProperties();
+                list.Add(new
+                {
+                    app = session.SourceAppUserModelId,
+                    title = properties.Title ?? "", artist = properties.Artist ?? "", album = properties.AlbumTitle ?? "",
+                    playing = session.GetPlaybackInfo().PlaybackStatus.ToString(),
+                    position = Math.Max(0, (timeline.Position - timeline.StartTime).TotalSeconds),
+                    duration = Math.Max(0, (timeline.EndTime - timeline.StartTime).TotalSeconds),
+                });
+            }
+            catch (Exception e) { list.Add(new { app = session.SourceAppUserModelId, error = e.GetType().Name + ": " + e.Message }); }
+        }
+        return list.ToArray();
+    }
     internal static Track MergeSession(Track session, Track? local)
     {
         if (local == null || !SameSong(session, local)) return session;

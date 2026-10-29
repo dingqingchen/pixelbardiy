@@ -21,6 +21,7 @@ public sealed record Settings
     public int Speed { get; init; } = 8;
     public bool AmbientEnabled { get; init; } = true;
     public string IdleContent { get; init; } = "clock";
+    public bool MonitorEnabled { get; init; } = true;
     public bool Themes { get; init; } = true;
     public string Theme { get; init; } = "kitty";
     public Dictionary<string, string> ThemeColors { get; init; } = [];

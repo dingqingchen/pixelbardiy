@@ -132,6 +132,7 @@ public sealed partial class StudioForm : Form
     {
         if (loading) return;
         bool previewChanged = current.IdleContent != s.IdleContent || current.MonitorView != s.MonitorView
+            || current.MonitorEnabled != s.MonitorEnabled
             || current.MonitorMetricsCustom != s.MonitorMetricsCustom || current.Themes != s.Themes
             || !current.MonitorMetrics.SequenceEqual(s.MonitorMetrics);
         current = s.Validated(); engine.Configure(current);
