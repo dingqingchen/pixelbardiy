@@ -9,6 +9,7 @@ public static class SelfTests
     {
         var checks = new List<string>(); void Assert(bool value, string name) { if (!value) throw new Exception("验证失败: " + name); checks.Add(name); }
         TelemetryTests.Run(Assert, Path.GetDirectoryName(output)!);
+        MonitorRegressionTests.Run(Assert, Path.GetDirectoryName(output)!);
         Assert(Protocol.Crc("123456789"u8) == 0x31C3, "CRC16-CCITT independent vector");
         var random = new Random(12345); for (int n = 0; n < 40; n++) { byte[] pixels = new byte[1024]; random.NextBytes(pixels); if (n % 2 == 0) for (int i = 0; i < 700; i++) pixels[i] = 0; Assert(Protocol.Unrle(Protocol.Rle(pixels)).AsSpan().SequenceEqual(pixels), "RLE random / sparse " + n); }
         Assert(Protocol.Rle(new byte[1024]).Length == 16, "Zero frame compresses to 16 bytes");

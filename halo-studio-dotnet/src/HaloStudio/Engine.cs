@@ -84,7 +84,7 @@ public sealed class Engine : IAsyncDisposable
                 if (mediaTask?.IsCompleted == true) { try { track = await mediaTask; } catch (Exception e) { Log("Media: " + e.Message); } mediaTask = null; }
                 if (mediaTask == null && now >= nextMedia) { mediaTask = media.PollAsync(mediaPlaying); nextMedia = now + (track.Playing ? (s.PowerProfile == "balanced" ? 100 : 200) : 1500); }
                 if (sensorTask?.IsCompleted == true) { try { snapshot = await sensorTask; metricRevision++; } catch (Exception e) { Log("Sensors: " + e.Message); } sensorTask = null; }
-                if (sensorTask == null && now >= nextMonitor && (MonitorVisible || (!carActive && s.Enabled && s.IdleContent == "monitor"))) { sensorTask = hardware.SampleAsync(s.FanLimits, s.CpuTemperatureEnabled, s.CpuTemperatureElevation); nextMonitor = now + (s.PowerProfile == "balanced" ? 2000 : 3000); }
+                if (sensorTask == null && now >= nextMonitor && (MonitorVisible || (!carActive && s.WantsMonitor))) { sensorTask = hardware.SampleAsync(s.FanLimits, s.CpuTemperatureEnabled, s.CpuTemperatureElevation); nextMonitor = now + (s.PowerProfile == "balanced" ? 2000 : 3000); }
                 if (track.Key != trackKey || fetchOnline != s.Online || importRevision != Volatile.Read(ref lyricImportRevision))
                 {
                     trackKey = track.Key; fetchOnline = s.Online; importRevision = Volatile.Read(ref lyricImportRevision); lines = []; lyricCancel?.Cancel(); lyricCancel?.Dispose(); lyricCancel = CancellationTokenSource.CreateLinkedTokenSource(stop.Token);
@@ -98,7 +98,7 @@ public sealed class Engine : IAsyncDisposable
                     if (cue != null) { text = cue.Text; mode = "歌词"; }
                 }
                 cueKey = mode == "歌词" ? cue!.Key + ":" + s.Theme : "";
-                if (mode == "时钟" && s.MonitorEnabled && (Designs.All.GetValueOrDefault(s.Theme)?.Monitor ?? false)) { mode = "系统监控"; text = ""; }
+                if (mode == "时钟" && s.WantsMonitor) { mode = "系统监控"; text = ""; }
                 var clock = DateTime.Now; string key = $"{mode}|{text}|{cueKey}|{s.Theme}|{s.MonitorView}|{rev}|{(mode == "系统监控" ? metricRevision : 0)}|{(mode == "系统监控" && s.MonitorRotate ? (int)(elapsed / s.RotationSeconds) : 0)}|{(s.Animations ? (int)(elapsed / 2) : 0)}|{clock:yyyyMMdd}";
                 if (carActive && car != null)
                 {

@@ -23,7 +23,7 @@ public static class Designs
                 var sprites = new Dictionary<string, string[]>(); if (r.TryGetProperty("sprites", out var sj)) foreach (var p in sj.EnumerateObject()) sprites[p.Name] = p.Value.EnumerateArray().Select(s => s.GetString()!).ToArray();
                 string transition=r.TryGetProperty("transition",out var tj) ? tj.GetString() ?? "center" : "center";
                 if(transition is not ("up" or "wipe" or "center" or "dissolve")) throw new InvalidDataException("主题过场无效");
-                bool monitor = r.TryGetProperty("monitor", out var mj) && mj.ValueKind == JsonValueKind.True;
+                bool monitor = r.TryGetProperty("monitor", out var mj) ? mj.ValueKind == JsonValueKind.True : new[] { "single", "pair", "dense" }.All(s => scenes.GetProperty(s).GetArrayLength() > 0);
                 if (!next.TryAdd(id, new(r.GetProperty("name").GetString()!, color, accent, r.GetProperty("description").GetString()!, scenes, sprites, transition, monitor))) throw new InvalidDataException("重复 id");
             }
             catch (Exception e) when (e is JsonException or InvalidDataException or KeyNotFoundException or FormatException or ArgumentException or InvalidOperationException) { errors.Add(Path.GetFileName(path) + ": " + e.Message); }

@@ -21,7 +21,10 @@ public sealed record Settings
     public int Speed { get; init; } = 8;
     public bool AmbientEnabled { get; init; } = true;
     public string IdleContent { get; init; } = "clock";
-    public bool MonitorEnabled { get; init; } = true;
+    // A missing field in pre-2.7 settings inherits the user's old idle choice.
+    bool? monitorEnabled;
+    public bool MonitorEnabled { get => monitorEnabled ?? IdleContent == "monitor"; init => monitorEnabled = value; }
+    [JsonIgnore] public bool WantsMonitor => Enabled && MonitorEnabled && (Designs.All.GetValueOrDefault(Theme)?.Monitor ?? false);
     public bool Themes { get; init; } = true;
     public string Theme { get; init; } = "kitty";
     public Dictionary<string, string> ThemeColors { get; init; } = [];
@@ -52,6 +55,7 @@ public sealed record Settings
     public string PixelTransition { get; init; } = "up";
     public Settings Validated() => this with
     {
+        MonitorEnabled = MonitorEnabled,
         TelemetryPort = TelemetryReceiver.ValidPort(TelemetryPort) ? TelemetryPort : 20777,
         TelemetryTheme = TelemetryDesigns.All.ContainsKey(TelemetryTheme) ? TelemetryTheme : TelemetryDesigns.All.Keys.FirstOrDefault() ?? TelemetryTheme,
         Theme = Designs.All.ContainsKey(Theme) ? Theme : Designs.All.Keys.FirstOrDefault() ?? Theme,
