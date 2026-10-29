@@ -6,6 +6,7 @@ namespace HaloStudio;
 public sealed class Hardware : IDisposable
 {
     public CpuTemperature Temperature { get; } = new();
+    public FrameStats Frames { get; } = new();
     ulong priorIdle, priorKernel, priorUser; readonly NetworkSampler network = new();
     readonly Dictionary<string, Queue<double>> history = [];
     IntPtr nv; IntPtr gpu; bool nvTried; object? wmi; long nextWmi; readonly CounterSet counters = new();
@@ -27,6 +28,15 @@ public sealed class Hardware : IDisposable
             var util = Get<NvUtil>("nvmlDeviceGetUtilizationRates"); NvUtilization utilization = default; double? usage = util != null && util(gpu, out utilization) == 0 ? utilization.Gpu : null;
             Add("gpu0", "显卡使用率", "GPU", usage, "%", "NVIDIA NVML", 100); Add("gpu0_temp", "显卡温度", "GPU", NvNumber("nvmlDeviceGetTemperature", true), "C", "NVIDIA NVML", 100);
             var power = NvNumber("nvmlDeviceGetPowerUsage"); Add("gpu0_power", "显卡功耗", "GPU", power / 1000, "W", "NVIDIA NVML");
+            var memoryGet = Get<NvMemory>("nvmlDeviceGetMemoryInfo"); NvMemoryInfo memory;
+            if (memoryGet != null && memoryGet(gpu, out memory) == 0 && memory.Total > 0)
+            {
+                Add("gpu0_vram", "显存使用率", "VRAM", 100.0 * memory.Used / memory.Total, "%", "NVIDIA NVML", 100);
+                Add("gpu0_vram_gb", "显存占用", "VRAM", memory.Used / Math.Pow(1024, 3), "GB", "NVIDIA NVML");
+            }
+            var clockGet = Get<NvClock>("nvmlDeviceGetClockInfo"); uint coreClock = 0, memoryClock = 0;
+            if (clockGet != null && clockGet(gpu, 0, out coreClock) == 0) Add("gpu0_clock", "显卡核心频率", "GPU", coreClock / 1000.0, "GHz", "NVIDIA NVML");
+            if (clockGet != null && clockGet(gpu, 2, out memoryClock) == 0) Add("gpu0_mem_clock", "显存频率", "VRAM", memoryClock / 1000.0, "GHz", "NVIDIA NVML");
             var fans = NvNumber("nvmlDeviceGetNumFans"); for (uint i = 0; i < (fans ?? 0); i++)
             {
                 var speed = Get<NvFan>("nvmlDeviceGetFanSpeed_v2"); uint percent = 0; double? driver = speed != null && speed(gpu, i, out percent) == 0 ? percent : null;
@@ -40,8 +50,16 @@ public sealed class Hardware : IDisposable
         // Keep the stable key consumed by every theme, even when WMI supplies the value.
         double? cpuTemperature = existingCpu?.Value ?? await Temperature.ReadAsync(temperatureEnabled, temperatureElevation);
         Add("cpu_temp", "CPU 温度 Tctl/Tdie", "CPU", cpuTemperature, "C", existingCpu?.Source ?? Temperature.Detail, 100);
-        for (int i = 0; i < rows.Count; i++) { var m = rows[i]; if (m.Value is double value) { if (!history.TryGetValue(m.Key, out var q)) history[m.Key] = q = new(); q.Enqueue(value); while (q.Count > 24) q.Dequeue(); rows[i] = m with { History = q.ToArray() }; } }
-        return new(rows.ToArray(), "Windows CPU / 内存 / 网络；GPU / 风扇 NVML；温度：" + Temperature.Detail);
+        Add("fps", "游戏帧率", "FPS", Frames.Fps, "", "RTSS 实时帧率");
+        Add("frametime", "帧生成时间", "FT", Frames.FrameTimeMs, "ms", "RTSS 帧时间");
+        for (int i = 0; i < rows.Count; i++) { var m = rows[i]; if (m.Key is "fps" or "frametime") continue; if (m.Value is double value) { if (!history.TryGetValue(m.Key, out var q)) history[m.Key] = q = new(); q.Enqueue(value); while (q.Count > 24) q.Dequeue(); rows[i] = m with { History = q.ToArray() }; } }
+        for (int i = 0; i < rows.Count; i++) rows[i] = rows[i].Key switch
+        {
+            "fps" => rows[i] with { History = Frames.FpsHistory.TakeLast(24).ToArray() },
+            "frametime" => rows[i] with { History = Frames.FrameHistory.TakeLast(24).ToArray() },
+            _ => rows[i]
+        };
+        return new(rows.ToArray(), "Windows CPU / 内存 / 网络；GPU / 显存 / 风扇 NVML；帧率：" + Frames.Detail + "；温度：" + Temperature.Detail);
     }
     void InitNv()
     {
@@ -70,11 +88,13 @@ public sealed class Hardware : IDisposable
         }
         catch { try { Marshal.FinalReleaseComObject(wmi); } catch { } wmi = null; }
     }
-    public void Dispose() { Temperature.Dispose(); counters.Dispose(); if (wmi != null) Marshal.FinalReleaseComObject(wmi); if (nv != IntPtr.Zero) { Get<NvInit>("nvmlShutdown")?.Invoke(); NativeLibrary.Free(nv); nv = IntPtr.Zero; } }
+    public void Dispose() { Temperature.Dispose(); Frames.Dispose(); counters.Dispose(); if (wmi != null) Marshal.FinalReleaseComObject(wmi); if (nv != IntPtr.Zero) { Get<NvInit>("nvmlShutdown")?.Invoke(); NativeLibrary.Free(nv); nv = IntPtr.Zero; } }
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int NvInit(); [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int NvHandle(uint i, out IntPtr h);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int NvNumberFn(IntPtr h, out uint v); [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int NvTemperature(IntPtr h, uint sensor, out uint v);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int NvUtil(IntPtr h, out NvUtilization v); [StructLayout(LayoutKind.Sequential)] struct NvUtilization { public uint Gpu, Memory; }
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int NvFan(IntPtr h, uint fan, out uint v); [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int NvRpm(IntPtr h, ref FanInfo v); [StructLayout(LayoutKind.Sequential)] struct FanInfo { public uint Version, Fan, Speed; }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int NvMemory(IntPtr h, out NvMemoryInfo v); [StructLayout(LayoutKind.Sequential)] struct NvMemoryInfo { public ulong Total, Free, Used; }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int NvClock(IntPtr h, uint type, out uint v);
     static class Native
     {
         [StructLayout(LayoutKind.Sequential)] internal struct MemoryStatus { public uint Length, Load; public ulong TotalPhys, AvailPhys, TotalPage, AvailPage, TotalVirtual, AvailVirtual, AvailExtended; }

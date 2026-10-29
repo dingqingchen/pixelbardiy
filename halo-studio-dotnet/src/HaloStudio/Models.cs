@@ -39,6 +39,9 @@ public sealed record Settings
     public bool MonitorRotate { get; init; } = true;
     public int RotationSeconds { get; init; } = 8;
     public string[] MonitorMetrics { get; init; } = ["cpu", "cpu_temp", "ram", "gpu0", "gpu0_temp", "download", "upload"];
+    // Only an explicit "apply" in the hardware page replaces the theme's curated
+    // dense slots; the default list must not rewrite a theme's dense design.
+    public bool MonitorMetricsCustom { get; init; }
     public Dictionary<string, double> FanLimits { get; init; } = [];
     public bool Rhythm { get; init; } = true;
     public string RhythmStyle { get; init; } = "pulse";

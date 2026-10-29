@@ -7,6 +7,9 @@ namespace HaloStudio;
 
 public sealed class MediaMonitor : IDisposable
 {
+    // NetEase keeps its verified native reader; Apple Music (and other SMTC
+    // players) only need the public media session for title, artist and clock.
+    static readonly string[] SupportedApps = ["cloudmusic", "netease", "网易", "music163", "applemusic", "itunes"];
     GlobalSystemMediaTransportControlsSessionManager? manager;
     readonly NetEaseNative native = new();
     readonly NetEaseLibrary library = new();
@@ -18,9 +21,11 @@ public sealed class MediaMonitor : IDisposable
         try
         {
             manager ??= await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
-            var relevant = manager.GetSessions().Where(s => new[] { "cloudmusic", "netease", "网易", "music163" }.Any(x => s.SourceAppUserModelId.Contains(x, StringComparison.OrdinalIgnoreCase))).ToArray();
+            var relevant = manager.GetSessions().Where(s => SupportedApps.Any(x => s.SourceAppUserModelId.Contains(x, StringComparison.OrdinalIgnoreCase))).ToArray();
             var current = manager.GetCurrentSession();
-            var session = relevant.FirstOrDefault(s => s.SourceAppUserModelId == current?.SourceAppUserModelId) ?? relevant.FirstOrDefault();
+            var session = relevant.FirstOrDefault(s => s.SourceAppUserModelId == current?.SourceAppUserModelId)
+                ?? relevant.FirstOrDefault(s => s.GetPlaybackInfo().PlaybackStatus == GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing)
+                ?? relevant.FirstOrDefault();
             if (session == null) { lastApp = ""; return local ?? new(); }
             string app = session.SourceAppUserModelId; long now = Environment.TickCount64;
             if (app != lastApp || now - propertiesAt >= 700)
@@ -31,11 +36,29 @@ public sealed class MediaMonitor : IDisposable
             bool playing = playback.PlaybackStatus == GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing;
             double duration = Math.Max(0, (timeline.EndTime - timeline.StartTime).TotalSeconds), position = Math.Max(0, (timeline.Position - timeline.StartTime).TotalSeconds);
             if (playing) { double elapsed = (DateTimeOffset.UtcNow - timeline.LastUpdatedTime).TotalSeconds; if (elapsed is >= 0 and < 86400) position += elapsed * (playback.PlaybackRate ?? 1); }
-            var track = new Track(title, artist, album, duration, duration > 0 ? Math.Min(position, duration) : position, playing, app);
-            return MergeSession(track, local);
+            bool netEase = IsNetEase(app);
+            // Apple Music's SMTC artist is often "Artist — Album - Single";
+            // split it so lyric search gets a clean artist and album.
+            if (!netEase && artist.Length > 0)
+            {
+                int dash = artist.IndexOf(" — ", StringComparison.Ordinal);
+                if (dash < 0) dash = artist.IndexOf(" – ", StringComparison.Ordinal);
+                if (dash > 0)
+                {
+                    string tail = artist[(dash + 3)..].Trim();
+                    if (album.Length == 0) album = tail;
+                    artist = artist[..dash].Trim();
+                }
+                foreach (string suffix in new[] { " - Single", " - EP", " - Album" })
+                    if (album.EndsWith(suffix, StringComparison.OrdinalIgnoreCase)) album = album[..^suffix.Length].Trim();
+            }
+            string provider = netEase ? "Windows 媒体会话" : app.Contains("applemusic", StringComparison.OrdinalIgnoreCase) ? "Apple Music" : app.Contains("itunes", StringComparison.OrdinalIgnoreCase) ? "iTunes" : "Windows 媒体会话";
+            var track = new Track(title, artist, album, duration, duration > 0 ? Math.Min(position, duration) : position, playing, app, provider);
+            return netEase ? MergeSession(track, local) : track;
         }
         catch { return local ?? new(); }
     }
+    static bool IsNetEase(string app) => new[] { "cloudmusic", "netease", "网易", "music163" }.Any(x => app.Contains(x, StringComparison.OrdinalIgnoreCase));
     internal static Track MergeSession(Track session, Track? local)
     {
         if (local == null || !SameSong(session, local)) return session;

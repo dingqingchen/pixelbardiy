@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Globalization;
 namespace HaloStudio;
@@ -28,7 +29,7 @@ public static class Designs
         }
         if (next.Count == 0) throw new InvalidDataException("无可用主题: " + string.Join("；", errors)); All = next; DirectoryPath = directory; return errors.ToArray();
     }
-    static readonly HashSet<string> operations = ["line", "rect", "round", "circle", "star", "sprite", "small", "raster", "digits", "text", "tag", "erase", "invert", "segments", "history", "dial", "repeat", "metrics", "micro", "seven"];
+    static readonly HashSet<string> operations = ["line", "rect", "round", "circle", "star", "sprite", "small", "raster", "digits", "text", "tag", "erase", "invert", "segments", "history", "dial", "repeat", "metrics", "micro", "seven", "spark"];
     internal static void Validate(JsonElement a) { if (a.ValueKind != JsonValueKind.Array || a.GetArrayLength() > 512) throw new InvalidDataException("命令列表无效"); foreach (var e in a.EnumerateArray()) { string op = e.GetProperty("op").GetString()!; if (!operations.Contains(op)) throw new InvalidDataException("未知操作: " + op); if (op is "repeat" or "metrics") Validate(e.GetProperty("commands")); } }
     public static LyricViewport LyricViewport(Settings s)
     {
@@ -72,8 +73,48 @@ public static class Designs
         }
         if (mode == "系统监控" && scene != "dense") { if (ctx.Selected.Length == 0) { c.Typeset("等待监控数据", 0, 0, 256, 32, size: 18); return new(c.Data, "等待监控数据", identity); } ctx.Metric = ctx.Selected[0]; ctx.Bind(); text = ctx.Metric.Label + " " + ctx.Metric.Text(); identity += ":" + ctx.Metric.Key; }
         if (scene == "pair") { identity += ":" + string.Join("+", ctx.Selected.Select(m => m.Key)); text = string.Join(" / ", ctx.Selected.Select(m => m.Label + " " + m.Text())); }
-        if (mode == "歌词") identity += ":" + text; if (scene == "dense") identity += ":dense"; Execute(d.Scenes.GetProperty(scene), ctx); return new(c.Data, text, identity, ctx.LyricPart == 1, ctx.LyricPart);
+        if (mode == "歌词") identity += ":" + text; if (scene == "dense") identity += ":dense";
+        if (scene == "dense" && s.MonitorMetricsCustom && s.MonitorMetrics.Length > 0)
+        {
+            // Keep the theme's dense slot geometry and decorations but fill the
+            // slots with the metrics the user applied in the hardware page.
+            using var dense = JsonDocument.Parse(DenseWithSelected(d, s));
+            Execute(dense.RootElement, ctx);
+        }
+        else Execute(d.Scenes.GetProperty(scene), ctx);
+        return new(c.Data, text, identity, ctx.LyricPart == 1, ctx.LyricPart);
     }
+    static string DenseWithSelected(Design d, Settings s)
+    {
+        var root = JsonNode.Parse(d.Scenes.GetProperty("dense").GetRawText())!.AsArray();
+        foreach (var node in root)
+        {
+            if (node is not JsonObject op || op["op"]?.GetValue<string>() != "metrics") continue;
+            if (op["items"] is not JsonArray items) continue;
+            int keep = Math.Min(items.Count, s.MonitorMetrics.Length);
+            for (int i = items.Count - 1; i >= keep; i--) items.RemoveAt(i);
+            for (int i = 0; i < keep; i++)
+            {
+                string key = s.MonitorMetrics[i];
+                if (items[i] is not JsonObject item) continue;
+                item["key"] = key;
+                item["label"] = ShortLabel(key);
+                item["short"] = ShortLabel(key);
+                item["unit"] = "";
+            }
+            break;
+        }
+        return root.ToJsonString();
+    }
+    static string ShortLabel(string key) => key switch
+    {
+        "cpu" => "CPU", "gpu0" => "GPU", "ram" => "RAM", "ram_gb" => "GB",
+        "gpu0_vram" => "VRAM", "gpu0_vram_gb" => "VRAM", "cpu_temp" => "CPU", "gpu0_temp" => "GPU",
+        "frequency" => "FREQ", "gpu0_clock" => "GCLK", "gpu0_mem_clock" => "MCLK",
+        "fps" => "FPS", "frametime" => "FT", "upload" => "UP", "download" => "DN",
+        "disk_read" => "READ", "disk_write" => "WRITE",
+        _ => key.Length > 5 ? key[..5].ToUpperInvariant() : key.ToUpperInvariant()
+    };
     internal static byte[] RenderCommands(JsonElement commands, Dictionary<string,string[]> sprites, Dictionary<string,double> numbers, Dictionary<string,string> text)
     {
         var c = new PixelCanvas(); var d = new Design("", "#FFFFFF", "#FFFFFF", "", default, sprites);
@@ -123,11 +164,17 @@ public static class Designs
                 case "invert": c.Invert(x, y, w, h); break;
                 case "segments": Segments(c, x, y, w, h, N(e, "ratio", ctx, ctx.Metric?.Ratio ?? 0), I(e, "count", ctx, 14), B(e, "slant")); break;
                 case "history": if (ctx.Metric != null) History(c, ctx.Metric, x, y, w, h, B(e, "area")); break;
+                case "spark":
+                    {
+                        var sparkMetric = ctx.Snapshot.Metrics.FirstOrDefault(m => m.Key == S(e, "key", ctx));
+                        if (sparkMetric != null && sparkMetric.History.Length > 1) History(c, sparkMetric, x, y, w, h, B(e, "area"));
+                        break;
+                    }
                 case "dial": Dial(c, x, y, I(e, "r", ctx, 14), N(e, "ratio", ctx), I(e, "start", ctx, 190), I(e, "end", ctx, 350)); break;
                 case "repeat": { string variable = S(e, "var", ctx, "i"); double old = ctx.Numbers.GetValueOrDefault(variable); int count = Math.Clamp(I(e, "count", ctx), 0, 256); double start = N(e, "start", ctx), step = N(e, "step", ctx, 1); for (int i = 0; i < count; i++) { ctx.Numbers[variable] = start + i * step; Execute(e.GetProperty("commands"), ctx); } ctx.Numbers[variable] = old; break; }
                 case "metrics":
                     {
-                        var saved = ctx.Metric; int i = 0; if (e.TryGetProperty("items", out var items)) { foreach (var item in items.EnumerateArray()) { string key = item.GetProperty("key").GetString()!; ctx.Metric = ctx.Snapshot.Get(key, S(item, "short", ctx, key), S(item, "unit", ctx)); ctx.Bind(); ctx.Numbers["column"] = i / 2; ctx.Numbers["row"] = i % 2; ctx.Numbers["x"] = I(item, "x", ctx); ctx.Numbers["w"] = I(item, "w", ctx); ctx.Numbers["y"] = 3 + i % 2 * 16; ctx.Text["label"] = S(item, "label", ctx); Execute(e.GetProperty("commands"), ctx); i++; } }
+                        var saved = ctx.Metric; int i = 0; if (e.TryGetProperty("items", out var items)) { foreach (var item in items.EnumerateArray()) { string key = item.GetProperty("key").GetString()!; ctx.Metric = ctx.Snapshot.Get(key, S(item, "short", ctx, key), S(item, "unit", ctx)); ctx.Bind(); ctx.Numbers["column"] = i / 2; ctx.Numbers["row"] = i % 2; ctx.Numbers["x"] = I(item, "x", ctx); ctx.Numbers["w"] = I(item, "w", ctx); ctx.Numbers["y"] = item.TryGetProperty("y", out _) ? I(item, "y", ctx) : 3 + i % 2 * 16; ctx.Text["label"] = S(item, "label", ctx); Execute(e.GetProperty("commands"), ctx); i++; } }
                         else foreach (var m in ctx.Selected.Take(I(e, "count", ctx, 2))) { ctx.Metric = m; ctx.Bind(); ctx.Numbers["column"] = i; ctx.Numbers["x"] = i * 128; Execute(e.GetProperty("commands"), ctx); i++; }
                         ctx.Metric = saved; ctx.Bind(); break;
                     }

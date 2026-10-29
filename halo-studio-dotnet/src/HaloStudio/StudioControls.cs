@@ -101,10 +101,15 @@ public sealed class ThemeTile : Control
     [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)] public bool Selected { get => selected; set { if (selected != value) { selected = value; Invalidate(); } } }
     public string Key { get; }
     public void SetColor(string hex) { if (color != hex) { color = hex; thumbnail?.Dispose(); thumbnail = null; Invalidate(); } }
-    public ThemeTile(string key, Design design)
+    public ThemeTile(string key, Design design, Settings preview)
     {
         Key = key; caption = design.Name; description = design.Description; color = ScreenPalette.Preview(design.Color);
-        pixels = Designs.Render("20:26", "时钟", new Settings { Theme = key }, 0, Showcase.Sample(0), new(2026, 10, 13, 20, 26, 0));
+        // The gallery must show the same content type as the screen: with
+        // "默认画面 = 系统监控" every theme preview is its monitor design, not
+        // the clock thumbnail that made the tiles look unrelated to the device.
+        var settings = preview with { Theme = key, Themes = true };
+        string mode = settings.IdleContent == "monitor" ? "系统监控" : "时钟";
+        pixels = Designs.Render(mode == "时钟" ? "20:26" : "", mode, settings, 0, Showcase.Sample(0), new(2026, 10, 13, 20, 26, 0));
         Init();
     }
     public ThemeTile(string key, TelemetryDesign design)

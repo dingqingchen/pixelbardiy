@@ -5,6 +5,7 @@ public sealed partial class StudioForm
     void BuildDisplay()
     {
         var p = pages[0]; p.Controls.Add(gallery);
+        p.Controls.Add(Hint("主题预览跟随“默认画面”和“监控布局”：预览里是时钟还是监控，屏幕上就是同一种内容类型；要看每套主题的时钟设计，请把默认画面改成“图形时钟”。"));
         var colors = Card(p, "主题配色", "色卡与预览依据实屏观感近似显示。整屏共色，每个主题独立保存。");
         colors.Controls.Add(colorStatus); colors.Controls.Add(colorChips); LoadColorChips();
         colors.Controls.Add(Row(Button("设备 RGB…", PickThemeColor), Button("恢复主题原色", () => SetThemeColor(null))));
@@ -17,6 +18,7 @@ public sealed partial class StudioForm
         Setting(daily, "播放音乐时", "自动跟随网易云当前歌词", Combo("播放音乐时", [("auto", "自动显示歌词"), ("idle", "保持默认画面")], () => current.Mode, v => Set(current with { Mode = v })));
         Setting(daily, "秒数", "时钟显示秒数", Toggle("显示秒数", () => current.Seconds, v => Set(current with { Seconds = v })));
         Setting(daily, "主题设计", "使用选中主题的布局与装饰", Toggle("主题设计", () => current.Themes, v => Set(current with { Themes = v })));
+        daily.Controls.Add(Hint("提示：默认画面为系统监控时，切换主题改变的是监控画面的排版与配色；主题的时钟／歌词设计需要在默认画面选“图形时钟”，或播放音乐时选“自动显示歌词”。"));
         var motion = Card(p, "动画与创作");
         Setting(motion, "装饰动画", "让主题中的图案缓慢变化", Toggle("装饰动画", () => current.Animations, v => Set(current with { Animations = v })));
         Setting(motion, "切换动画", "画面轮换时使用 MCU 本地过渡", Toggle("切换动画", () => current.Transitions, v => Set(current with { Transitions = v })));
@@ -40,8 +42,9 @@ public sealed partial class StudioForm
         Setting(layout, "轮换指标", "按选择顺序轮流显示", Toggle("轮换指标", () => current.MonitorRotate, v => Set(current with { MonitorRotate = v })));
         Setting(layout, "轮换间隔", "单位：秒", Number("轮换间隔", 2, 120, () => current.RotationSeconds, v => Set(current with { RotationSeconds = (int)v })));
         layout.Controls.Add(Hint("网速按活动物理网卡统计，避免 VPN 重复计数；单位为字节/秒，屏幕 K/M 对应 KiB/s、MiB/s（1024 进制），不是 Mbps。"));
-        var selected = Card(p, "显示指标", "同类优先，余项就近配对；奇数时最后一项单独显示。可在列表内滚动。", maxHeight: 480); selected.Controls.Add(metrics);
-        selected.Controls.Add(Button("应用指标选择", () => Set(current with { MonitorMetrics = metrics.SelectedKeys })));
+        var selected = Card(p, "显示指标", "勾选后立即生效；紧凑两行布局会用所选指标替换主题槽位。同类优先，余项就近配对。", maxHeight: 480); selected.Controls.Add(metrics);
+        metrics.SelectionChanged += () => { if (!loading) Set(current with { MonitorMetrics = metrics.SelectedKeys, MonitorMetricsCustom = true }); };
+        selected.Controls.Add(Button("应用指标选择", () => Set(current with { MonitorMetrics = metrics.SelectedKeys, MonitorMetricsCustom = true })));
         var fans = Card(p, "风扇额定转速", "输入额定最大 RPM，用于计算相对转速百分比。"); fanKey.PlaceholderText = "传感器键，例如 gpu0_fan0"; fanMax.PlaceholderText = "最大 RPM";
         Setting(fans, "风扇传感器", "使用显示指标中的传感器键", new InputSurface(fanKey, 256));
         Setting(fans, "额定最大转速", "单位：RPM", new InputSurface(fanMax, 160));

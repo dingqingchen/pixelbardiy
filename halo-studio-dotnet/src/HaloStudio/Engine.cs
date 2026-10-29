@@ -99,7 +99,7 @@ public sealed class Engine : IAsyncDisposable
                 }
                 cueKey = mode == "歌词" ? cue!.Key + ":" + s.Theme : "";
                 if (mode == "时钟" && s.IdleContent == "monitor") { mode = "系统监控"; text = ""; }
-                var clock = DateTime.Now; string key = $"{mode}|{text}|{cueKey}|{rev}|{(mode == "系统监控" ? metricRevision : 0)}|{(mode == "系统监控" && s.MonitorRotate ? (int)(elapsed / s.RotationSeconds) : 0)}|{(s.Animations ? (int)(elapsed / 2) : 0)}|{clock:yyyyMMdd}";
+                var clock = DateTime.Now; string key = $"{mode}|{text}|{cueKey}|{s.Theme}|{s.MonitorView}|{rev}|{(mode == "系统监控" ? metricRevision : 0)}|{(mode == "系统监控" && s.MonitorRotate ? (int)(elapsed / s.RotationSeconds) : 0)}|{(s.Animations ? (int)(elapsed / 2) : 0)}|{clock:yyyyMMdd}";
                 if (carActive && car != null)
                 {
                     if(!wasTelemetry || changed || now >= nextTelemetry)

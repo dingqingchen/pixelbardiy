@@ -25,7 +25,8 @@ public sealed class SensorTable : Control
 public sealed class MetricPicker : Panel
 {
     readonly Dictionary<string, MetricChip> chips = [];
-    bool arranging; int viewportLimit;
+    bool arranging; int viewportLimit; bool updating;
+    public event Action? SelectionChanged;
     public string[] SelectedKeys => chips.Where(x => x.Value.Checked).Select(x => x.Key).ToArray();
     public MetricPicker() { DoubleBuffered = true; ResizeRedraw = true; AutoScroll = true; BackColor = Palette.Card; Width = 700; Height = 100; Margin = new(0, 10, 0, 10); AccessibleName = "可滚动的显示指标列表"; }
     public void SetViewportLimit(int height) { if (viewportLimit == height) return; viewportLimit = height; PerformLayout(); }
@@ -34,7 +35,12 @@ public sealed class MetricPicker : Panel
         // Preserve pending selections across sensor polls; only add newly discovered metrics.
         if (snapshot.Metrics.All(m => chips.ContainsKey(m.Key))) return;
         SuspendLayout();
-        foreach (var m in snapshot.Metrics) if (!chips.ContainsKey(m.Key)) { var chip = new MetricChip(m.Name, m.Key) { Checked = selected.Contains(m.Key) }; chips.Add(m.Key, chip); Controls.Add(chip); }
+        updating = true;
+        try
+        {
+            foreach (var m in snapshot.Metrics) if (!chips.ContainsKey(m.Key)) { var chip = new MetricChip(m.Name, m.Key) { Checked = selected.Contains(m.Key) }; chip.Changed += () => { if (!updating) SelectionChanged?.Invoke(); }; chips.Add(m.Key, chip); Controls.Add(chip); }
+        }
+        finally { updating = false; }
         ResumeLayout(true);
     }
     protected override void OnLayout(LayoutEventArgs e)
@@ -61,7 +67,9 @@ public sealed class MetricPicker : Panel
 public sealed class MetricChip : CheckBox
 {
     readonly string title, key;
+    public event Action? Changed;
     public MetricChip(string title, string key) { this.title=title; this.key=key; Text=title; AccessibleName=title+" "+key; Cursor=Cursors.Hand; AutoSize=false; SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true); }
+    protected override void OnCheckedChanged(EventArgs e) { base.OnCheckedChanged(e); Changed?.Invoke(); }
     protected override void OnPaint(PaintEventArgs e)
     {
         var g=e.Graphics; g.Clear(Parent?.BackColor ?? Palette.Card); g.SmoothingMode=SmoothingMode.AntiAlias;

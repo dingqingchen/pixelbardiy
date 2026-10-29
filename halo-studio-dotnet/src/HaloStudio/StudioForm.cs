@@ -128,7 +128,16 @@ public sealed partial class StudioForm : Form
         string signature = string.Join("|", snap.Metrics.Select(m => m.Key + m.Text())); if (signature == sensorSignature) return; sensorSignature = signature;
         sensors.Update(snap); metrics.Update(snap, current.MonitorMetrics);
     }
-    void Set(Settings s) { if (loading) return; current = s.Validated(); engine.Configure(current); Sync(); }
+    void Set(Settings s)
+    {
+        if (loading) return;
+        bool previewChanged = current.IdleContent != s.IdleContent || current.MonitorView != s.MonitorView
+            || current.MonitorMetricsCustom != s.MonitorMetricsCustom || current.Themes != s.Themes
+            || !current.MonitorMetrics.SequenceEqual(s.MonitorMetrics);
+        current = s.Validated(); engine.Configure(current);
+        if (previewChanged) LoadThemes();
+        Sync();
+    }
     void Sync()
     {
         loading = true; try
@@ -168,7 +177,7 @@ public sealed partial class StudioForm : Form
     void LoadThemes()
     {
         gallery.SuspendLayout(); foreach (var tile in tiles) tile.Dispose(); tiles.Clear(); gallery.Controls.Clear();
-        foreach (var (key, design) in Designs.All) { var tile = new ThemeTile(key, design); tile.Click += (_, _) => Set(current with { Theme = tile.Key, Themes = true }); gallery.Controls.Add(tile); tiles.Add(tile); }
+        foreach (var (key, design) in Designs.All) { var tile = new ThemeTile(key, design, current); tile.Click += (_, _) => Set(current with { Theme = tile.Key, Themes = true }); gallery.Controls.Add(tile); tiles.Add(tile); }
         gallery.ResumeLayout(true);
 
     }
